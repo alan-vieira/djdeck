@@ -115,4 +115,4 @@ Bugs que impediam a aplicação de compilar ou de funcionar corretamente:
 - A playlist não é persistida entre execuções.
 - Não há crossfader, equalização nem hotcues.
 
-[0.1.0]: https://github.com/SEU-USUARIO/djdeck/releases/tag/v0.1.0
+[0.1.0]: https://github.com/alan-vieira/djdeck/releases/tag/v0.1.0

@@ -33,7 +33,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS YES)
 FetchContent_Declare(
     JUCE
     GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-    GIT_TAG origin/master
+    GIT_TAG 9.0.5          # tag versionada: build reprodutivel
     GIT_SHALLOW ON
     FIND_PACKAGE_ARGS 7.0.3 GLOBAL)
 
