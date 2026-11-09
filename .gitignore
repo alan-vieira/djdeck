@@ -1,0 +1,64 @@
+# ---- Build ----
+Builds/
+build/
+build-*/
+cmake-build-*/
+out/
+install/
+*.vcxproj
+*.vcxproj.*
+*.sln
+*.suo
+*.user
+CMakeLists.txt.user
+CMakeSettings.json
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+
+# ---- JUCE ----
+JuceLibraryCode/
+*.jucer
+juce_modules/
+!JUCE
+
+# ---- Artefatos / binarios ----
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.obj
+*.o
+*.pdb
+*.ilk
+*.exp
+*.app/
+*.dSYM/
+
+# ---- Arquivos de teste / diagnostico ----
+# Arquivos de diagnostico preservados fora do build (fora do glob do CMake)
+Scratch/
+*.wav
+*.aiff
+*.flac
+*.ogg
+*.mp3
+*.m4a
+*.aac
+*.log
+
+# ---- IDE / editor ----
+.vs/
+.vscode/
+.idea/
+*.swp
+*~
+.cache/
+compile_commands.json
+
+# ---- SO ----
+.DS_Store
+Thumbs.db
+desktop.ini
