@@ -2,6 +2,12 @@
 
 Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 
+> **Guia visual e de construção:** ver
+> [`DOCUMENTACAO_LAYOUT_UI.md`](DOCUMENTACAO_LAYOUT_UI.md) — paleta de cores
+> medida, divisão de layout, especificação dos componentes (big waveform,
+> mixer, EQ, VU meter, jog wheel, knobs, biblioteca) e as armadilhas da API
+> JUCE 9.
+
 ---
 
 ## Decisões de arquitetura
