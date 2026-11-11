@@ -98,9 +98,12 @@ void ChannelStripComponent::resized()
         sideColumn = controlsArea.removeFromLeft (juce::jmax (30, controlsArea.getWidth() / 4));
 
     // ---- Botao CUE e fader na coluna lateral ----
-    auto cueArea = sideColumn.removeFromTop (juce::jmin (26, sideColumn.getHeight() / 4));
-    cueButton.setBounds (cueArea.reduced (2));
+    // O botao CUE tem tamanho fixo para nao ficar truncado.
+    const auto cueSize = juce::jmin (24, sideColumn.getWidth() - 4);
+    auto cueArea = sideColumn.removeFromTop (cueSize);
+    cueButton.setBounds (cueArea.withSizeKeepingCentre (cueSize, cueSize));
 
+    // O volume fader ocupa o resto da coluna lateral.
     volumeFader.setBounds (sideColumn.reduced (2));
 
     // ---- Knobs empilhados na coluna principal ----

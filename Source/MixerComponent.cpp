@@ -13,17 +13,21 @@ MixerComponent::MixerComponent (DeckPlayer* playerAToUse, DeckPlayer* playerBToU
     addAndMakeVisible (crossfader);
 
     // ---- MIXING / LEVEL (rodape do mixer) ----
-    mixingKnob.setRange (0.0f, 1.0f, 0.01f);
-    mixingKnob.setValue (0.5f);
-    mixingKnob.setBipolar (false);
-    mixingKnob.addListener (this);
-    addAndMakeVisible (mixingKnob);
+    // MIXING: 0 = so deck A, 1 = so deck B, 0.5 = mistura equilibrada.
+    mixingFader.setRange (0.0, 1.0, 0.01);
+    mixingFader.setValue (0.5);
+    mixingFader.setSliderStyle (juce::Slider::LinearVertical);
+    mixingFader.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
+    mixingFader.addListener (this);
+    addAndMakeVisible (mixingFader);
 
-    levelKnob.setRange (0.0f, 1.0f, 0.01f);
-    levelKnob.setValue (0.7f);
-    levelKnob.setBipolar (false);
-    levelKnob.addListener (this);
-    addAndMakeVisible (levelKnob);
+    // LEVEL: volume geral (0 = silencio, 1 = maximo).
+    levelFader.setRange (0.0, 1.0, 0.01);
+    levelFader.setValue (0.7);
+    levelFader.setSliderStyle (juce::Slider::LinearVertical);
+    levelFader.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
+    levelFader.addListener (this);
+    addAndMakeVisible (levelFader);
 
     // O crossfader publica os ganhos; aplicamos nos DeckPlayers.
     crossfader.onGainsChanged = [this] (float gainA, float gainB)
@@ -49,9 +53,9 @@ void MixerComponent::sliderValueChanged (juce::Slider* slider)
 {
     // MIXING: 0 = so deck A, 1 = so deck B, 0.5 = mistura equilibrada.
     // Aplica como crossfade gain nos dois decks (mesma curva de potencia constante).
-    if (slider == &mixingKnob)
+    if (slider == &mixingFader)
     {
-        const auto t = static_cast<double> (mixingKnob.getValue());
+        const auto t = static_cast<double> (mixingFader.getValue());
         const auto gainA = static_cast<float> (std::cos (t * juce::MathConstants<double>::halfPi));
         const auto gainB = static_cast<float> (std::sin (t * juce::MathConstants<double>::halfPi));
         if (playerA != nullptr)
@@ -63,9 +67,9 @@ void MixerComponent::sliderValueChanged (juce::Slider* slider)
     }
 
     // LEVEL: volume geral (ganho linear aplicado em ambos os decks).
-    if (slider == &levelKnob)
+    if (slider == &levelFader)
     {
-        const auto gain = static_cast<float> (levelKnob.getValue());
+        const auto gain = static_cast<float> (levelFader.getValue());
         if (playerA != nullptr)
             playerA->setGain (gain);
         if (playerB != nullptr)
@@ -98,15 +102,15 @@ void MixerComponent::resized()
     // O crossfader fica no rodape, entre MIXING e LEVEL.
     auto footerArea = footer;
 
-    const auto knobSize = juce::jmin (56, footerArea.getHeight() - 8);
-    const auto knobWidth = knobSize + 44;   // knob + espaco para o rotulo
+    const auto faderWidth = juce::jmin (44, footerArea.getHeight() - 8);
+    const auto faderHeight = footerArea.getHeight() - 4;
 
-    auto mixingArea = footerArea.removeFromLeft (knobWidth);
-    auto levelArea = footerArea.removeFromRight (knobWidth);
+    auto mixingArea = footerArea.removeFromLeft (faderWidth + 24);  // fader + rotulo
+    auto levelArea  = footerArea.removeFromRight (faderWidth + 24);
 
     // O crossfader ocupa o que sobra no meio do rodape.
     crossfader.setBounds (footerArea.reduced (2));
 
-    mixingKnob.setBounds (mixingArea.withSizeKeepingCentre (knobSize, knobSize));
-    levelKnob.setBounds (levelArea.withSizeKeepingCentre (knobSize, knobSize));
+    mixingFader.setBounds (mixingArea.removeFromLeft (faderWidth).withSizeKeepingCentre (faderWidth, faderHeight));
+    levelFader.setBounds (levelArea.removeFromRight (faderWidth).withSizeKeepingCentre (faderWidth, faderHeight));
 }

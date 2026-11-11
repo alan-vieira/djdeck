@@ -4,20 +4,7 @@
 #include "ChannelStripComponent.h"
 #include "CrossfaderComponent.h"
 #include "DeckPlayer.h"
-#include "KnobComponent.h"
 
-//==============================================================================
-// Mixer central: dois canais + crossfader.
-//
-//   ┌─────────┬─────────────────────┬─────────┐
-//   │ canal A │    crossfader        │ canal B │
-//   │  (strip)│  + MIXING / LEVEL    │ (strip) │
-//   └─────────┴─────────────────────┴─────────┘
-//
-// O mixer NAO tem controle de ganho por fonte no juce::MixerAudioSource —
-// por isso o crossfader e aplicado dentro de cada DeckPlayer, antes da soma.
-//
-// Ver docs/DOCUMENTACAO_LAYOUT_UI.md §5.
 class MixerComponent : public juce::Component,
                        public juce::Slider::Listener
 {
@@ -33,10 +20,7 @@ public:
     double getCrossfaderPosition() const { return crossfader.getPosition(); }
 
 private:
-    // Aplica os ganhos do crossfader nos dois decks.
-    void applyCrossfaderGains();
-
-    // Slider::Listener — MIXING e LEVEL knobs.
+    // Slider::Listener — MIXING e LEVEL faders.
     void sliderValueChanged (juce::Slider* slider) override;
 
     ChannelStripComponent channelA;
@@ -46,11 +30,9 @@ private:
 
     // MIXING: escolhe o que se ouve no fone (0 = deck A, 1 = deck B,
     // 0.5 = mistura). LEVEL: volume geral do fone.
-    //
-    // Ambos sao knobs UNIPOLARES: o valor neutro e o centro do arco, mas o
-    // caminho e so para um lado.
-    KnobComponent mixingKnob { "MIXING" };
-    KnobComponent levelKnob  { "LEVEL" };
+    // Ambos sao sliders VERTICAIS (faders), nao knobs rotativos.
+    juce::Slider mixingFader { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
+    juce::Slider levelFader  { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
 
     DeckPlayer* playerA;
     DeckPlayer* playerB;
