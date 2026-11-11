@@ -73,7 +73,7 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         // Preenchimento: do handle ate o fundo.
         const auto handleY = bounds.getY() + bounds.getHeight() * (1.0f - sliderPos);
 
-        g.setColour (RekordboxColours::accent);
+        g.setColour (RekordboxColours::textDisabled);
         g.fillRoundedRectangle (centreX - 2.0f, handleY, 4.0f,
                                 bounds.getBottom() - handleY, 2.0f);
 
@@ -97,7 +97,7 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         // Preenchimento: do inicio ate o handle.
         const auto handleX = bounds.getX() + bounds.getWidth() * sliderPos;
 
-        g.setColour (RekordboxColours::accent);
+        g.setColour (RekordboxColours::textDisabled);
         g.fillRoundedRectangle (bounds.getX(), centreY - 2.0f, handleX - bounds.getX(), 4.0f, 2.0f);
 
         // Handle
