@@ -52,16 +52,16 @@ void MixerComponent::setCrossfaderPosition (double position)
 void MixerComponent::sliderValueChanged (juce::Slider* slider)
 {
     // MIXING: 0 = so deck A, 1 = so deck B, 0.5 = mistura equilibrada.
-    // Aplica como crossfade gain nos dois decks (mesma curva de potencia constante).
+    // Aplica como canal de cada deck (balanco), nao como crossfader principal.
     if (slider == &mixingFader)
     {
         const auto t = static_cast<double> (mixingFader.getValue());
         const auto gainA = static_cast<float> (std::cos (t * juce::MathConstants<double>::halfPi));
         const auto gainB = static_cast<float> (std::sin (t * juce::MathConstants<double>::halfPi));
         if (playerA != nullptr)
-            playerA->setCrossfadeGain (gainA);
+            playerA->setChannelGain (gainA);
         if (playerB != nullptr)
-            playerB->setCrossfadeGain (gainB);
+            playerB->setChannelGain (gainB);
         repaint();
         return;
     }
@@ -71,9 +71,9 @@ void MixerComponent::sliderValueChanged (juce::Slider* slider)
     {
         const auto gain = static_cast<float> (levelFader.getValue());
         if (playerA != nullptr)
-            playerA->setGain (gain);
+            playerA->setChannelGain (gain);
         if (playerB != nullptr)
-            playerB->setGain (gain);
+            playerB->setChannelGain (gain);
         repaint();
     }
 }
@@ -102,15 +102,23 @@ void MixerComponent::resized()
     // O crossfader fica no rodape, entre MIXING e LEVEL.
     auto footerArea = footer;
 
-    const auto faderWidth = juce::jmin (44, footerArea.getHeight() - 8);
-    const auto faderHeight = footerArea.getHeight() - 4;
+    // Layout do rodape: MIXING (esquerda) | Crossfader (centro, largo) | LEVEL (direita).
+    // MIXING e LEVEL sao faders verticais finos nas laterais; o crossfader
+    // horizontal ocupa todo o centro sobrante.
+    const auto sideWidth = juce::jmin (56, footerArea.getWidth() / 4);
 
-    auto mixingArea = footerArea.removeFromLeft (faderWidth + 24);  // fader + rotulo
-    auto levelArea  = footerArea.removeFromRight (faderWidth + 24);
+    auto mixingArea = footerArea.removeFromLeft (sideWidth);
+    auto levelArea  = footerArea.removeFromRight (sideWidth);
 
-    // O crossfader ocupa o que sobra no meio do rodape.
-    crossfader.setBounds (footerArea.reduced (2));
+    // O crossfader horizontal ocupa TODO o centro sobrante do rodape.
+    crossfader.setBounds (footerArea.reduced (4));
 
-    mixingFader.setBounds (mixingArea.removeFromLeft (faderWidth).withSizeKeepingCentre (faderWidth, faderHeight));
-    levelFader.setBounds (levelArea.removeFromRight (faderWidth).withSizeKeepingCentre (faderWidth, faderHeight));
+    // MIXING: fader vertical na lateral esquerda.
+    const auto faderWidth = juce::jmin (24, mixingArea.getHeight() - 8);
+    mixingFader.setBounds (mixingArea.removeFromLeft (faderWidth)
+                           .withSizeKeepingCentre (faderWidth, mixingArea.getHeight() - 4));
+
+    // LEVEL: fader vertical na lateral direita.
+    levelFader.setBounds (levelArea.removeFromRight (faderWidth)
+                          .withSizeKeepingCentre (faderWidth, levelArea.getHeight() - 4));
 }

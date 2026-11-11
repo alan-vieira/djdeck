@@ -28,8 +28,8 @@ public:
     // Timer: mantem as duas ondas sincronizadas com a reproducao.
     void timerCallback() override;
 
-    // Carrega a mesma faixa nos dois componentes (usado no carregamento).
-    void loadURL (const juce::URL& url);
+    // Carrega a URL apenas na onda do deck especificado (1 ou 2).
+    void loadURL(int deckId, const juce::URL& url);
 
     // Acesso as ondas, para o cabecalho do deck marcar os hot cues.
     BigWaveformComponent& getWaveformA() { return waveformA; }

@@ -7,6 +7,10 @@
 #include <juce_core/juce_core.h>
 #include "MainComponent.h"
 
+#if defined(_WIN32)
+ #include <windows.h>
+#endif
+
 struct ProjectInfo
 {
     static const char* const projectName;
@@ -33,7 +37,27 @@ public:
     void initialise(const juce::String& commandLine) override
     {
         juce::ignoreUnused(commandLine);
-        mainWindow.reset(new MainWindow(getApplicationName()));
+
+        try
+        {
+            mainWindow.reset(new MainWindow(getApplicationName()));
+        }
+        catch (const std::exception& e)
+        {
+#if defined(_WIN32)
+            ::MessageBoxA(nullptr, e.what(), "djdeck — erro ao iniciar", MB_ICONERROR | MB_OK);
+#else
+            juce::ignoreUnused(e);
+#endif
+        }
+        catch (...)
+        {
+#if defined(_WIN32)
+            ::MessageBoxA(nullptr, "Erro desconhecido ao iniciar o djdeck", "djdeck — erro ao iniciar",
+                          MB_ICONERROR | MB_OK);
+#else
+#endif
+        }
     }
 
     void shutdown() override

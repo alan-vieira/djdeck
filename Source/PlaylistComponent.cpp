@@ -343,25 +343,19 @@ void PlaylistComponent::loadSongAtRow(int row)
 
     const auto& song = songs.getReference (row);
 
-    // O duplo-clique carrega no Deck 1. Passamos tambem o BPM lido pelo
-    // TagLib, para o deck exibir no jog wheel e calcular o pitch correto.
+    // O duplo-clique carrega no Deck 1. Passamos também o BPM, título e artista
+    // lidos pelo TagLib, para o deck exibir metadados reais no cabeçalho.
     if (onSongSelected)
-        onSongSelected (juce::URL { song.file }, song.bpm);
+        onSongSelected (juce::URL { song.file }, song.bpm, song.title, song.artist, 1);
 }
 
 //==============================================================================
 void PlaylistComponent::mouseDoubleClick (const juce::MouseEvent& event)
 {
-    // Descobre em qual linha o duplo-clique aconteceu, usando a geometria
-    // da tabela (altura do cabeçalho + altura da linha).
+    // Forma segura e nativa do JUCE de obter a linha sob o mouse,
+    // convertendo coordenadas de tela para locais da tabela.
     const auto localPos = playlistTable.getLocalPoint (nullptr, event.getScreenPosition());
-    const auto headerHeight = playlistTable.getHeaderHeight();
-    const auto rowHeight = playlistTable.getRowHeight();
-
-    if (rowHeight <= 0)
-        return;
-
-    const int row = (localPos.y - headerHeight) / rowHeight;
+    const int row = playlistTable.getRowContainingPosition (localPos.x, localPos.y);
 
     if (row >= 0 && row < songs.size())
     {

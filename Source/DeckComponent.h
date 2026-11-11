@@ -78,15 +78,17 @@ public:
     // Timer para atualizar playhead e slider de posicao
     void timerCallback() override;
 
-    // Chamado pela playlist para carregar uma faixa neste deck
-    void loadFile (juce::URL audioURL);
-    void loadFile (juce::URL audioURL, double bpm);
+    // Chamado pela playlist para carregar uma faixa neste deck.
+    void loadFile(juce::URL audioURL, double bpm);
+    void loadFile(juce::URL audioURL, double bpm,
+                  const juce::String& title, const juce::String& artist);
 
     DeckPlayer* getPlayer() const { return player; }
     int getDeckId() const { return id; }
 
 private:
-    void loadFileURL (juce::URL audioURL);
+    void loadFileURL (juce::URL audioURL, const juce::String& title = {},
+                      const juce::String& artist = {});
     void updateHeaderTimes();
 
     int id;

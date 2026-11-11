@@ -163,3 +163,56 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags)
+
+#===============================================================================
+# Testes automatizados (opcional, ON por padrão)
+#
+# Desative com:  cmake -B Builds -DJDECK_ENABLE_TESTS=OFF ...
+# Ative com:     cmake -B Builds -DJDECK_ENABLE_TESTS=ON ...
+# Execute:       cmake --build Builds --config Debug --target djdeck_tests
+#                Builds/djdeck_artefacts/Debug/djdeck_tests.exe
+#
+# Dependencia: Catch2 v3 via FetchContent (fornece implementacoes .cpp completas).
+#===============================================================================
+option(DJDECK_ENABLE_TESTS "Build unit tests with Catch2" ON)
+
+if (DJDECK_ENABLE_TESTS)
+    FetchContent_Declare(
+        CATCH2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v3.5.2
+        GIT_SHALLOW ON)
+    FetchContent_MakeAvailable(CATCH2)
+
+    add_executable(djdeck_tests
+        tests/test_song.cpp
+        tests/test_deckplayer.cpp
+        tests/test_crossfader.cpp
+
+        # Implementacoes do projeto necessarias pelos testes
+        Source/Song.cpp
+        Source/DeckPlayer.cpp
+        Source/CrossfaderComponent.cpp
+    )
+
+    target_link_libraries(djdeck_tests PRIVATE
+        Catch2::Catch2WithMain
+        juce::juce_core
+        juce::juce_audio_basics
+        juce::juce_audio_formats
+        juce::juce_audio_utils
+    )
+
+    target_include_directories(djdeck_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+    )
+
+    target_compile_definitions(djdeck_tests PRIVATE
+        DJDECK_TESTS=1
+    )
+
+    # Os testes rodam como console app (sem janela GUI).
+    set_target_properties(djdeck_tests PROPERTIES
+        WIN32_EXECUTABLE FALSE
+    )
+endif()

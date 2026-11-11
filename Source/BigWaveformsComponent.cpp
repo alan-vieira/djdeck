@@ -53,8 +53,10 @@ void BigWaveformsComponent::timerCallback()
 }
 
 //==============================================================================
-void BigWaveformsComponent::loadURL (const juce::URL& url)
+void BigWaveformsComponent::loadURL(int deckId, const juce::URL& url)
 {
-    waveformA.loadURL (url);
-    waveformB.loadURL (url);
+    if (deckId == 1)
+        waveformA.loadURL(url);
+    else if (deckId == 2)
+        waveformB.loadURL(url);
 }

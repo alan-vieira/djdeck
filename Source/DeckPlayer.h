@@ -44,9 +44,16 @@ public:
     void stop();
     bool isPlaying() const;
 
-    // Ganho (0.0 a 1.0) — fader de canal
+    // Ganho (0.0 a 1.0) — fader de canal (LEVEL).
     void setGain(double gain);
     double getGain() const;
+
+    // Ganho de canal com nome explícito (usado pelo fader MIXING como balanço).
+    void setChannelGain(double gain);
+
+    // Estado CUE/PFL do deck.
+    void setCue(bool on);
+    bool isCue() const { return cueActive; }
 
     // TRIM — ganho de entrada, ±12 dB, neutro = 0 dB.
     void setTrimDb(double db);
@@ -112,6 +119,7 @@ private:
 
     // ---- Estado de DSP (thread de GUI escreve, thread de audio le) ----
     double trimDb = 0.0;
+    bool cueActive = false;
     double eqLowDb = 0.0;
     double eqMidDb = 0.0;
     double eqHighDb = 0.0;

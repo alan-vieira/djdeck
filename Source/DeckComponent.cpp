@@ -237,11 +237,17 @@ void DeckComponent::buttonClicked (juce::Button* button)
     {
         const auto pos = player->getPositionRelative();
         if (pos > 0.05)
-            player->setPositionRelative (pos - 0.05);
+            player->setPositionRelative(pos - 0.05);
+    }
+    // --- NOVO: Handler para o botao CUE (PFL / monitoramento de fone) ---
+    else if (button == &cueButton)
+    {
+        if (player != nullptr)
+            player->setCue(cueButton.getToggleState());
     }
 }
 
-void DeckComponent::sliderValueChanged (juce::Slider* slider)
+void DeckComponent::sliderValueChanged(juce::Slider* slider)
 {
     if (player == nullptr)
         return;
@@ -259,7 +265,7 @@ bool DeckComponent::isInterestedInFileDrag (const juce::StringArray& files)
 void DeckComponent::filesDropped (const juce::StringArray& files, int, int)
 {
     if (files.size() == 1)
-        loadFileURL (juce::URL { juce::File { files[0] } });
+        loadFileURL (juce::URL { juce::File { files[0] } }, juce::String(), juce::String());
 }
 
 //==============================================================================
@@ -298,7 +304,7 @@ void DeckComponent::itemDropped (const juce::DragAndDropTarget::SourceDetails& d
     if (auto* payload = PlaylistDragPayload::getFrom (details.description))
     {
         if (payload->file.existsAsFile())
-            loadFileURL (juce::URL { payload->file });
+            loadFileURL(juce::URL { payload->file }, juce::String(), juce::String());
     }
 }
 
@@ -333,14 +339,9 @@ void DeckComponent::updateHeaderTimes()
 }
 
 //==============================================================================
-void DeckComponent::loadFile (juce::URL audioURL)
-{
-    loadFileURL (audioURL);
-}
-
 void DeckComponent::loadFile (juce::URL audioURL, double bpm)
 {
-    loadFileURL (audioURL);
+    loadFileURL (audioURL, juce::String(), juce::String());
 
     // BPM lido da faixa: publica no player (para o jog wheel calcular o pitch
     // efetivo) e no proprio jog wheel, que exibe o valor no centro do disco.
@@ -349,7 +350,17 @@ void DeckComponent::loadFile (juce::URL audioURL, double bpm)
     jogWheel.setBpm (bpm);
 }
 
-void DeckComponent::loadFileURL (juce::URL audioURL)
+void DeckComponent::loadFile (juce::URL audioURL, double bpm,
+                              const juce::String& title, const juce::String& artist)
+{
+    loadFileURL (audioURL, title, artist);
+
+    if (player != nullptr)
+        player->setBpm (bpm);
+    jogWheel.setBpm (bpm);
+}
+
+void DeckComponent::loadFileURL (juce::URL audioURL, const juce::String& title, const juce::String& artist)
 {
     if (player == nullptr)
         return;
@@ -357,8 +368,9 @@ void DeckComponent::loadFileURL (juce::URL audioURL)
     player->loadURL (audioURL);
     waveformDisplay.loadURL (audioURL);
 
-    // O titulo vem do nome do arquivo, sem a extensao.
-    header.setTrackTitle (juce::File (audioURL.getLocalFile()).getFileNameWithoutExtension());
+    // Usa os metadados reais do TagLib quando disponiveis; caso contrario, o nome do arquivo.
+    header.setTrackTitle (title.isNotEmpty() ? title : juce::File (audioURL.getLocalFile()).getFileNameWithoutExtension());
+    header.setTrackArtist (artist);
     header.setBpm (player->getBpm());
 
     updateHeaderTimes();

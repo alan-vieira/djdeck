@@ -32,13 +32,22 @@ MainComponent::MainComponent()
     library = std::make_unique<LibraryComponent>();
 
     // Duplo-clique numa faixa da lista carrega no Deck 1.
-    library->getTrackList().onSongSelected = [this] (const juce::URL& url, double bpm)
+    library->getTrackList().onSongSelected = [this] (const juce::URL& url, double bpm,
+                                                     const juce::String& title,
+                                                     const juce::String& artist, int targetDeckId)
     {
-        if (deck1 != nullptr)
-            deck1->loadFile (url, bpm);
-
-        if (bigWaveforms != nullptr)
-            bigWaveforms->loadURL (url);
+        if (targetDeckId == 1 && deck1 != nullptr)
+        {
+            deck1->loadFile (url, bpm, title, artist);
+            if (bigWaveforms != nullptr)
+                bigWaveforms->loadURL (1, url);
+        }
+        else if (targetDeckId == 2 && deck2 != nullptr)
+        {
+            deck2->loadFile (url, bpm, title, artist);
+            if (bigWaveforms != nullptr)
+                bigWaveforms->loadURL (2, url);
+        }
     };
 
     addAndMakeVisible(*globalHeader);

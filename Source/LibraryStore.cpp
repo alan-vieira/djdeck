@@ -78,14 +78,16 @@ juce::Array<Song> LibraryStore::load()
         juce::XmlDocument document (file);
 
         // getDocumentElement() retorna um unique_ptr<XmlElement> no JUCE 9.
-        auto* root = document.getDocumentElement().get();
+        // Manter o unique_ptr no escopo (rootPtr) para nao deixar root como
+        // ponteiro pendente (dangling pointer) apos o temporario ser destruido.
+        auto rootPtr = document.getDocumentElement();
 
-        if (root == nullptr || ! root->hasTagName ("djdeckLibrary"))
+        if (rootPtr == nullptr || ! rootPtr->hasTagName ("djdeckLibrary"))
             return result;
 
-        for (int i = 0; i < root->getNumChildElements(); ++i)
+        for (int i = 0; i < rootPtr->getNumChildElements(); ++i)
         {
-            auto* element = root->getChildElement (i);
+            auto* element = rootPtr->getChildElement (i);
 
             if (element == nullptr || ! element->hasTagName ("track"))
                 continue;

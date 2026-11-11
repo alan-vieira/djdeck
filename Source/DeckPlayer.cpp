@@ -60,6 +60,14 @@ void DeckPlayer::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToF
             filterHighPass.processSamples(samples, numSamples);
     }
 
+    // Log diagnostico: mostra se o buffer tem sinal (ajuda a depurar sem som)
+    {
+        auto mag0 = buffer.getMagnitude (0, startSample, numSamples);
+        auto mag1 = buffer.getNumChannels() > 1 ? buffer.getMagnitude (1, startSample, numSamples) : 0.0f;
+        juce::Logger::writeToLog ("DeckPlayer::getNextAudioBlock mag0=" + juce::String (mag0, 6)
+                                  + " mag1=" + juce::String (mag1, 6));
+    }
+
     // Nivel RMS do bloco, por canal, publicado ja em dB. A conversao RMS->dB
     // e cara demais para repetir a 30 Hz na thread de GUI.
     for (int ch = 0; ch < juce::jmin (2, buffer.getNumChannels()); ++ch)
@@ -137,6 +145,11 @@ void DeckPlayer::applyGain()
                       * juce::jlimit(0.0f, 1.0f, static_cast<float>(channelGain))
                       * juce::jlimit(0.0f, 1.0f, static_cast<float>(crossfadeGain));
 
+    juce::Logger::writeToLog ("DeckPlayer::applyGain linear=" + juce::String (linear)
+                              + " trimDb=" + juce::String (trimDb)
+                              + " channelGain=" + juce::String (channelGain)
+                              + " crossfadeGain=" + juce::String (crossfadeGain));
+
     transportSource.setGain(linear);
 }
 
@@ -145,13 +158,27 @@ void DeckPlayer::loadURL(juce::URL audioURL)
 {
     juce::File file = audioURL.getLocalFile();
     if (!file.existsAsFile())
+    {
+        juce::Logger::writeToLog ("DeckPlayer::loadURL arquivo nao existe: " + audioURL.toString (false));
         return;
+    }
+
+    juce::Logger::writeToLog ("DeckPlayer::loadURL carregando: " + file.getFullPathName());
+
+    // Parar o transporte antes de trocar a fonte para evitar race condition
+    // com a thread de audio (getNextAudioBlock) e cliques audiveis.
+    const bool wasPlaying = transportSource.isPlaying();
+    if (wasPlaying)
+        transportSource.stop();
 
     // createReaderFor() retorna um ponteiro cru: temos que devolvê-lo ao
     // AudioFormatReaderSource (que o deleta quando destruído).
     std::unique_ptr<juce::AudioFormatReader> reader (formatManager.createReaderFor(file));
     if (reader == nullptr)
+    {
+        juce::Logger::writeToLog ("DeckPlayer::loadURL createReaderFor retornou null");
         return;
+    }
 
     // Guarda a taxa ANTES de soltar o reader: o transporte precisa corrigir a
     // taxa do arquivo para a taxa do dispositivo de saída.
@@ -160,8 +187,13 @@ void DeckPlayer::loadURL(juce::URL audioURL)
     auto newSource = std::make_unique<juce::AudioFormatReaderSource>(reader.release(), true);
 
     transportSource.setSource(newSource.get(), 0, nullptr, sourceSampleRate);
-
     readerSource = std::move(newSource);
+
+    // Retomar a reproducao se estava tocando antes da troca.
+    if (wasPlaying)
+        transportSource.start();
+
+    juce::Logger::writeToLog ("DeckPlayer::loadURL carregado com sucesso, sampleRate=" + juce::String (sourceSampleRate));
 }
 
 void DeckPlayer::start()      { transportSource.start(); }
@@ -175,6 +207,17 @@ void DeckPlayer::setGain(double gain)
 }
 
 double DeckPlayer::getGain() const { return channelGain; }
+
+void DeckPlayer::setChannelGain(double gain)
+{
+    channelGain = juce::jlimit(0.0, 1.0, gain);
+    applyGain();
+}
+
+void DeckPlayer::setCue(bool on)
+{
+    cueActive = on;
+}
 
 //==============================================================================
 void DeckPlayer::setTrimDb(double db)
