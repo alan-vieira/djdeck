@@ -30,11 +30,7 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 
 ## Geral
 
-- [ ] **Esquema de cores e gráficos de UI customizados** — hoje a interface usa
-  os componentes padrão do JUCE com um `LookAndFeel_V4`.
-  O layout seguirá a **temática do Rekordbox**: biblioteca de faixas à
-  esquerda, decks dispostos lado a lado à direita, tema escuro e alto
-  contraste entre a waveform e o fundo.
+- [x] **Esquema de cores e gráficos de UI customizados** — `RekordboxColours` + `RekordboxLookAndFeel` implementados, paleta medida no Rekordbox.
 - [ ] **Fonte customizada** (open source) — hoje usa a fonte padrão do sistema.
 - [ ] **Lógica de interpolação** (pitch e afinação) — hoje o pitch é alterado
   por *resampling* simples, o que desloca a duração. O objetivo é manter a
@@ -46,11 +42,10 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 
 ## Mixer
 
-- [ ] **Filtro** — passa-baixa / passa-alta.
-- [ ] **Equalizador de 3 bandas** (low / mid / high).
-- [ ] **Controle de crossfade** entre os decks.
-- [ ] **Gain por player** — o ganho já existe por deck (slider de 0.0 a 1.0);
-      falta implementar o balanceamento de crossfade entre eles.
+- [x] **Filtro** — passa-baixa / passa-alta.
+- [x] **Equalizador de 3 bandas** (low / mid / high).
+- [x] **Controle de crossfade** entre os decks.
+- [x] **Gain por player** — o ganho já existe por deck (slider de 0.0 a 1.0); o balanceamento de crossfade entre eles está implementado via `MixerComponent`.
 
 ---
 
@@ -75,7 +70,9 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 - [x] **Persistir a biblioteca** — gravada em XML no diretório de dados da
       aplicação (`%APPDATA%/djdeck/library.xml`), com escrita atômica
       (arquivo temporário + rename). Faixas cujo arquivo não existe mais são
-      ignoradas na carga; os metadados são relidos do disco.
+      ignoradas na carga; os metadados são relidos do disco. O parsing de XML
+      é envolvido em `try/catch` para não derrubar o app se o arquivo estiver
+      corrompido.
 
 #### Como os projetos de referência persistem
 

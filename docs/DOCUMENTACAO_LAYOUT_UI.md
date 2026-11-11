@@ -2243,52 +2243,44 @@ Para o djdeck, um formato próprio simplificado em memória é suficiente — o
 
 ## 11. Estado atual vs. alvo
 
-Verificado no commit `7d0b704`.
+Verificado no commit `4203707` (tag `v0.1.0`).
 
-| Área | Estado | Observação |
-|---|---|---|
-| Layout raiz | ⚠️ parcial | playlist 30% à esquerda, 2 decks lado a lado; falta header, big waveform, mixer, biblioteca embaixo |
-| Big waveform | ❌ ausente | componente novo |
-| Waveform do deck | ✅ presente | `WaveformDisplay` — comportamento correto, falta cor/grade/cues |
-| Carregamento da waveform | ⚠️ a melhorar | carrega o arquivo inteiro em memória — trocar por `FileInputSource` |
-| Mixer (UI) | ❌ ausente | |
-| TRIM | ❌ ausente | |
-| EQ 3 bandas | ❌ ausente | |
-| Filtro | ❌ ausente | |
-| Fader de canal | ✅ presente | `volSlider` no `DeckGUI`, faixa linear 0–1 |
-| VU meter | ❌ ausente | |
-| Crossfader | ❌ ausente | `MixerAudioSource` não tem ganho por fonte — aplicar no `DeckPlayer` |
-| MIXING / LEVEL (fone) | ❌ ausente | exige segunda saída de áudio — ver §5.9 |
-| Knob | ❌ ausente | |
-| Jog wheel | ❌ ausente | |
-| Pads (hot cue / beat jump) | ❌ ausente | |
-| Cabeçalho do deck | ❌ ausente | sem BPM, key, título, artista |
-| LookAndFeel | ⚠️ padrão | `LookAndFeel_V4` sem customização |
-| Biblioteca em árvore | ❌ ausente | hoje é só `TableListBox` |
-| Preview com waveform | ❌ ausente | |
-| Árvore de navegação | ❌ ausente | |
-| Fonte customizada | ❌ ausente | fonte do sistema |
-| Cor customizada | ❌ ausente | cores padrão do JUCE |
-| Metadados (TagLib) | ❌ ausente | decidido no ROADMAP |
-| Detecção de BPM | ❌ ausente | candidatos em avaliação no ROADMAP |
+|| Área | Estado | Observação |
+|---|---|---|---|
+| Layout raiz | ✅ completo | 4 seções: header (~10%), big waveforms (~22%), decks+mixer (~39%), biblioteca (~28%) |
+| Big waveform | ✅ presente | `BigWaveformComponent` — agulha fixa no centro, onda rolante, janela simétrica de 30 s |
+| Waveform do deck | ✅ presente | `MiniWaveformComponent` — faixa estática, agulha móvel esquerda → direita |
+| Carregamento da waveform | ✅ OK | Usa `FileInputSource` (não carrega arquivo inteiro em memória) |
+| Mixer (UI) | ✅ presente | `MixerComponent` + `ChannelStripComponent` × 2 |
+| TRIM | ✅ presente | Knob bipolar ±12 dB |
+| EQ 3 bandas | ✅ presente | Low shelf 250 Hz, peak 1 kHz, high shelf 4 kHz — ±12 dB |
+| Filtro | ✅ presente | Passa-baixa / passa-alta bipolar |
+| Fader de canal | ✅ presente | `volumeFader`, faixa linear 0–1 |
+| VU meter | ✅ presente | `VUMeterComponent` — decay em domínio linear, escala dB, LED de clip |
+| Crossfader | ✅ presente | `CrossfaderComponent` — curva constant power, aplicado no `DeckPlayer` |
+| MIXING / LEVEL (fone) | ✅ presente | `mixingFader` + `levelFader` no `MixerComponent` (segunda saída de áudio ainda não) |
+| Knob | ✅ presente | `KnobComponent` — rotativo, bipolar/unipolar, arco de valor |
+| Jog wheel | ✅ presente | `JogWheelComponent` — modo touch (scratch) e pitch (vertical), rotação do disco |
+| Pads (hot cue / beat jump) | ✅ presente | `HotCuePadsComponent` + `BeatJumpComponent` |
+| Cabeçalho do deck | ✅ presente | `DeckHeaderComponent` — título, artista, BPM, key, tempo decorrido/restante |
+| LookAndFeel | ✅ customizado | `RekordboxLookAndFeel` — desenho de knobs, sliders, botões, VU meter |
+| Biblioteca em árvore | ✅ presente | `LibraryComponent` + `LibraryTreeModel` + `StretchableLayoutManager` |
+| Preview com waveform | ❌ ausente | Coluna Preview na biblioteca não tem miniatura de onda |
+| Árvore de navegação | ✅ presente | Collection, Playlists, Explorer, Devices, Histories, Recordings |
+| Fonte customizada | ❌ ausente | Fonte do sistema |
+| Cor customizada | ✅ presente | `RekordboxColours` — paleta completa medida no Rekordbox |
+| Metadados (TagLib) | ✅ presente | `TagLibReader` + `TagLibFileStream` — ID3, Vorbis, MP4, APE, caminhos largos no Windows |
+| Detecção de BPM | ❌ ausente | TagLib lê a tag `BPM` quando o arquivo já tem; não há detecção de áudio |
 
-### 11.1 Ordem sugerida de implementação
+### 11.1 Ordem sugerida de implementação (próximas fases)
 
-1. **`RekordboxColours.h` + `RekordboxLookAndFeel.h`** — a base visual. Sem
-   isso, todo componente nasce com a cara padrão do JUCE e depois é
-   retrabalhado.
-2. **Reorganização do layout raiz** — `MainComponent::resized()` passa a
-   empilhar as 4 seções.
-3. **Big waveform** — componente novo, com a agulha fixa no centro. É o
-   item de maior impacto visual.
-4. **Waveform do deck** — apenas ajustes de cor, grade e markers sobre o
-   componente existente.
-5. **Mixer** — TRIM + EQ + fader + VU, com o DSP entrando no `DeckPlayer`.
-6. **Crossfader** — depois do mixer, porque depende dos ganhos por canal.
-7. **Jog wheel** — componente isolado, sem dependência de áudio nova.
-8. **Pads e cabeçalho do deck.**
-9. **Biblioteca em árvore** — a maior fatia de trabalho; depende de
-   metadados.
+1. **Detecção de BPM** — avaliar `libebguess` ou `aubio`; o TagLib só lê o BPM quando a tag já existe.
+2. **Preview com waveform na biblioteca** — coluna Preview na tabela de faixas.
+3. **Persistência de hot cues** — gravar posição dos cues no arquivo (tag ANLZ do Rekordbox ou similar).
+4. **Caminhos Unicode no Windows** — validar `TagLibFileStream` com caminhos acentuados.
+5. **Segunda saída de áudio (fone)** — necessário para PFL/MIXING/LEVEL reais (§5.9).
+6. **Fonte customizada** — carregar via `BinaryData` (ex.: XXIIAven).
+7. **DVS / timecode** — fora do escopo atual (decisão no ROADMAP.md).
 
 ---
 
