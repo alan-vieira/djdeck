@@ -12,29 +12,46 @@ MainComponent::MainComponent()
     deckPlayer1 = std::make_unique<DeckPlayer>(formatManager);
     deckPlayer2 = std::make_unique<DeckPlayer>(formatManager);
 
-    deckGUI1 = std::make_unique<DeckGUI>(1, deckPlayer1.get(),
-                                         formatManager,
-                                         thumbnailCache);
+    // Deck 1: Beat Jump à esquerda, jog wheel à direita (não espelhado).
+    // Deck 2: Hot Cue à direita, jog wheel à esquerda (espelhado).
+    deck1 = std::make_unique<DeckComponent>(1, false, false,
+                                             deckPlayer1.get(),
+                                             formatManager,
+                                             thumbnailCache);
 
-    deckGUI2 = std::make_unique<DeckGUI>(2, deckPlayer2.get(),
-                                         formatManager,
-                                         thumbnailCache);
+    deck2 = std::make_unique<DeckComponent>(2, true, true,
+                                             deckPlayer2.get(),
+                                             formatManager,
+                                             thumbnailCache);
 
-    playlist = std::make_unique<PlaylistComponent>();
+    // Seções do layout raiz.
+    globalHeader = std::make_unique<GlobalHeaderComponent>();
+    bigWaveforms = std::make_unique<BigWaveformsComponent>(formatManager, thumbnailCache,
+                                                            deckPlayer1.get(), deckPlayer2.get());
+    mixer = std::make_unique<MixerComponent>(deckPlayer1.get(), deckPlayer2.get());
+    library = std::make_unique<LibraryComponent>();
 
-    // Duplo-clique numa faixa da playlist carrega no Deck 1.
+    // Duplo-clique numa faixa da lista carrega no Deck 1.
     // O arrraste da faixa até um deck funciona por drag-and-drop nativo do
     // JUCE: a PlaylistComponent fornece o payload (getDragSourceDescription)
-    // e o DeckGUI recebe o drop (itemDropped).
-    playlist->onSongSelected = [this] (const juce::URL& url)
+    // e o DeckComponent recebe o drop (itemDropped).
+    library->getTrackList().onSongSelected = [this] (const juce::URL& url, double bpm)
     {
-        if (deckGUI1 != nullptr)
-            deckGUI1->loadFile (url);
+        if (deck1 != nullptr)
+            deck1->loadFile (url, bpm);
+
+        // O mesmo carregamento e refletido nas ondas rolantes do topo,
+        // para o usuario ver a forma de onda da faixa selecionada.
+        if (bigWaveforms != nullptr)
+            bigWaveforms->loadURL (url);
     };
 
-    addAndMakeVisible(*deckGUI1);
-    addAndMakeVisible(*deckGUI2);
-    addAndMakeVisible(*playlist);
+    addAndMakeVisible(*globalHeader);
+    addAndMakeVisible(*bigWaveforms);
+    addAndMakeVisible(*deck1);
+    addAndMakeVisible(*mixer);
+    addAndMakeVisible(*deck2);
+    addAndMakeVisible(*library);
     addAndMakeVisible(settingsButton);
 
     settingsButton.addListener(this);
@@ -91,30 +108,65 @@ void MainComponent::releaseResources()
 //==============================================================================
 void MainComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::black);
+    g.fillAll(RekordboxColours::background);
 }
 
 void MainComponent::resized()
 {
     auto area = getLocalBounds();
 
-    // Botão settings no topo
-    settingsButton.setBounds(area.removeFromTop(40).removeFromRight(150));
-
-    // Playlist à esquerda (30% da largura)
-    if (playlist != nullptr)
+    // ---- Seção 1: header (~10%) ----
     {
-        auto playlistWidth = static_cast<int>(area.getWidth() * 0.30f);
-        playlist->setBounds(area.removeFromLeft(playlistWidth));
+        const auto headerHeight = juce::jlimit (40, 90, area.getHeight() / 10);
+
+        if (globalHeader != nullptr)
+            globalHeader->setBounds (area.removeFromTop (headerHeight));
     }
 
-    // Área restante para os 2 decks lado a lado
-    if (deckGUI1 != nullptr && deckGUI2 != nullptr)
+    // ---- Seção 2: big waveforms (~22%) ----
     {
-        auto decksArea = area;
-        int halfW = decksArea.getWidth() / 2;
-        deckGUI1->setBounds(decksArea.removeFromLeft(halfW));
-        deckGUI2->setBounds(decksArea);
+        const auto waveformHeight = juce::jlimit (80, 220, area.getHeight() / 5);
+
+        if (bigWaveforms != nullptr)
+            bigWaveforms->setBounds (area.removeFromTop (waveformHeight));
+    }
+
+    // ---- Seção 3: decks + mixer (~39%) ----
+    {
+        const auto decksHeight = juce::jlimit (200, 400,
+                                  static_cast<int> (area.getHeight() * 0.39));
+
+        auto decksArea = area.removeFromTop (decksHeight);
+
+        // Colunas: deck A ~45%, mixer ~10%, deck B ~45%.
+        if (deck1 != nullptr && mixer != nullptr && deck2 != nullptr)
+        {
+            const auto totalWidth = decksArea.getWidth();
+            const auto mixerWidth = juce::jlimit (140, 260, totalWidth / 10);
+            const auto deckWidth = (totalWidth - mixerWidth) / 2;
+
+            // Posicoes explicitas: deck A | mixer | deck B.
+            deck1->setBounds (decksArea.getX(), decksArea.getY(), deckWidth, decksArea.getHeight());
+
+            mixer->setBounds (decksArea.getX() + deckWidth, decksArea.getY(),
+                              mixerWidth, decksArea.getHeight());
+
+            deck2->setBounds (decksArea.getX() + deckWidth + mixerWidth, decksArea.getY(),
+                              totalWidth - deckWidth - mixerWidth, decksArea.getHeight());
+        }
+    }
+
+    // ---- Seção 4: biblioteca (~28%) ----
+    {
+        if (library != nullptr)
+            library->setBounds (area);
+    }
+
+    // Botão de settings, sobreposto ao header.
+    if (globalHeader != nullptr)
+    {
+        auto headerBounds = globalHeader->getBounds();
+        settingsButton.setBounds (headerBounds.removeFromRight (110).reduced (4, 8));
     }
 }
 

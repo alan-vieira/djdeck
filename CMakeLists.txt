@@ -39,6 +39,61 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(JUCE)
 
+#===============================================================================
+# TagLib — leitura e escrita de metadados de audio.
+#
+# Decisao registrada em docs/ROADMAP.md. Le e escreve tags ID3 (MP3),
+# Vorbis Comments (OGG/FLAC/Opus), MP4 (M4A) e APE.
+#
+# Configuracao:
+#   - Build estatico (BUILD_SHARED_LIBS OFF) e com o mesmo runtime /MT do app.
+#     Sem ENABLE_STATIC_RUNTIME, o TagLib seria compilado com /MD e o link
+#     falharia com LNK2038 (runtime mismatch) contra o /MT do djdeck.
+#   - WITH_ZLIB OFF: zlib so e necessario para descomprimir DADOS de audio.
+#     Os metadados ficam em blocos nao comprimidos (ID3, Vorbis Comments,
+#     FLAC METADATA_BLOCK, atoms MP4). Desligar remove a dependencia e
+#     elimina o risco de linkar uma zlib /MD contra o app /MT.
+#   - Formatos exoticos desligados (ASF, MOD, Shorten, TrueAudio, DSF,
+#     Matroska): nao usados pelo djdeck e cada um adiciona tempo de build.
+#   - BUILD_TESTING OFF: o TagLib procuraria CppUnit, que nao existe aqui.
+#   - BUILD_BINDINGS OFF: as bindings C do TagLib nao sao usadas.
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(BUILD_BINDINGS OFF CACHE BOOL "" FORCE)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(ENABLE_STATIC_RUNTIME ON CACHE BOOL "" FORCE)
+set(WITH_ZLIB OFF CACHE BOOL "" FORCE)
+set(WITH_ASF OFF CACHE BOOL "" FORCE)
+set(WITH_MOD OFF CACHE BOOL "" FORCE)
+set(WITH_SHORTEN OFF CACHE BOOL "" FORCE)
+set(WITH_TRUEAUDIO OFF CACHE BOOL "" FORCE)
+set(WITH_DSF OFF CACHE BOOL "" FORCE)
+set(WITH_MATROSKA OFF CACHE BOOL "" FORCE)
+
+# utfcpp — dependencia header-only do TagLib (UTF-8 <-> UTF-16).
+#
+# O TagLib normalmente usa o proprio submodule 3rdparty/utfcpp, mas
+# FetchContent com GIT_SHALLOW nao popula submodules. Buscamos o utfcpp
+# separadamente e apontamos a variavel de cache que o TagLib procura via
+# find_path.
+FetchContent_Declare(
+    UTF8CPP
+    GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
+    GIT_TAG v4.2.1
+    GIT_SHALLOW ON)
+FetchContent_MakeAvailable(UTF8CPP)
+
+# O nome das variaveis de FetchContent e MINUSCULO: `utf8cpp_SOURCE_DIR`.
+set(utf8cpp_INCLUDE_DIR "${utf8cpp_SOURCE_DIR}/source"
+    CACHE PATH "Include directory for utfcpp")
+
+FetchContent_Declare(
+    TAGLIB
+    GIT_REPOSITORY https://github.com/taglib/taglib.git
+    GIT_TAG v2.3.2          # tag versionada: build reprodutivel
+    GIT_SHALLOW ON)
+
+FetchContent_MakeAvailable(TAGLIB)
+
 juce_add_gui_app(djdeck)
 
 file(GLOB_RECURSE SourceFiles
@@ -51,7 +106,49 @@ list(FILTER SourceFiles EXCLUDE REGEX "/Scratch/")
 
 target_sources("${PROJECT_NAME}" PRIVATE ${SourceFiles})
 
+# O target do TagLib chama-se `tag` (o nome `TagLib::taglib` so existe no
+# pacote instalado). O target `tag` expoe apenas os include dirs de
+# INSTALL_INTERFACE, entao os diretorios de include do codigo-fonte e do
+# build precisam ser declarados aqui para o codigo do djdeck.
+#
+# Os headers do TagLib incluem uns aos outros por nome curto ("tfile.h",
+# "taglib_export.h"), e cada um vive no seu subdiretorio (toolkit, mpeg,
+# mpeg/id3v2, ogg, flac, mp4, ...). Por isso precisamos de TODOS esses
+# diretorios no include path, nao apenas da raiz.
+#
+# A raiz `taglib/` tambem e necessaria: e onde esta o `taglib_export.h`, e o
+# target `tag` do proprio TagLib a recebe implicitamente (CMake sempre
+# adiciona o source dir e o binary dir do target ao include path) — o nosso
+# target, que vive na raiz do projeto, nao recebe.
+set(TAGLIB_INCLUDE_DIRS
+    ${taglib_SOURCE_DIR}/taglib/toolkit
+    ${taglib_SOURCE_DIR}/taglib/mpeg
+    ${taglib_SOURCE_DIR}/taglib/mpeg/id3v2
+    ${taglib_SOURCE_DIR}/taglib/mpeg/id3v2/frames
+    ${taglib_SOURCE_DIR}/taglib/mpeg/id3v1
+    ${taglib_SOURCE_DIR}/taglib/ogg
+    ${taglib_SOURCE_DIR}/taglib/ogg/flac
+    ${taglib_SOURCE_DIR}/taglib/ogg/vorbis
+    ${taglib_SOURCE_DIR}/taglib/ogg/speex
+    ${taglib_SOURCE_DIR}/taglib/ogg/opus
+    ${taglib_SOURCE_DIR}/taglib/flac
+    ${taglib_SOURCE_DIR}/taglib/ape
+    ${taglib_SOURCE_DIR}/taglib/mpc
+    ${taglib_SOURCE_DIR}/taglib/wavpack
+    ${taglib_SOURCE_DIR}/taglib/mp4
+    ${taglib_SOURCE_DIR}/taglib/riff
+    ${taglib_SOURCE_DIR}/taglib/riff/aiff
+    ${taglib_SOURCE_DIR}/taglib/riff/wav)
+
+target_include_directories("${PROJECT_NAME}" PRIVATE
+    ${taglib_SOURCE_DIR}          # taglib/fileref.h
+    ${taglib_SOURCE_DIR}/taglib   # taglib_export.h
+    ${taglib_BINARY_DIR}          # config.h e taglib_config.h gerados
+    ${utf8cpp_SOURCE_DIR}/source  # utf8.h, exigido pelos headers do TagLib
+    ${TAGLIB_INCLUDE_DIRS})       # "tfile.h", "toolkit/tstring.h", ...
+
 target_link_libraries("${PROJECT_NAME}" PRIVATE
+    tag
     juce::juce_audio_basics
     juce::juce_audio_devices
     juce::juce_audio_formats

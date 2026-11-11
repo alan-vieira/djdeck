@@ -68,14 +68,53 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 
 - [x] **Arrastar “track” para o player** — implementado na v0.1.0 com
       drag-and-drop nativo do JUCE e payload tipado.
-- [ ] **Biblioteca para metadados** → **TagLib** (decidido).
-      Vai substituir o preenchimento manual de título/artista/duração.
-- [ ] **Listar metadados na playlist** — colunas de título, artista, álbum e
-      BPM.
+- [x] **Biblioteca para metadados** → **TagLib** (decidido).
+      TagLib v2.3.2 integrado via `FetchContent`, com build estático e o
+      mesmo runtime `/MT` do app. Le e escreve tags ID3 (MP3), Vorbis
+      Comments (OGG/FLAC/Opus), MP4 (M4A) e APE.
+- [x] **Persistir a biblioteca** — gravada em XML no diretório de dados da
+      aplicação (`%APPDATA%/djdeck/library.xml`), com escrita atômica
+      (arquivo temporário + rename). Faixas cujo arquivo não existe mais são
+      ignoradas na carga; os metadados são relidos do disco.
+
+#### Como os projetos de referência persistem
+
+Comparação com `TheAudioProgrammer/juceDjApp` e `dubstep-warrior/DJDecks`
+(ambos JUCE C++), verificados no código:
+
+| | juceDjApp | DJDecks | djdeck |
+|---|---|---|---|
+| Formato | XML (`XmlElement`) | XML (`ValueTree` → `writeToStream`) | XML (`XmlElement`) |
+| Local | `~/Music/TAP DJ App/Playlist.xml` | caminho **hardcoded** `C:/Otodecks/...` | `%APPDATA%/djdeck/library.xml` |
+| Grava quando | ao adicionar faixa | só no destructor | ao adicionar **e** no destructor |
+| Metadados | TagLib (`TagReader`) | — | TagLib (`TagLibReader`) |
+| Estrutura | `TABLE_DATA` → `HEADERS`/`COLUMN` + `LIBRARY`/`AUDIOFILE` | `ValueTree("main")` → pastas → faixas | `djdeckLibrary` → `track` |
+
+Três lições aplicadas:
+1. **XML** é o formato que os dois usam — mantém o djdeck alinhado.
+2. **`writeTo()`** no lugar de `writeToFile()` (depreciada no JUCE 9).
+3. **Gravar ao adicionar, não só no destructor** — o DJDecks perde a lista
+   montada se o app cair; o djdeck grava nos dois momentos.
+
+O `juce::ValueTree` do DJDecks é uma abstração de árvore mais elegante que o
+`XmlElement` cru. Fica como melhoria futura se a biblioteca ganhar playlists
+e folders aninhados.
+
+- [x] **Listar metadados na playlist** — colunas de título, artista, BPM,
+      key, álbum, gênero, rating (5 estrelas) e duração.
+- [ ] **Caminhos Unicode no Windows** — o `FileStream` do próprio TagLib
+      usa `fopen(const char*)`, que depende da codepage ANSI. O djdeck usa um
+      adaptador (`TagLibFileStream`) que abre por caminho largo (`_wfopen`).
+      **Pendente:** validar com uma faixa em caminho acentuado.
+- [ ] **Hot cue persistente** — os pads já guardam a posição em memória;
+      gravar no arquivo depende de definir em qual tag (o Rekordbox usa o
+      banco `ANLZ`, não tags de texto).
 - [ ] **Biblioteca para BPM** — ainda não definida. Candidatos:
       [libebguess](https://github.com/break/libebguess) (porta do GNU
       SoundTouch) e [aubio](https://aub.io). Precisa avaliar licença e
       precisão antes de adotar.
+      *Nota:* o TagLib lê o BPM quando o arquivo já o tem na tag `BPM`
+      (o Rekordbox grava), mas não o detecta.
 
 ---
 

@@ -5,6 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "Song.h"
 #include "PlaylistDragPayload.h"
+#include "TagLibReader.h"
 
 // Componente de biblioteca/playlist.
 // Exibe uma TableListBox de faixas importadas e permite arrastar uma faixa
@@ -54,8 +55,9 @@ public:
     // Retorna a faixa atualmente selecionada (ou nenhuma)
     const Song* getSelectedSong() const;
 
-    // Callback chamado quando o usuário seleciona uma faixa para carregar em um deck
-    std::function<void(juce::URL)> onSongSelected;
+    // Callback chamado quando o usuário seleciona uma faixa para carregar em um deck.
+    // O segundo parametro e o BPM lido do arquivo (0.0 quando desconhecido).
+    std::function<void(juce::URL, double)> onSongSelected;
 
     // Carrega a faixa de um índice (usado no duplo-clique)
     void loadSongAtRow(int row);
@@ -64,11 +66,26 @@ public:
     void mouseDoubleClick (const juce::MouseEvent& event) override;
 
 private:
+    // Rating: 5 estrelas preenchidas, em ambar.
+    void drawRating (juce::Graphics& g, int rating, const juce::Rectangle<int>& area);
+
+    // Le os metadados do arquivo com o TagLib e aplica na faixa.
+    void readMetadataFor (Song& song);
+
+    // Carrega a biblioteca persistida do disco.
+    void loadLibrary();
+
+    // Grava a biblioteca no disco.
+    void saveLibrary() const;
+
     juce::TableListBox playlistTable;
     juce::TextButton addButton{ "Adicionar faixa" };
 
     juce::Array<Song> songs;
     int selectedRow = -1;
+
+    // Leitor de metadados (TagLib). Compartilhado entre as faixas.
+    TagLibReader metadataReader;
 
     juce::FileChooser fileChooser{ "Selecione arquivos de áudio",
                                    juce::File(),

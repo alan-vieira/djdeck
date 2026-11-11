@@ -7,9 +7,13 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_graphics/juce_graphics.h>
 #include "DeckPlayer.h"
-#include "DeckGUI.h"
-#include "PlaylistComponent.h"
+#include "DeckComponent.h"
+#include "BigWaveformsComponent.h"
+#include "GlobalHeaderComponent.h"
+#include "LibraryComponent.h"
+#include "MixerComponent.h"
 #include "MixerDeviceScanner.h"
+#include "RekordboxLookAndFeel.h"
 
 // Forward declaration da janela de configurações (definida em SettingsDialog.h)
 class SettingsDialog;
@@ -51,8 +55,8 @@ private:
     // Cache compartilhado para miniaturas de waveform.
     // IMPORTANTE: declarado ANTES dos decks de propósito. Os membros são destruídos
     // na ordem inversa da declaração, e o destructor do AudioThumbnail (dentro do
-    // WaveformDisplay de cada deck) acessa este cache. Se o cache fosse destruído
-    // primeiro, teríamos um use-after-free no encerramento do app.
+    // MiniWaveformComponent de cada deck) acessa este cache. Se o cache fosse
+    // destruído primeiro, teríamos um use-after-free no encerramento do app.
     juce::AudioThumbnailCache thumbnailCache{ 5 };
 
     MixerDeviceScanner deviceScanner;
@@ -61,11 +65,14 @@ private:
     // Decks
     std::unique_ptr<DeckPlayer> deckPlayer1;
     std::unique_ptr<DeckPlayer> deckPlayer2;
-    std::unique_ptr<DeckGUI> deckGUI1;
-    std::unique_ptr<DeckGUI> deckGUI2;
+    std::unique_ptr<DeckComponent> deck1;
+    std::unique_ptr<DeckComponent> deck2;
 
-    // Playlist
-    std::unique_ptr<PlaylistComponent> playlist;
+    // Seções do layout raiz (docs/DOCUMENTACAO_LAYOUT_UI.md §2.1)
+    std::unique_ptr<GlobalHeaderComponent> globalHeader;
+    std::unique_ptr<BigWaveformsComponent> bigWaveforms;
+    std::unique_ptr<MixerComponent> mixer;
+    std::unique_ptr<LibraryComponent> library;
 
     // Diálogo de configurações de áudio (criado sob demanda)
     std::unique_ptr<SettingsDialog> settingsDialog;
@@ -73,8 +80,13 @@ private:
     // Botão de settings
     juce::TextButton settingsButton{ "Settings" };
 
-    // Look and feel personalizado
-    juce::LookAndFeel_V4 lookAndFeel;
+    // Look and feel personalizado.
+    //
+    // IMPORTANTE: este member DEVE ser o ULTIMO da classe. Os members sao
+    // destruidos na ordem inversa da declaracao, e os widgets filhos usam este
+    // LookAndFeel enquanto pintam. Se ele fosse destruido antes deles, o app
+    // quebraria ao fechar. Ver docs/DOCUMENTACAO_LAYOUT_UI.md §6.
+    RekordboxLookAndFeel lookAndFeel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
