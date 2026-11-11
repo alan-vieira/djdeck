@@ -70,49 +70,56 @@ juce::Array<Song> LibraryStore::load()
     if (! file.existsAsFile())
         return result;
 
-    // O XmlDocument NAO faz o parse no construtor — ele acontece em
-    // getDocumentElement().
-    juce::XmlDocument document (file);
-
-    // getDocumentElement() retorna um unique_ptr<XmlElement> no JUCE 9.
-    // Extraimos o ponteiro bruto para trabalhar com o tipo completo.
-    auto* root = document.getDocumentElement().get();
-
-    if (root == nullptr || ! root->hasTagName ("djdeckLibrary"))
-        return result;
-
-    for (int i = 0; i < root->getNumChildElements(); ++i)
+    // O parsing de XML pode falhar se o arquivo estiver corrompido (ex: entidades
+    // nao suportadas pelo parser JUCE). Envolvemos em try/catch para nao
+    // derrubar o app — o usuario pode reimportar as faixas depois.
+    try
     {
-        auto* element = root->getChildElement (i);
+        juce::XmlDocument document (file);
 
-        if (element == nullptr || ! element->hasTagName ("track"))
-            continue;
+        // getDocumentElement() retorna um unique_ptr<XmlElement> no JUCE 9.
+        auto* root = document.getDocumentElement().get();
 
-        const auto path = element->getStringAttribute ("path");
+        if (root == nullptr || ! root->hasTagName ("djdeckLibrary"))
+            return result;
 
-        if (path.isEmpty())
-            continue;
+        for (int i = 0; i < root->getNumChildElements(); ++i)
+        {
+            auto* element = root->getChildElement (i);
 
-        const juce::File audioFile (path);
+            if (element == nullptr || ! element->hasTagName ("track"))
+                continue;
 
-        // Faixa apagada ou movida: nao aparece na biblioteca.
-        if (! audioFile.existsAsFile())
-            continue;
+            const auto path = element->getStringAttribute ("path");
 
-        Song song;
-        song.file = audioFile;
-        song.title = element->getStringAttribute ("title");
-        song.artist = element->getStringAttribute ("artist");
-        song.album = element->getStringAttribute ("album");
-        song.genre = element->getStringAttribute ("genre");
-        song.key = element->getStringAttribute ("key");
-        song.year = element->getStringAttribute ("year");
-        song.trackNumber = element->getStringAttribute ("trackNumber");
-        song.bpm = element->getDoubleAttribute ("bpm", 0.0);
-        song.rating = element->getIntAttribute ("rating", 0);
-        song.lengthInSeconds = element->getDoubleAttribute ("duration", 0.0);
+            if (path.isEmpty())
+                continue;
 
-        result.add (song);
+            const juce::File audioFile (path);
+
+            if (! audioFile.existsAsFile())
+                continue;
+
+            Song song;
+            song.file = audioFile;
+            song.title = element->getStringAttribute ("title");
+            song.artist = element->getStringAttribute ("artist");
+            song.album = element->getStringAttribute ("album");
+            song.genre = element->getStringAttribute ("genre");
+            song.key = element->getStringAttribute ("key");
+            song.year = element->getStringAttribute ("year");
+            song.trackNumber = element->getStringAttribute ("trackNumber");
+            song.bpm = element->getDoubleAttribute ("bpm", 0.0);
+            song.rating = element->getIntAttribute ("rating", 0);
+            song.lengthInSeconds = element->getDoubleAttribute ("duration", 0.0);
+
+            result.add (song);
+        }
+    }
+    catch (...)
+    {
+        // Se o XML estiver corrompido, ignoramos e começamos com biblioteca vazia.
+        // O usuario pode reimportar as faixas pelo botao "Adicionar faixa".
     }
 
     return result;

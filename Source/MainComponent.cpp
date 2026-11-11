@@ -32,16 +32,11 @@ MainComponent::MainComponent()
     library = std::make_unique<LibraryComponent>();
 
     // Duplo-clique numa faixa da lista carrega no Deck 1.
-    // O arrraste da faixa até um deck funciona por drag-and-drop nativo do
-    // JUCE: a PlaylistComponent fornece o payload (getDragSourceDescription)
-    // e o DeckComponent recebe o drop (itemDropped).
     library->getTrackList().onSongSelected = [this] (const juce::URL& url, double bpm)
     {
         if (deck1 != nullptr)
             deck1->loadFile (url, bpm);
 
-        // O mesmo carregamento e refletido nas ondas rolantes do topo,
-        // para o usuario ver a forma de onda da faixa selecionada.
         if (bigWaveforms != nullptr)
             bigWaveforms->loadURL (url);
     };

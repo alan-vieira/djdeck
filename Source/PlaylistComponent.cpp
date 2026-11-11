@@ -43,7 +43,15 @@ PlaylistComponent::PlaylistComponent()
     playlistTable.addMouseListener (this, true);
 
     // Carrega a biblioteca persistida do disco.
-    loadLibrary();
+    try
+    {
+        loadLibrary();
+    }
+    catch (...)
+    {
+        // Se a leitura da biblioteca falhar, iniciamos com biblioteca vazia.
+        // O usuario pode reimportar as faixas pelo botao "Adicionar faixa".
+    }
 }
 
 PlaylistComponent::~PlaylistComponent()
@@ -64,8 +72,8 @@ void PlaylistComponent::loadLibrary()
 
     songs = stored;
 
-    // Relê os metadados do arquivo: uma edicao feita fora do app (ou por
-    // outro programa de DJ) aparece na proxima vez que o djdeck abre.
+    // Relê os metadados do arquivo: uma edição feita fora do app (ou por
+    // outro programa de DJ) aparece na próxima vez que o djdeck abre.
     for (auto& song : songs)
         readMetadataFor (song);
 
