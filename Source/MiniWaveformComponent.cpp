@@ -217,12 +217,11 @@ void MiniWaveformComponent::loadURL (juce::URL audioURL)
         return;
     }
 
-    // Limpa o thumbnail anterior antes de carregar um novo arquivo. O
-    // AudioThumbnail processa em background thread, entao nao setamos
-    // fileLoaded = true aqui — o changeListenerCallback o fara quando o
-    // processamento terminar.
+    // O thumbnail assume a posse do source e o destroi quando substituido.
+    // FileInputSource abre o arquivo so quando precisa — nao carrega o audio
+    // na memoria.
     audioThumb.setSource (nullptr);
-    audioThumb.setSource (new juce::FileInputSource (file));
+    fileLoaded = audioThumb.setSource (new juce::FileInputSource (file));
 
     repaint();
 }
