@@ -42,6 +42,11 @@ public:
     // Define a posicao relativa do playhead (0.0 a 1.0)
     void setPositionRelative (double pos);
 
+    // Diagnostico: o que o thumbnail ja sabe. total=0 significa que nenhuma
+    // amostra foi processada ainda -> nada pode ser desenhado.
+    double getThumbnailTotalLength() const noexcept { return audioThumb.getTotalLength(); }
+    int getThumbnailChannels() const noexcept { return audioThumb.getNumChannels(); }
+
     // Grade de beats, em tempo absoluto (segundos). Vazio = sem grade.
     void setBeatGrid (const juce::Array<BeatMarker>& beats);
 

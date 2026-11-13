@@ -305,6 +305,11 @@ void DeckComponent::itemDropped (const juce::DragAndDropTarget::SourceDetails& d
     {
         if (payload->file.existsAsFile())
             loadFileURL(juce::URL { payload->file }, juce::String(), juce::String());
+        // CORRECAO: Notificar a big waveform para que ela exiba o track,
+        // pois o drag and drop ignora o caminho do double-click.
+        // A big waveform correspondente e notificada via onTrackLoaded,
+        // definido pelo MainComponent — assim nao precisamos de include
+        // circular nem de cast para o pai.
     }
 }
 
@@ -367,6 +372,12 @@ void DeckComponent::loadFileURL (juce::URL audioURL, const juce::String& title, 
 
     player->loadURL (audioURL);
     waveformDisplay.loadURL (audioURL);
+
+    // Notifica quem coordena o layout (o MainComponent) para que a big
+    // waveform do topo carregue a mesma faixa. Dispara em TODOS os caminhos
+    // de carga, porque loadFileURL e o ponto de convergencia.
+    if (onTrackLoaded != nullptr)
+        onTrackLoaded (id, audioURL);
 
     // Usa os metadados reais do TagLib quando disponiveis; caso contrario, o nome do arquivo.
     header.setTrackTitle (title.isNotEmpty() ? title : juce::File (audioURL.getLocalFile()).getFileNameWithoutExtension());

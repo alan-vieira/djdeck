@@ -30,18 +30,6 @@
 
 namespace
 {
-    // O app de console precisa que o MessageManager exista antes do primeiro
-    // MessageManagerLock.
-    struct MessageManagerBootstrap
-    {
-        MessageManagerBootstrap()
-        {
-            juce::MessageManager::getInstance();
-        }
-    };
-
-    MessageManagerBootstrap g_messageManagerBootstrap;
-
     //==============================================================================
     // Procura uma faixa real SEM usar literal nao-ASCII no codigo.
     //

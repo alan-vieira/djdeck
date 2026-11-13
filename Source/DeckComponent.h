@@ -83,6 +83,14 @@ public:
     void loadFile(juce::URL audioURL, double bpm,
                   const juce::String& title, const juce::String& artist);
 
+    // Notificado sempre que uma faixa e carregada neste deck, por QUALQUER
+    // caminho (duplo-clique, arrastar-soltar, arquivos do sistema).
+    //
+    // O MainComponent usa isto para sincronizar a big waveform do topo.
+    // Um callback (e nao um cast para o componente pai) evita include
+    // circular: DeckComponent.h nao conhece MainComponent.
+    std::function<void (int deckId, const juce::URL&)> onTrackLoaded;
+
     DeckPlayer* getPlayer() const { return player; }
     int getDeckId() const { return id; }
 

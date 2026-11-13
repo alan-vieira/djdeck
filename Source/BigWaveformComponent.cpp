@@ -23,7 +23,7 @@ void BigWaveformComponent::paint (juce::Graphics& g)
 
     g.fillAll (RekordboxColours::canvas);
 
-    if (audioThumb.getTotalLength() <= 0.0)
+    if (! fileLoaded || audioThumb.getTotalLength() <= 0.0)
     {
         g.setColour (RekordboxColours::textTertiary);
         g.setFont (juce::Font (juce::FontOptions (12.0f)));
@@ -178,10 +178,15 @@ void BigWaveformComponent::loadURL (const juce::URL& url)
         return;
     }
 
-    // O thumbnail assume a posse do source e o destroi quando substituído.
-    // FileInputSource abre o arquivo só quando precisa — não mantém handle
-    // aberto o tempo todo, e não carrega o áudio na memória.
-    audioThumb.setSource (new juce::FileInputSource (file));
+    // O thumbnail assume a posse do source e o destroi quando substituido.
+    //
+    // FileInputSource abre o arquivo SO quando precisa, numa background thread.
+    // A alternativa (decodificar o arquivo inteiro para um AudioBuffer em
+    // memoria) travava a message thread durante a carga: 4:18 a 44.1 kHz
+    // stereo sao ~91 MB para alocar e decodificar, o que congelava a UI
+    // por centenas de milissegundos a cada faixa carregada.
+    audioThumb.setSource (nullptr);
+    fileLoaded = audioThumb.setSource (new juce::FileInputSource (file));
 
     repaint();
 }

@@ -185,9 +185,14 @@ if (DJDECK_ENABLE_TESTS)
     FetchContent_MakeAvailable(CATCH2)
 
     add_executable(djdeck_tests
+        # main.cpp define o ponto de entrada e inicializa o JUCE dentro de
+        # main() — ver o comentario la. Por isso o target usa Catch2::Catch2
+        # (SEM main) e nao Catch2::Catch2WithMain.
+        tests/main.cpp
         tests/test_song.cpp
         tests/test_deckplayer.cpp
         tests/test_crossfader.cpp
+        tests/test_waveform.cpp
 
         # Implementacoes do projeto necessarias pelos testes
         Source/Song.cpp
@@ -196,8 +201,11 @@ if (DJDECK_ENABLE_TESTS)
     )
 
     target_link_libraries(djdeck_tests PRIVATE
-        Catch2::Catch2WithMain
+        Catch2::Catch2
         juce::juce_core
+        juce::juce_events
+        juce::juce_graphics
+        juce::juce_gui_basics
         juce::juce_audio_basics
         juce::juce_audio_formats
         juce::juce_audio_utils

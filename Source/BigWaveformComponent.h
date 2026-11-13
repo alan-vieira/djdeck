@@ -53,6 +53,11 @@ public:
     void setPositionSeconds (double seconds);
     double getPositionSeconds() const { return positionSeconds; }
 
+    // Diagnostico: o que o thumbnail ja sabe. total=0 significa que nenhuma
+    // amostra foi processada ainda -> nada pode ser desenhado.
+    double getThumbnailTotalLength() const noexcept { return audioThumb.getTotalLength(); }
+    int getThumbnailChannels() const noexcept { return audioThumb.getNumChannels(); }
+
     // Grade de beats, em tempo absoluto (segundos). Vazio = sem grade.
     void setBeatGrid (const juce::Array<BeatMarker>& beats);
     const juce::Array<BeatMarker>& getBeatGrid() const { return beatGrid; }
@@ -83,6 +88,8 @@ private:
 
     juce::Array<BeatMarker> beatGrid;
     juce::Array<double> hotCueTimes;
+
+    bool fileLoaded = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BigWaveformComponent)
 };

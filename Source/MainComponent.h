@@ -52,12 +52,21 @@ private:
     // Por isso usamos o manager herdado da base.
     juce::AudioFormatManager formatManager;
 
-    // Cache compartilhado para miniaturas de waveform.
-    // IMPORTANTE: declarado ANTES dos decks de propósito. Os membros são destruídos
-    // na ordem inversa da declaração, e o destructor do AudioThumbnail (dentro do
-    // MiniWaveformComponent de cada deck) acessa este cache. Se o cache fosse
-    // destruído primeiro, teríamos um use-after-free no encerramento do app.
-    juce::AudioThumbnailCache thumbnailCache{ 5 };
+    // Caches de miniaturas de waveform — UM PARA CADA RESOLUCAO.
+    //
+    // IMPORTE: o juce::AudioThumbnailCache indexa os thumbs pelo hashCode do
+    // SOURCE (o arquivo), e NAO pela resolucao. Mini (1024 samples) e Big
+    // (2048 samples) do MESMO arquivo cairiam no MESMO slot do cache, com
+    // dados de resolucao errada — a waveform sairia corrompida ou vazia.
+    // Por isso cada resolucao tem seu proprio cache.
+    //
+    // IMPORTANTE: declarados ANTES dos decks de proposito. Os membros sao
+    // destruidos na ordem inversa da declaracao, e o destructor do
+    // AudioThumbnail (dentro do MiniWaveformComponent de cada deck) acessa
+    // este cache. Se o cache fosse destruido primeiro, teriamos um
+    // use-after-free no encerramento do app.
+    juce::AudioThumbnailCache miniThumbnailCache{ 5 };
+    juce::AudioThumbnailCache bigThumbnailCache{ 5 };
 
     MixerDeviceScanner deviceScanner;
     juce::MixerAudioSource mixerSource;

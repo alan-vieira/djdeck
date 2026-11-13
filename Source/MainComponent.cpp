@@ -14,24 +14,45 @@ MainComponent::MainComponent()
 
     // Deck 1: Beat Jump à esquerda, jog wheel à direita (não espelhado).
     // Deck 2: Hot Cue à direita, jog wheel à esquerda (espelhado).
+    //
+    // Cada deck usa o cache da sua resolucao: o AudioThumbnailCache e
+    // indexado pelo hash do ARQUIVO, nao pela resolucao. Compartilhar o
+    // cache entre Mini (1024) e Big (2048) do mesmo arquivo faria os dois
+    // lerem dados de resolucao errada do mesmo slot.
     deck1 = std::make_unique<DeckComponent>(1, false, false,
                                              deckPlayer1.get(),
                                              formatManager,
-                                             thumbnailCache);
+                                             miniThumbnailCache);
 
     deck2 = std::make_unique<DeckComponent>(2, true, true,
                                              deckPlayer2.get(),
                                              formatManager,
-                                             thumbnailCache);
+                                             miniThumbnailCache);
 
     // Seções do layout raiz.
     globalHeader = std::make_unique<GlobalHeaderComponent>();
-    bigWaveforms = std::make_unique<BigWaveformsComponent>(formatManager, thumbnailCache,
-                                                            deckPlayer1.get(), deckPlayer2.get());
+    bigWaveforms = std::make_unique<BigWaveformsComponent>(formatManager, bigThumbnailCache,
+                                                           deckPlayer1.get(), deckPlayer2.get());
     mixer = std::make_unique<MixerComponent>(deckPlayer1.get(), deckPlayer2.get());
     library = std::make_unique<LibraryComponent>();
 
+    // Sincroniza a big waveform do topo com o deck que carregou a faixa.
+    // Passa por um callback e nao por cast para o pai: o DeckComponent nao
+    // conhece o MainComponent (evita include circular).
+    auto syncBigWaveform = [this] (int deckId, const juce::URL& url)
+    {
+        if (bigWaveforms != nullptr)
+            bigWaveforms->loadURL (deckId, url);
+    };
+
+    deck1->onTrackLoaded = syncBigWaveform;
+    deck2->onTrackLoaded = syncBigWaveform;
+
     // Duplo-clique numa faixa da lista carrega no Deck 1.
+    //
+    // NOTA: a big waveform e notificada pelo callback onTrackLoaded do deck,
+    // nao aqui — assim o duplo-clique e o arrastar-soltar seguem o MESMO
+    // caminho e nao ha risco de a big waveform ficar dessincronizada.
     library->getTrackList().onSongSelected = [this] (const juce::URL& url, double bpm,
                                                      const juce::String& title,
                                                      const juce::String& artist, int targetDeckId)
@@ -39,14 +60,10 @@ MainComponent::MainComponent()
         if (targetDeckId == 1 && deck1 != nullptr)
         {
             deck1->loadFile (url, bpm, title, artist);
-            if (bigWaveforms != nullptr)
-                bigWaveforms->loadURL (1, url);
         }
         else if (targetDeckId == 2 && deck2 != nullptr)
         {
             deck2->loadFile (url, bpm, title, artist);
-            if (bigWaveforms != nullptr)
-                bigWaveforms->loadURL (2, url);
         }
     };
 
