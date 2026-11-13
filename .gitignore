@@ -1,5 +1,6 @@
 # ---- Build ----
 Builds/
+BuildsTests/
 build/
 build-*/
 cmake-build-*/
