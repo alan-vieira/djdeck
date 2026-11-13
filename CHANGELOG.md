@@ -13,6 +13,16 @@ Nada ainda.
 
 ---
 
+## [0.3.1] — 2026-11-13
+
+Atualização de documentação visual.
+
+### Alterado
+
+- `docs/screenshots/main-window.png` — screenshot da janela principal atualizado para refletir a versão mais recente da aplicação.
+
+---
+
 ## [0.3.0] — 2026-11-13
 
 Versão estável com mixer completo, equalizador de 3 bandas, filtro, crossfader,
