@@ -35,6 +35,11 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 - [ ] **Lógica de interpolação** (pitch e afinação) — hoje o pitch é alterado
   por *resampling* simples, o que desloca a duração. O objetivo é manter a
   duração constante com interpolação de qualidade.
+- [x] **Testes automatizados** — suíte com Catch2 v3.5.2 (`tests/`):
+  `test_song.cpp`, `test_deckplayer.cpp`, `test_crossfader.cpp`,
+  `test_waveform.cpp`. Ponto de entrada em `tests/main.cpp` que inicializa
+  o JUCE dentro de `main()`. Ativado por padrão via
+  `DJDECK_ENABLE_TESTS`.
 - [ ] **Digital Vinyl System (DVS)** — ver [Alternativas avaliadas](#alternativas-avaliadas-para-dvs--vinyl-control).
   Bloqueado por depender de timecode.
 

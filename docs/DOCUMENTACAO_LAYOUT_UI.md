@@ -2243,7 +2243,7 @@ Para o djdeck, um formato próprio simplificado em memória é suficiente — o
 
 ## 11. Estado atual vs. alvo
 
-Verificado no commit `4203707` (tag `v0.1.0`).
+Verificado na tag `v0.3.0`.
 
 || Área | Estado | Observação |
 |---|---|---|---|
