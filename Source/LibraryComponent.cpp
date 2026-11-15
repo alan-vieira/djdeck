@@ -2,8 +2,9 @@
 #include "RekordboxColours.h"
 
 //==============================================================================
-LibraryComponent::LibraryComponent()
-    : trackList (std::make_unique<PlaylistComponent>())
+LibraryComponent::LibraryComponent (juce::AudioFormatManager& formatManagerToUse)
+    : formatManager (formatManagerToUse),
+      trackList (std::make_unique<PlaylistComponent> (formatManager))
 {
     addAndMakeVisible (treeView);
     addAndMakeVisible (*trackList);

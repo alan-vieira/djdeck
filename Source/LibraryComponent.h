@@ -1,5 +1,6 @@
 #pragma once
 
+#include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "LibraryTreeModel.h"
 #include "PlaylistComponent.h"
@@ -24,7 +25,9 @@
 class LibraryComponent : public juce::Component
 {
 public:
-    LibraryComponent();
+    // O formatManager e necessario para a deteccao de BPM por analise de
+    // audio ao importar faixas (ver PlaylistComponent).
+    LibraryComponent (juce::AudioFormatManager& formatManagerToUse);
     ~LibraryComponent() override;
 
     void paint (juce::Graphics& g) override;
@@ -41,6 +44,10 @@ private:
 
     // O TreeView NAO tem posse do root — guardamos como member.
     std::unique_ptr<LibraryTreeModel> treeRoot;
+
+    // Declarado antes de trackList porque o construtor da playlist recebe a
+    // referencia ao formatManager.
+    juce::AudioFormatManager& formatManager;
 
     std::unique_ptr<PlaylistComponent> trackList;
 

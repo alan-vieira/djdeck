@@ -1,5 +1,8 @@
 #include "DeckPlayer.h"
 
+#include <juce_events/juce_events.h>
+#include "BpmDetector.h"
+
 //==============================================================================
 DeckPlayer::DeckPlayer(juce::AudioFormatManager& formatManagerToUse)
     : formatManager(formatManagerToUse),
@@ -308,4 +311,71 @@ juce::Atomic<float>& DeckPlayer::getLevelSource (int channel)
 {
     // O canal e fixado em 0: cada DeckPlayer tem o seu proprio par de atomics.
     return levelDb[juce::jlimit (0, 1, channel)];
+}
+
+void DeckPlayer::setBpmDetectedHandler (std::function<void (double)> handler)
+{
+    onBpmDetected = std::move (handler);
+}
+
+//==============================================================================
+// Job de deteccao de BPM do deck. Roda no ThreadPool do proprio DeckPlayer e
+// entrega o resultado na message thread.
+//
+// O job guarda uma REFERENCIA ao AudioFormatManager. O manager e propriedade
+// do MainComponent, que vive mais que os decks, entao a referencia permanece
+// valida durante toda a deteccao.
+namespace
+{
+    class DeckBpmDetectionJob : public juce::ThreadPoolJob
+    {
+    public:
+        DeckBpmDetectionJob (juce::File fileToScan,
+                             juce::AudioFormatManager& formatManagerToUse,
+                             std::function<void (double)> resultCallback)
+            : juce::ThreadPoolJob ("Deck BPM Detection"),
+              file (std::move (fileToScan)),
+              formatManager (formatManagerToUse),
+              callback (std::move (resultCallback))
+        {
+        }
+
+        // No JUCE 9 o retorno de runJob() e juce::ThreadPoolJob::JobStatus
+        // (nao existe um tipo "JobResult"). Os enumeradores jobHasFinished /
+        // jobNeedsRunningAgain ficam acessiveis sem qualifying por serem
+        // membros da classe base.
+        JobStatus runJob() override
+        {
+            std::unique_ptr<juce::AudioFormatReader> reader (formatManager.createReaderFor (file));
+            double bpm = 0.0;
+
+            if (reader != nullptr)
+                bpm = BpmDetector::estimate (*reader, nullptr);
+
+            // O callback roda na message thread: e o unico lugar seguro para
+            // tocar na UI.
+            juce::MessageManager::callAsync ([cb = std::move (callback), bpm] () mutable
+            {
+                if (cb)
+                    cb (bpm);
+            });
+
+            return jobHasFinished;
+        }
+
+    private:
+        juce::File file;
+        juce::AudioFormatManager& formatManager;
+        std::function<void (double)> callback;
+    };
+}
+
+void DeckPlayer::detectBpm (const juce::File& file)
+{
+    auto handler = onBpmDetected;
+
+    if (! handler)
+        return;
+
+    bpmPool.addJob (new DeckBpmDetectionJob (file, formatManager, std::move (handler)), true);
 }

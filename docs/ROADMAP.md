@@ -67,7 +67,10 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 ## Área de “Playlist”
 
 - [x] **Arrastar “track” para o player** — implementado na v0.1.0 com
-      drag-and-drop nativo do JUCE e payload tipado.
+      drag-and-drop nativo do JUCE e payload tipado. O `PlaylistDragPayload`
+      agora transporta `bpm`, `title` e `artist` além do `file`, de modo que o
+      BPM detectado aparece no cabeçalho do deck e no centro do jog wheel após
+      o drop.
 - [x] **Biblioteca para metadados** → **TagLib** (decidido).
       TagLib v2.3.2 integrado via `FetchContent`, com build estático e o
       mesmo runtime `/MT` do app. Le e escreve tags ID3 (MP3), Vorbis
@@ -111,12 +114,10 @@ e folders aninhados.
 - [ ] **Hot cue persistente** — os pads já guardam a posição em memória;
       gravar no arquivo depende de definir em qual tag (o Rekordbox usa o
       banco `ANLZ`, não tags de texto).
-- [ ] **Biblioteca para BPM** — ainda não definida. Candidatos:
-      [libebguess](https://github.com/break/libebguess) (porta do GNU
-      SoundTouch) e [aubio](https://aub.io). Precisa avaliar licença e
-      precisão antes de adotar.
-      *Nota:* o TagLib lê o BPM quando o arquivo já o tem na tag `BPM`
-      (o Rekordbox grava), mas não o detecta.
+- [x] **Detecção de BPM por áudio** — detector próprio em JUCE (`Source/BpmDetector.h/.cpp`):
+  envelope de onsets por fluxo espectral + autocorrelação (60–200 BPM), rodando
+  em thread de fundo ao importar/carregar a faixa, com fallback tag → áudio →
+  placeholder 120 BPM. Sem dependências externas.
 
 ---
 

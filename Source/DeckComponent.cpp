@@ -1,5 +1,7 @@
 #include "DeckComponent.h"
 #include "RekordboxColours.h"
+#include "TagLibReader.h"
+#include "TrackMetadata.h"
 
 //==============================================================================
 DeckComponent::DeckComponent (int deckId,
@@ -112,6 +114,23 @@ DeckComponent::DeckComponent (int deckId,
 
     // Timer para atualizar playhead (~30 fps)
     startTimer (33);
+
+    // Quando o BPM for detectado (por tag ou por analise de audio), publica no
+    // cabecalho e no jog wheel.
+    // SafePointer: o handler roda na message thread e pode chegar DEPOIS do
+    // DeckComponent ter sido destruido (fechamento do app). O SafePointer vira
+    // null nesse caso, evitando o use-after-free.
+    juce::Component::SafePointer<DeckComponent> safeThis (this);
+
+    player->setBpmDetectedHandler ([safeThis] (double bpm)
+    {
+        juce::Logger::writeToLog ("[DIAG] DeckComponent bpmDetectedHandler called with " + juce::String (bpm, 2));
+        if (safeThis == nullptr)
+            return;
+
+        safeThis->header.setBpm (bpm);
+        safeThis->jogWheel.setBpm (bpm);
+    });
 }
 
 DeckComponent::~DeckComponent()
@@ -265,7 +284,7 @@ bool DeckComponent::isInterestedInFileDrag (const juce::StringArray& files)
 void DeckComponent::filesDropped (const juce::StringArray& files, int, int)
 {
     if (files.size() == 1)
-        loadFileURL (juce::URL { juce::File { files[0] } }, juce::String(), juce::String());
+        loadFileURL (juce::URL { juce::File { files[0] } }, 0.0, juce::String(), juce::String());
 }
 
 //==============================================================================
@@ -304,12 +323,11 @@ void DeckComponent::itemDropped (const juce::DragAndDropTarget::SourceDetails& d
     if (auto* payload = PlaylistDragPayload::getFrom (details.description))
     {
         if (payload->file.existsAsFile())
-            loadFileURL(juce::URL { payload->file }, juce::String(), juce::String());
-        // CORRECAO: Notificar a big waveform para que ela exiba o track,
-        // pois o drag and drop ignora o caminho do double-click.
-        // A big waveform correspondente e notificada via onTrackLoaded,
-        // definido pelo MainComponent — assim nao precisamos de include
-        // circular nem de cast para o pai.
+            loadFileURL (juce::URL { payload->file }, payload->bpm,
+                         payload->title, payload->artist);
+        // Notificar a big waveform para que ela exiba o track.
+        // O drag and drop ignora o caminho do double-click, mas a big
+        // waveform e notificada via onTrackLoaded definido pelo MainComponent.
     }
 }
 
@@ -346,43 +364,85 @@ void DeckComponent::updateHeaderTimes()
 //==============================================================================
 void DeckComponent::loadFile (juce::URL audioURL, double bpm)
 {
-    loadFileURL (audioURL, juce::String(), juce::String());
+    juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFile called with bpm=" + juce::String (bpm, 2));
 
-    // BPM lido da faixa: publica no player (para o jog wheel calcular o pitch
-    // efetivo) e no proprio jog wheel, que exibe o valor no centro do disco.
+    // Define o BPM no player ANTES de carregar, para que loadFileURL veja
+    // getBpm() > 0 e nao dispare detectBpm desnecessariamente, e para que o
+    // header ja receba o valor correto na primeira pintura.
     if (player != nullptr)
         player->setBpm (bpm);
     jogWheel.setBpm (bpm);
+    header.setBpm (bpm);
+
+    loadFileURL (audioURL, bpm, juce::String(), juce::String());
 }
 
 void DeckComponent::loadFile (juce::URL audioURL, double bpm,
                               const juce::String& title, const juce::String& artist)
 {
-    loadFileURL (audioURL, title, artist);
+    juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFile(url,bpm,title,artist) called with bpm=" + juce::String (bpm, 2) + " title=" + title);
 
     if (player != nullptr)
         player->setBpm (bpm);
     jogWheel.setBpm (bpm);
+    header.setBpm (bpm);
+
+    loadFileURL (audioURL, bpm, title, artist);
 }
 
-void DeckComponent::loadFileURL (juce::URL audioURL, const juce::String& title, const juce::String& artist)
+void DeckComponent::loadFileURL (juce::URL audioURL, double bpm,
+                              const juce::String& title, const juce::String& artist)
 {
     if (player == nullptr)
         return;
 
+    juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFileURL called, player->getBpm()=" + juce::String (player->getBpm(), 2));
+
+    // Se o caller forneceu um BPM (duplo-clique na biblioteca, ou drag-and-drop
+    // com payload preenchido), garante que o player ja saiba o valor antes
+    // de carregar o audio.
+    if (bpm > 0.0)
+        player->setBpm (bpm);
+
     player->loadURL (audioURL);
     waveformDisplay.loadURL (audioURL);
-
     // Notifica quem coordena o layout (o MainComponent) para que a big
     // waveform do topo carregue a mesma faixa. Dispara em TODOS os caminhos
     // de carga, porque loadFileURL e o ponto de convergencia.
     if (onTrackLoaded != nullptr)
         onTrackLoaded (id, audioURL);
 
+    // Se nenhum BPM foi fornecido (drag-and-drop de arquivo do sistema,
+    // ou payload sem metadados), tenta ler do TagLib antes de recorrer
+    // à detecção por análise de áudio.
+    auto localTitle = title;
+    auto localArtist = artist;
+    if (player->getBpm() <= 0.0)
+    {
+        TagLibReader tagReader;
+        auto metadata = tagReader.readMetadata (audioURL.getLocalFile());
+        if (metadata.isValid && metadata.bpm > 0.0)
+        {
+            player->setBpm (metadata.bpm);
+            if (localTitle.isEmpty())
+                localTitle = metadata.title;
+            if (localArtist.isEmpty())
+                localArtist = metadata.artist;
+        }
+    }
+
+    // Se ainda nao ha BPM conhecido (sem tag na faixa nem valor da biblioteca),
+    // dispara a deteccao por analise de audio. Quando termina, o handler
+    // definido no construtor atualiza o cabecalho e o jog wheel.
+    if (player->getBpm() <= 0.0)
+        player->detectBpm (audioURL.getLocalFile());
+
     // Usa os metadados reais do TagLib quando disponiveis; caso contrario, o nome do arquivo.
-    header.setTrackTitle (title.isNotEmpty() ? title : juce::File (audioURL.getLocalFile()).getFileNameWithoutExtension());
-    header.setTrackArtist (artist);
+    header.setTrackTitle (localTitle.isNotEmpty() ? localTitle : juce::File (audioURL.getLocalFile()).getFileNameWithoutExtension());
+    header.setTrackArtist (localArtist);
     header.setBpm (player->getBpm());
+
+    juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFileURL finished, player->getBpm()=" + juce::String (player->getBpm(), 2));
 
     updateHeaderTimes();
 }

@@ -34,7 +34,7 @@ MainComponent::MainComponent()
     bigWaveforms = std::make_unique<BigWaveformsComponent>(formatManager, bigThumbnailCache,
                                                            deckPlayer1.get(), deckPlayer2.get());
     mixer = std::make_unique<MixerComponent>(deckPlayer1.get(), deckPlayer2.get());
-    library = std::make_unique<LibraryComponent>();
+    library = std::make_unique<LibraryComponent> (formatManager);
 
     // Sincroniza a big waveform do topo com o deck que carregou a faixa.
     // Passa por um callback e nao por cast para o pai: o DeckComponent nao

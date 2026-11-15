@@ -132,6 +132,22 @@ TEST_CASE("DeckPlayer::setSpeed / getSpeed - variacao de pitch", "[DeckPlayer]")
     REQUIRE(player.getSpeed() == Approx(3.0));
 }
 
+TEST_CASE("DeckPlayer::setBpm / getBpm - BPM armazenado no player", "[DeckPlayer]")
+{
+    DeckPlayer player(formatManager());
+
+    // Sem faixa carregada, BPM e zero.
+    REQUIRE(player.getBpm() == Approx(0.0));
+
+    // BPM lido da tag da faixa.
+    player.setBpm(128.0);
+    REQUIRE(player.getBpm() == Approx(128.0));
+
+    // Outro valor.
+    player.setBpm(90.5);
+    REQUIRE(player.getBpm() == Approx(90.5));
+}
+
 TEST_CASE("DeckPlayer::setPositionRelative / getPositionRelative", "[DeckPlayer]")
 {
     DeckPlayer player(formatManager());

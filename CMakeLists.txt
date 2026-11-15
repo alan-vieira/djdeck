@@ -193,11 +193,15 @@ if (DJDECK_ENABLE_TESTS)
         tests/test_deckplayer.cpp
         tests/test_crossfader.cpp
         tests/test_waveform.cpp
+        tests/test_bpm_detector.cpp
 
         # Implementacoes do projeto necessarias pelos testes
         Source/Song.cpp
         Source/DeckPlayer.cpp
         Source/CrossfaderComponent.cpp
+
+        # O detector de BPM por analise de audio (usa juce::dsp::FFT).
+        Source/BpmDetector.cpp
     )
 
     target_link_libraries(djdeck_tests PRIVATE
@@ -209,6 +213,10 @@ if (DJDECK_ENABLE_TESTS)
         juce::juce_audio_basics
         juce::juce_audio_formats
         juce::juce_audio_utils
+
+        # juce::dsp: o BpmDetector usa juce::dsp::FFT e o DeckPlayer usa
+        # juce::IIRFilter (EQ e filtro).
+        juce::juce_dsp
     )
 
     target_include_directories(djdeck_tests PRIVATE

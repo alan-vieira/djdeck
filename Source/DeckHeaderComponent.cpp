@@ -34,6 +34,7 @@ void DeckHeaderComponent::setTrackArtist (const juce::String& artist)
 
 void DeckHeaderComponent::setBpm (double newBpm)
 {
+    juce::Logger::writeToLog ("[DIAG] DeckHeaderComponent::setBpm called with " + juce::String (newBpm, 2));
     bpm = newBpm;
     repaint();
 }

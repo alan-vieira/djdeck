@@ -3,6 +3,10 @@
 #include "RekordboxColours.h"
 #include "TagLibReader.h"
 
+#include "BpmDetector.h"
+
+#include <functional>
+
 // IDs das colunas da tabela
 enum PlaylistColumns
 {
@@ -17,7 +21,8 @@ enum PlaylistColumns
 };
 
 //==============================================================================
-PlaylistComponent::PlaylistComponent()
+PlaylistComponent::PlaylistComponent (juce::AudioFormatManager& formatManagerToUse)
+    : formatManager (formatManagerToUse)
 {
     addAndMakeVisible(playlistTable);
     playlistTable.setModel(this);
@@ -74,8 +79,16 @@ void PlaylistComponent::loadLibrary()
 
     // Relê os metadados do arquivo: uma edição feita fora do app (ou por
     // outro programa de DJ) aparece na próxima vez que o djdeck abre.
-    for (auto& song : songs)
+    // Faixas sem BPM na tag sao encaminhadas para a deteccao por analise de
+    // audio (roda em segundo plano, uma por vez).
+    for (int i = 0; i < songs.size(); ++i)
+    {
+        auto& song = songs.getReference (i);
         readMetadataFor (song);
+
+        if (song.bpm <= 0.0)
+            detectBpmFor (i);
+    }
 
     playlistTable.updateContent();
 }
@@ -276,6 +289,12 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
                                         Song song{ f };
                                         readMetadataFor (song);
                                         songs.add (song);
+
+                                        // Se o arquivo nao tem BPM na tag,
+                                        // detecta por analise de audio em
+                                        // segundo plano.
+                                        if (song.bpm <= 0.0)
+                                            detectBpmFor (songs.size() - 1);
                                     }
                                     playlistTable.updateContent();
 
@@ -301,6 +320,10 @@ void PlaylistComponent::filesDropped(const juce::StringArray& files, int /*x*/, 
         Song song{ juce::File(f) };
         readMetadataFor (song);
         songs.add(song);
+
+        // Se o arquivo nao tem BPM na tag, detecta por analise de audio.
+        if (song.bpm <= 0.0)
+            detectBpmFor (songs.size() - 1);
     }
     playlistTable.updateContent();
 
@@ -332,7 +355,8 @@ juce::var PlaylistComponent::getDragSourceDescription (const juce::SparseSet<int
     if (row < 0 || row >= songs.size())
         return {};
 
-    return juce::var (new PlaylistDragPayload (songs.getReference (row).file));
+    const auto& song = songs.getReference (row);
+    return juce::var (new PlaylistDragPayload (song.file, song.bpm, song.title, song.artist));
 }
 
 //==============================================================================
@@ -376,4 +400,62 @@ const Song* PlaylistComponent::getSelectedSong() const
         return &songs.getReference(selectedRow);
 
     return nullptr;
+}
+
+//==============================================================================
+// Job de deteccao de BPM: roda no ThreadPool (uma faixa por vez) e avisa o
+// resultado na message thread para atualizar o modelo da tabela.
+namespace
+{
+    class BpmDetectionJob : public juce::ThreadPoolJob
+    {
+    public:
+        BpmDetectionJob (juce::File fileToScan,
+                         juce::AudioFormatManager& formatManagerToUse,
+                         std::function<void (double)> resultCallback)
+            : juce::ThreadPoolJob ("BPM Detection"),
+              file (std::move (fileToScan)),
+              formatManager (formatManagerToUse),
+              callback (std::move (resultCallback))
+        {
+        }
+
+        JobStatus runJob() override
+        {
+            std::unique_ptr<juce::AudioFormatReader> reader (formatManager.createReaderFor (file));
+            double bpm = 0.0;
+
+            if (reader != nullptr)
+                bpm = BpmDetector::estimate (*reader, nullptr);
+
+            // Avisa na thread de GUI: so la e seguro tocar no modelo da tabela.
+            juce::MessageManager::callAsync ([cb = std::move (callback), bpm] () mutable
+            {
+                if (cb)
+                    cb (bpm);
+            });
+
+            return jobHasFinished;
+        }
+
+    private:
+        juce::File file;
+        juce::AudioFormatManager& formatManager;
+        std::function<void (double)> callback;
+    };
+}
+
+void PlaylistComponent::detectBpmFor (int row)
+{
+    const auto file = songs.getReference (row).file;
+
+    bpmPool.addJob (new BpmDetectionJob (file, formatManager,
+        [this, row] (double bpm)
+        {
+            if (row >= 0 && row < songs.size() && bpm > 0.0)
+            {
+                songs.getReference (row).bpm = bpm;
+                playlistTable.updateContent();
+            }
+        }), true);
 }

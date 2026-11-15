@@ -2270,11 +2270,11 @@ Verificado na tag `v0.3.0`.
 | Fonte customizada | ❌ ausente | Fonte do sistema |
 | Cor customizada | ✅ presente | `RekordboxColours` — paleta completa medida no Rekordbox |
 | Metadados (TagLib) | ✅ presente | `TagLibReader` + `TagLibFileStream` — ID3, Vorbis, MP4, APE, caminhos largos no Windows |
-| Detecção de BPM | ❌ ausente | TagLib lê a tag `BPM` quando o arquivo já tem; não há detecção de áudio |
+| Detecção de BPM | ✅ presente | `BpmDetector` — envelope de onsets por fluxo espectral + autocorrelação (60–200 BPM), rodando em thread de fundo ao carregar/importar a faixa; fallback: tag BPM do arquivo → detecção por áudio → placeholder `--.--`. O valor aparece no cabeçalho do deck e no centro do jog wheel. |
 
 ### 11.1 Ordem sugerida de implementação (próximas fases)
 
-1. **Detecção de BPM** — avaliar `libebguess` ou `aubio`; o TagLib só lê o BPM quando a tag já existe.
+1. **Detecção de BPM** — implementada (`Source/BpmDetector.h/.cpp`). Aparece no cabeçalho do deck e no centro do jog wheel após o carregamento da faixa, via `PlaylistDragPayload` (drag-and-drop da biblioteca) ou detecção assíncrona por áudio (`DeckPlayer::detectBpm`).
 2. **Preview com waveform na biblioteca** — coluna Preview na tabela de faixas.
 3. **Persistência de hot cues** — gravar posição dos cues no arquivo (tag ANLZ do Rekordbox ou similar).
 4. **Caminhos Unicode no Windows** — validar `TagLibFileStream` com caminhos acentuados.

@@ -9,7 +9,33 @@ o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
-Nada ainda.
+### Adicionado
+
+- **Detecção de BPM por análise de áudio** (`Source/BpmDetector.h/.cpp`):
+  pipeline sem dependências externas (JUCE DSP): envelope de onsets por
+  fluxo espectral + autocorrelação na faixa de 60–200 BPM, com correção de
+  oitava e interpolação parabólica. Roda em thread de fundo ao importar ou
+  carregar uma faixa, com fallback: tag BPM do arquivo → detecção por áudio →
+  placeholder de 120 BPM. O valor detectado é persistido em `library.xml`.
+- Testes `tests/test_bpm_detector.cpp` (Catch2): detecção de 90/128/170 BPM
+  em sinais sintéticos e retorno de zero para silêncio.
+
+### Alterado
+
+- `PlaylistComponent` dispara a detecção de BPM por áudio para faixas sem tag
+  ao importar, abrir biblioteca ou soltar arquivos; atualiza a linha da tabela
+  quando o resultado fica pronto.
+- `DeckPlayer` expõe `setBpmDetectedHandler` e `detectBpm`, disparando a
+  detecção ao carregar uma faixa sem BPM conhecido; o handler atualiza o
+  cabeçalho e o jog wheel.
+
+### Corrigido
+
+- **BPM no deck e no jog wheel ao arrastar da playlist** — o `PlaylistDragPayload`
+  agora transporta `bpm`, `title` e `artist` além do `file`; `DeckComponent::loadFileURL`
+  aplica o BPM no player, no cabeçalho e no jog wheel antes de carregar o áudio.
+  Quando nenhum BPM vem do payload, `TagLibReader` é consultado antes de recorrer
+  à detecção por análise de áudio.
 
 ---
 

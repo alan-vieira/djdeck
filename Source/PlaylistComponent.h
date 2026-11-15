@@ -1,8 +1,10 @@
 #pragma once
 
+#include <juce_audio_formats/juce_audio_formats.h>
 #include <juce_core/juce_core.h>
 #include <juce_events/juce_events.h>
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <functional>
 #include "Song.h"
 #include "PlaylistDragPayload.h"
 #include "TagLibReader.h"
@@ -19,7 +21,9 @@ class PlaylistComponent : public juce::Component,
                           public juce::FileDragAndDropTarget
 {
 public:
-    PlaylistComponent();
+    // O formatManager e usado para decodificar o audio na deteccao de BPM por
+    // analise, que roda na thread de fundo (nunca na thread de GUI).
+    PlaylistComponent (juce::AudioFormatManager& formatManagerToUse);
     ~PlaylistComponent() override;
 
     void paint(juce::Graphics&) override;
@@ -66,11 +70,21 @@ public:
     void mouseDoubleClick (const juce::MouseEvent& event) override;
 
 private:
+    juce::AudioFormatManager& formatManager;
+
+    // Detecta BPM de uma unica faixa por vez (nao empilha threads por faixa
+    // importada).
+    juce::ThreadPool bpmPool { 1 };
+
     // Rating: 5 estrelas preenchidas, em ambar.
     void drawRating (juce::Graphics& g, int rating, const juce::Rectangle<int>& area);
 
     // Le os metadados do arquivo com o TagLib e aplica na faixa.
     void readMetadataFor (Song& song);
+
+    // Deteccao de BPM por analise de audio da faixa na linha `row`; atualiza a
+    // linha da tabela quando termina.
+    void detectBpmFor (int row);
 
     // Carrega a biblioteca persistida do disco.
     void loadLibrary();

@@ -22,12 +22,21 @@ class PlaylistDragPayload : public juce::ReferenceCountedObject
 public:
     static constexpr const char* typeToken = "djdeck/playlistTrack";
 
-    explicit PlaylistDragPayload (juce::File fileToUse)
-        : file (std::move (fileToUse))
+    PlaylistDragPayload (juce::File fileToUse,
+                         double bpmToUse = 0.0,
+                         juce::String titleToUse = {},
+                         juce::String artistToUse = {})
+        : file (std::move (fileToUse)),
+          bpm (bpmToUse),
+          title (std::move (titleToUse)),
+          artist (std::move (artistToUse))
     {
     }
 
     juce::File file;
+    double bpm = 0.0;
+    juce::String title;
+    juce::String artist;
 
     static bool isPayload (const juce::var& value)
     {

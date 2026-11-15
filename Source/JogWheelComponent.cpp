@@ -13,6 +13,7 @@ JogWheelComponent::~JogWheelComponent() = default;
 //==============================================================================
 void JogWheelComponent::setBpm (double newBpm)
 {
+    juce::Logger::writeToLog ("[DIAG] JogWheelComponent::setBpm called with " + juce::String (newBpm, 2));
     bpm = newBpm;
     repaint();
 }

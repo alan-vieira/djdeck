@@ -5,6 +5,8 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_core/juce_core.h>
 
+#include <functional>
+
 //==============================================================================
 // Processador de áudio de um único deck.
 //
@@ -102,6 +104,14 @@ public:
     double getBpm() const { return bpm; }
     void setBpm(double value) { bpm = value; }
 
+    // Define o handler chamado quando a deteccao assincrona de BPM termina.
+    // Executado na message thread (seguro para atualizar a UI).
+    void setBpmDetectedHandler (std::function<void (double)> handler);
+
+    // Detecta o BPM do arquivo por analise de audio (thread de fundo). Usado
+    // quando a faixa nao traz BPM na tag nem na biblioteca.
+    void detectBpm (const juce::File& file);
+
 private:
     // Aplica o ganho total (trim x fader x crossfader) no transporte.
     void applyGain();
@@ -142,6 +152,14 @@ private:
 
     double currentSampleRate = 44100.0;
     double bpm = 0.0;
+
+    // Handler de conclusao da deteccao de BPM (disparado na message thread).
+    std::function<void (double)> onBpmDetected;
+
+    // Pool dedicado a deteccao de BPM deste deck. Uma unica thread: a deteccao
+    // e pesada (decodifica ate 60 s de audio) e nao precisa de paralelismo
+    // dentro do mesmo deck.
+    juce::ThreadPool bpmPool { 1 };
 
     // Filtros do EQ de 3 bandas: low shelf 250 Hz, peak 1 kHz, high shelf 4 kHz.
     juce::IIRFilter lowFilter;

@@ -95,7 +95,8 @@ public:
     int getDeckId() const { return id; }
 
 private:
-    void loadFileURL (juce::URL audioURL, const juce::String& title = {},
+    void loadFileURL (juce::URL audioURL, double bpm = 0.0,
+                      const juce::String& title = {},
                       const juce::String& artist = {});
     void updateHeaderTimes();
 
