@@ -7,7 +7,7 @@ o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ---
 
-## [Não publicado]
+## [0.4.0] — 2026-11-15
 
 ### Adicionado
 

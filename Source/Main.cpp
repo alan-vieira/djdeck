@@ -21,8 +21,8 @@ struct ProjectInfo
 
 inline const char* const ProjectInfo::projectName = "djdeck";
 inline const char* const ProjectInfo::companyName = "DJ App";
-inline const char* const ProjectInfo::versionString = "0.3.0";
-inline const int ProjectInfo::versionNumber = 1;
+inline const char* const ProjectInfo::versionString = "0.4.0";
+inline const int ProjectInfo::versionNumber = 2;
 
 //==============================================================================
 class DJApplication : public juce::JUCEApplication
