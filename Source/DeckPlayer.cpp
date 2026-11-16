@@ -264,7 +264,9 @@ void DeckPlayer::setCrossfadeGain(double gain)
 
 void DeckPlayer::setSpeed(double ratio)
 {
-    resampleSource.setResamplingRatio(juce::jlimit(0.5, 3.0, ratio));
+    // Faixa padrão da indústria para pitch de DJ: ±100% (0.01× a 2.0×).
+    // 0.01 evita ratio zero no ResamplingAudioSource.
+    resampleSource.setResamplingRatio(juce::jlimit(0.01, 2.0, ratio));
 }
 double DeckPlayer::getSpeed() const { return resampleSource.getResamplingRatio(); }
 

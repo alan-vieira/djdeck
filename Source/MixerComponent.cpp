@@ -16,6 +16,7 @@ MixerComponent::MixerComponent (DeckPlayer* playerAToUse, DeckPlayer* playerBToU
     // MIXING: 0 = so deck A, 1 = so deck B, 0.5 = mistura equilibrada.
     mixingFader.setRange (0.0, 1.0, 0.01);
     mixingFader.setValue (0.5);
+    mixingFader.setDoubleClickReturnValue (true, 0.5);
     mixingFader.setSliderStyle (juce::Slider::LinearVertical);
     mixingFader.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
     mixingFader.addListener (this);
@@ -24,6 +25,7 @@ MixerComponent::MixerComponent (DeckPlayer* playerAToUse, DeckPlayer* playerBToU
     // LEVEL: volume geral (0 = silencio, 1 = maximo).
     levelFader.setRange (0.0, 1.0, 0.01);
     levelFader.setValue (0.7);
+    levelFader.setDoubleClickReturnValue (true, 0.7);
     levelFader.setSliderStyle (juce::Slider::LinearVertical);
     levelFader.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
     levelFader.addListener (this);

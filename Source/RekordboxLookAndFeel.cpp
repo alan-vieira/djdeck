@@ -85,6 +85,10 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
 
         g.setColour (RekordboxColours::canvas);
         g.fillRect (handle.getCentreX() - 1.0f, handle.getY(), 2.0f, handle.getHeight());
+
+        // Pino de posicao: marcador na trilha indicando onde o slider esta.
+        g.setColour (RekordboxColours::accent);
+        g.fillRect (centreX - 6.0f, handleY - 1.5f, 12.0f, 3.0f);
     }
     else
     {
@@ -108,6 +112,10 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
 
         g.setColour (RekordboxColours::canvas);
         g.fillRect (handle.getX(), handle.getCentreY() - 1.0f, handle.getWidth(), 2.0f);
+
+        // Pino de posicao: marcador na trilha indicando onde o slider esta.
+        g.setColour (RekordboxColours::accent);
+        g.fillRect (handleX - 1.5f, centreY - 6.0f, 3.0f, 12.0f);
     }
 }
 

@@ -51,6 +51,7 @@ ChannelStripComponent::ChannelStripComponent (DeckPlayer* playerToUse, bool mirr
     // Range LINEAR 0-1: mantem a API de DeckPlayer::setGain() sem conversao.
     volumeFader.setRange (0.0, 1.0);
     volumeFader.setValue (player != nullptr ? player->getGain() : 0.5);
+    volumeFader.setDoubleClickReturnValue (true, 0.5);
     volumeFader.addListener (this);
     addAndMakeVisible (volumeFader);
 

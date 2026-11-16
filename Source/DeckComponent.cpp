@@ -49,11 +49,13 @@ DeckComponent::DeckComponent (int deckId,
     cueButton.setTooltip ("Monitoramento de fone (PFL)");
     addAndMakeVisible (cueButton);
 
-    // ---- Velocidade ----
-    speedSlider.setRange (0.5, 3.0);
-    speedSlider.setValue (1.0);
-    speedSlider.addListener (this);
-    addAndMakeVisible (speedSlider);
+    // ---- Velocidade (pitch) ----
+    pitchSlider.setRange (-16.0, 16.0, 0.1);
+    pitchSlider.setValue (0.0);
+    pitchSlider.setTooltip ("Pitch / velocidade (+-16%)");
+    pitchSlider.setDoubleClickReturnValue (true, 0.0);
+    pitchSlider.addListener (this);
+    addAndMakeVisible (pitchSlider);
 
     // ---- Jog wheel: scratch desloca a posicao ----
     jogWheel.onScratch = [this] (float deltaRadians)
@@ -128,7 +130,12 @@ DeckComponent::DeckComponent (int deckId,
         if (safeThis == nullptr)
             return;
 
+        safeThis->player->setBpm (bpm);
         safeThis->header.setBpm (bpm);
+        safeThis->jogWheel.setBpm (bpm);
+        // Propaga o BPM detectado para a biblioteca, se houver um listener registrado
+        if (safeThis->libraryListener != nullptr)
+            safeThis->libraryListener->onBpmDetected (safeThis->id, bpm);
         safeThis->jogWheel.setBpm (bpm);
     });
 }
@@ -184,43 +191,54 @@ void DeckComponent::resized()
     reverseButton.setBounds (navRow.removeFromLeft (navWidth));
     forwardButton.setBounds (navRow.removeFromLeft (navWidth));
 
-    // Velocidade na faixa restante.
-    speedSlider.setBounds (playArea.reduced (2));
-
-    // ---- Area central: pads + jog wheel ----
+    // ---- Area central: pads + jog wheel + pitch slider ----
     auto middleArea = area;
 
     // O jog wheel e quadrado, com ~140 px de diametro.
     const auto jogSize = juce::jmin (140, juce::jmin (middleArea.getWidth(), middleArea.getHeight()));
-    auto jogArea = middleArea.withSizeKeepingCentre (jogSize, jogSize);
+    const auto pitchWidth = 48;
+    const auto cueWidth = 40;
 
-    // No deck 1 o jog fica a DIREITA e os pads a ESQUERDA; no deck 2 e o
-    // inverso. O `mirrored` decide — sem `if` espalhado no desenho.
     if (! mirrored)
-        jogArea = middleArea.removeFromRight (jogSize);
-    else
-        jogArea = middleArea.removeFromLeft (jogSize);
+    {
+        // Deck 1 (nao espelhado): [pads] [CUE] [jog] [pitch]
+        // Pitch fica à direita do jog wheel.
+        auto pitchArea = middleArea.removeFromRight (pitchWidth);
+        pitchArea = pitchArea.withSizeKeepingCentre (pitchWidth, jogSize);
+        auto jogArea = middleArea.removeFromRight (jogSize);
+        jogArea = jogArea.withSizeKeepingCentre (jogSize, jogSize);
+        auto cueStrip = middleArea.removeFromRight (cueWidth);
+        auto cueArea = juce::Rectangle<int> (cueStrip.getX() + (cueStrip.getWidth() - 38) / 2,
+                                             jogArea.getY(), 38, 28);
 
-    jogWheel.setBounds (jogArea);
+        jogWheel.setBounds (jogArea);
+        pitchSlider.setBounds (pitchArea.reduced (2));
+        cueButton.setBounds (cueArea);
+    }
+    else
+    {
+        // Deck 2 (espelhado): [jog] [pitch] [CUE] [pads]
+        // Pitch fica à direita do jog wheel.
+        auto jogArea = middleArea.removeFromLeft (jogSize);
+        jogArea = jogArea.withSizeKeepingCentre (jogSize, jogSize);
+
+        auto pitchArea = middleArea.removeFromLeft (pitchWidth);
+        pitchArea = pitchArea.withSizeKeepingCentre (pitchWidth, jogSize);
+
+        auto cueStrip = middleArea.removeFromLeft (cueWidth);
+        auto cueArea = juce::Rectangle<int> (cueStrip.getX() + (cueStrip.getWidth() - 38) / 2,
+                                             jogArea.getY(), 38, 28);
+
+        jogWheel.setBounds (jogArea);
+        pitchSlider.setBounds (pitchArea.reduced (2));
+        cueButton.setBounds (cueArea);
+    }
 
     // Os pads ocupam o resto da area central.
     if (! useHotCuePads)
         beatJump.setBounds (middleArea);
     else
         hotCuePads.setBounds (middleArea);
-
-    // ---- CUE: ao lado do jog wheel ----
-    auto cueArea = juce::Rectangle<int> (jogArea.getX() - 40, jogArea.getY(), 38, 28);
-
-    if (mirrored)
-        cueArea = juce::Rectangle<int> (jogArea.getRight() + 2, jogArea.getY(), 38, 28);
-
-    cueArea = cueArea.getIntersection (area);
-
-    if (cueArea.getWidth() > 8 && cueArea.getHeight() > 8)
-        cueButton.setBounds (cueArea);
-    else
-        cueButton.setBounds (0, 0, 0, 0);
 
     // ---- Waveform: ocupa o espaco entre o cabecalho e a area central ----
     auto waveformArea = area;
@@ -271,8 +289,15 @@ void DeckComponent::sliderValueChanged(juce::Slider* slider)
     if (player == nullptr)
         return;
 
-    if (slider == &speedSlider)
-        player->setSpeed (speedSlider.getValue());
+    if (slider == &pitchSlider)
+    {
+        // Converte variacao de pitch (%) em taxa de reproducao:
+        //   0%   -> 1.0x  (neutro)
+        //  +16%  -> 1.16x  (padrao industria: faixa +-16%)
+        //  -16%  -> 0.84x
+        // DeckPlayer::setSpeed limita a 0.01x .. 2.0x.
+        player->setSpeed (1.0 + slider->getValue() / 100.0);
+    }
 }
 
 //==============================================================================
@@ -395,6 +420,11 @@ void DeckComponent::loadFileURL (juce::URL audioURL, double bpm,
 {
     if (player == nullptr)
         return;
+
+    // Sempre reseta o pitch ao carregar uma faixa nova: o usuario espera
+    // tocar a proxima faixa na velocidade original (1.0x / 0%).
+    pitchSlider.setValue (0.0);
+    player->setSpeed (1.0);
 
     juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFileURL called, player->getBpm()=" + juce::String (player->getBpm(), 2));
 

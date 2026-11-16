@@ -7,6 +7,7 @@ CrossfaderComponent::CrossfaderComponent()
     // Posicao: -1.0 (deck A) .. +1.0 (deck B). Centro = mistura equilibrada.
     crossfader.setRange (-1.0, 1.0, 0.001);
     crossfader.setValue (0.0);
+    crossfader.setDoubleClickReturnValue (true, 0.0);
     crossfader.addListener (this);
     addAndMakeVisible (crossfader);
 

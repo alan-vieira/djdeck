@@ -119,7 +119,7 @@ private:
     juce::TextButton reverseButton { "<<" };
     juce::TextButton cueButton { "CUE" };
 
-    juce::Slider speedSlider { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
+    juce::Slider pitchSlider { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
 
     // Estado visual do drag-and-drop (para dar feedback ao usuario)
     bool dragOverActive = false;
