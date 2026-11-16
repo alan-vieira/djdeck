@@ -86,6 +86,15 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         g.setColour (RekordboxColours::canvas);
         g.fillRect (handle.getCentreX() - 1.0f, handle.getY(), 2.0f, handle.getHeight());
 
+                        // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
+        g.setColour (RekordboxColours::separator);
+        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
+        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
+        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
+        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
+        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
+        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
+        // Pino de posicao: marcador na trilha indicando onde o slider esta.
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
         g.setColour (RekordboxColours::accent);
         g.fillRect (centreX - 6.0f, handleY - 1.5f, 12.0f, 3.0f);
@@ -113,6 +122,15 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         g.setColour (RekordboxColours::canvas);
         g.fillRect (handle.getX(), handle.getCentreY() - 1.0f, handle.getWidth(), 2.0f);
 
+                        // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
+        g.setColour (RekordboxColours::separator);
+        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
+        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
+        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
+        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
+        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
+        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
+        // Pino de posicao: marcador na trilha indicando onde o slider esta.
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
         g.setColour (RekordboxColours::accent);
         g.fillRect (handleX - 1.5f, centreY - 6.0f, 3.0f, 12.0f);
