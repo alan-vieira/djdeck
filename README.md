@@ -6,12 +6,24 @@ Aplicação de DJ para desktop com **dois decks**, mixer, equalizador de 3 banda
 
 ![Janela principal do djdeck](docs/screenshots/main-window.png)
 
-> **Status:** `v0.3.0` — versão estável com mixer completo, equalizador, filtro, crossfader, big/mini waveform sincronizadas e testes automatizados.
+> **Status:** `v0.4.0` — versão estável com mixer completo, equalizador, filtro, crossfader, big/mini waveform sincronizadas, detecção de BPM e testes automatizados.
 > Compila sem erros nem warnings, abre corretamente, e o fluxo principal (importar faixa → arrastar para um deck → reproduzir) está verificado em execução.
 
 O [roadmap completo](docs/ROADMAP.md) está em [`docs/ROADMAP.md`](docs/ROADMAP.md). O guia detalhado de layout, cores e componentes está em [`docs/DOCUMENTACAO_LAYOUT_UI.md`](docs/DOCUMENTACAO_LAYOUT_UI.md).
 
----
+### Configuração de UI centralizada (layout.json)
+
+Todas as proporções, cores, tipografia e regras de espelhamento da UI agora vivem em [`Source/layout.json`](Source/layout.json), editável sem recompilar o C++. Um script Python ([`tools/layout_codegen.py`](tools/layout_codegen.py)) converte esse JSON em [`Source/LayoutConfig.hpp`](Source/LayoutConfig.hpp) em tempo de build via CMake, injetando `constexpr`/`inline const` direto no binário — zero parsing de JSON em runtime.
+
+Para regenerar o header após editar o JSON:
+
+```bash
+python tools/layout_codegen.py
+```
+
+Ou deixe o CMake fazer isso automaticamente (o target `djdeck` depende de `djdeck_layout_codegen`).
+
+--- 
 
 ## Funcionalidades
 
@@ -137,7 +149,9 @@ djdeck/
 │   ├── RekordboxLookAndFeel.h/.cpp# LookAndFeel customizado
 │   ├── RekordboxColours.h      # paleta de cores medida no Rekordbox
 │   ├── SettingsDialog.h        # diálogo de dispositivo de áudio
-│   └── TagLibReader.h/.cpp     # leitura de metadados (ID3, Vorbis, MP4, APE)
+│   ├── TagLibReader.h/.cpp     # leitura de metadados (ID3, Vorbis, MP4, APE)
+│   ├── layout.json             # configuração centralizada de UI (cores, proporções, espelhamento)
+│   └── LayoutConfig.hpp        # GERADO a partir de layout.json (não editar à mão)
 ├── tests/
 │   ├── main.cpp                # ponto de entrada dos testes (inicializa JUCE)
 │   ├── test_song.cpp           # testes de Song / metadados
@@ -147,6 +161,10 @@ djdeck/
 ├── docs/
 │   ├── ROADMAP.md              # planejamento e decisões de arquitetura
 │   └── DOCUMENTACAO_LAYOUT_UI.md # guia de estilo, layout e componentes
+├── tools/
+│   └── layout_codegen.py       # codegen: layout.json -> LayoutConfig.hpp
+├── cmake/
+│   └── LayoutCodegen.cmake    # módulo CMake do codegen
 └── Builds/                     # artefatos de build (ignorado pelo git)
 ```
 

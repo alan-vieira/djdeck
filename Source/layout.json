@@ -1,0 +1,222 @@
+{
+  "$schema": "layout.schema.json",
+  "version": "1.0.0",
+  "name": "djdeck UI Layout",
+  "description": "Centralized UI configuration for djdeck — colors, typography, proportions, and mirror rules. Editable without recompiling C++. Source: docs/DOCUMENTACAO_LAYOUT_UI.md + Source/RekordboxColours.h.",
+
+  "screen": {
+    "width": 1600,
+    "height": 900
+  },
+
+  "sections": {
+    "vertical": [
+      { "id": "headerAndFX", "heightPercent": 10, "heightPx": 90, "content": ["mode", "layout", "activeModules", "clock"] },
+      { "id": "bigWaveforms", "heightPercent": 22, "heightPx": 200, "content": ["twoStackedWaveforms"] },
+      { "id": "decksAndMixer", "heightPercent": 39, "heightPx": 350, "content": ["deckA", "mixer", "deckB"] },
+      { "id": "library", "heightPercent": 28, "heightPx": 250, "content": ["libraryTree", "trackList"] }
+    ]
+  },
+
+  "decksAndMixer": {
+    "columns": {
+      "deckA": 45,
+      "mixer": 10,
+      "deckB": 45
+    }
+  },
+
+  "library": {
+    "columns": {
+      "libraryTree": 30,
+      "trackList": 70
+    }
+  },
+
+  "spacing": {
+    "gapTiny": 2,
+    "gapSmall": 4,
+    "gapMedium": 8,
+    "gapLarge": 16,
+    "panelInnerMargin": 8,
+    "sectionBorder": 1
+  },
+
+  "mirroring": {
+    "enabled": true,
+    "parameter": "bool mirrored",
+    "rule": "DeckComponent receives bool mirrored at construction; no scattered if(mirrored) in painting code — the component positions itself from the parameter.",
+    "elements": {
+      "padsGrid": { "mirrored=false": "left", "mirrored=true": "right", "label": "Beat Jump / Hot Cue pads", "positionRelativeToJog": { "mirrored=false": "left", "mirrored=true": "right" } },
+      "jogWheel": { "mirrored=false": "right", "mirrored=true": "left", "label": "Jog wheel + CUE / Play", "positionRelativeToPads": { "mirrored=false": "right", "mirrored=true": "left" } },
+      "cuePlayButtons": { "mirrored=false": "left", "mirrored=true": "right", "label": "CUE and play/pause", "positionRelativeToJog": { "mirrored=false": "left side", "mirrored=true": "right side" } },
+      "eqLabels": { "mirrored=false": "right", "mirrored=true": "left", "label": "EQ knob labels" }
+    }
+  },
+
+  "colors": {
+    "surfaces": {
+      "background": "#191919",
+      "panel": "#1A1A1A",
+      "panelRaised": "#282828",
+      "mixerBackground": "#121212",
+      "canvas": "#000000",
+      "separator": "#323232"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#CCCCCC",
+      "tertiary": "#AEAEAE",
+      "disabled": "#707070"
+    },
+    "states": {
+      "accent": "#007DE1",
+      "selection": "#052E64",
+      "selectionText": "#158016",
+      "hover": "#2A2A2A"
+    },
+    "djSemantics": {
+      "loop": "#FF8C00",
+      "cue": "#A63031",
+      "rating": "#DEAB38",
+      "beatGrid": "#B8B8B8",
+      "downbeat": "#A30000",
+      "needle": "#FFFFFF"
+    },
+    "waveform": {
+      "low": "#006EFF",
+      "mid": "#00B4C2",
+      "high": "#3EB4B4",
+      "region": "#805200"
+    },
+    "hotCue": [
+      "#007aff",
+      "#00ff00",
+      "#af7ac7",
+      "#ff8c00",
+      "#00b4c2",
+      "#ff6ec7",
+      "#ffd700",
+      "#ff0000"
+    ],
+    "gradients": {
+      "vu": { "from": "yellow", "stop": [ { "proportion": 0.75, "color": "yellow" } ], "to": "orangered" },
+      "wave": { "from": "waveLow", "to": "waveHigh" }
+    }
+  },
+
+  "typography": {
+    "roles": {
+      "display": { "sizePx": 28, "weight": "regular", "usage": "BPM at jog wheel center" },
+      "title": { "sizePx": 16, "weight": "regular", "usage": "deck track title" },
+      "body": { "sizePx": 13, "weight": "regular", "usage": "knob labels, BPM, key" },
+      "caption": { "sizePx": 11, "weight": "regular", "usage": "timestamps, counters" },
+      "micro": { "sizePx": 9, "weight": "regular", "usage": "beat grid markings" }
+    },
+    "notes": [
+      "Numbers should use tabular figures to avoid shaking during playback",
+      "Format timestamps with fixed width: \"  1:23\" instead of \"1:23\""
+    ]
+  },
+
+  "deck": {
+    "header": {
+      "elements": [
+        { "id": "deckNumber", "position": "topLeft", "sizePx": 18, "color": "textPrimary", "shape": "circle" },
+        { "id": "title", "position": "afterDeckNumber", "sizePx": 16, "color": "textPrimary" },
+        { "id": "artist", "position": "belowTitle", "sizePx": 13, "color": "textSecondary" },
+        { "id": "bpmKey", "position": "topRight", "sizePx": 16, "color": "textPrimary" },
+        { "id": "elapsedTime", "position": "belowRight", "sizePx": 11, "color": "textSecondary" },
+        { "id": "remainingTime", "position": "belowRight", "sizePx": 11, "color": "textSecondary" },
+        { "id": "sync", "position": "topRightColumn", "color": "accent", "activeColor": "accent" },
+        { "id": "master", "position": "besideSync", "color": "loop", "activeColor": "loop" }
+      ]
+    },
+    "layout": [
+      { "id": "deckHeader", "label": "track info" },
+      { "id": "miniWaveform", "label": "static waveform, moving needle" },
+      { "id": "beatJumpOrHotCue", "label": "deck 1: Beat Jump left; deck 2: Hot Cue right" },
+      { "id": "jogWheel", "label": "~140px diameter + CUE + Play" },
+      { "id": "footer", "label": "assignment 1-4, MIXING, LEVEL" }
+    ]
+  },
+
+  "library": {
+    "columns": {
+      "libraryTree": 30,
+      "trackList": 70
+    },
+    "columnDefinitions": [
+      { "id": "hash", "label": "#", "content": "number + cue marker" },
+      { "id": "preview", "label": "Preview", "content": "waveform thumbnail colored with hot cues A-H" },
+      { "id": "title", "label": "Title", "content": "white title, gray artist" },
+      { "id": "artist", "label": "Artist" },
+      { "id": "bpm", "label": "BPM", "content": "\"140.00\" + key \"Gm\"" },
+      { "id": "album", "label": "Album" },
+      { "id": "genre", "label": "Genre" },
+      { "id": "rating", "label": "Rating", "content": "5 stars filled amber #DEAB38" },
+      { "id": "time", "label": "Time", "content": "duration" }
+    ]
+  },
+
+  "components": {
+    "knob": {
+      "bodyColor": "panelRaised",
+      "borderColor": "separator",
+      "indicatorColor": "textPrimary",
+      "indicatorLengthPercent": 70,
+      "arcColor": "accent",
+      "arcThicknessPx": 2,
+      "arcDegrees": 270,
+      "labelBelow": true,
+      "labelSizePx": 11,
+      "labelColor": "textSecondary"
+    },
+    "slider": {
+      "vertical": {
+        "railWidthPx": 4,
+        "railColor": "canvas",
+        "fillColor": "accent",
+        "handleHeightPx": 18,
+        "handleColor": "textSecondary",
+        "handleLineColor": "canvas"
+      },
+      "horizontal": {
+        "railHeightPx": 4,
+        "handleWidthPx": 24,
+        "handleShape": "diamondOrCapsule"
+      }
+    },
+    "jogWheel": {
+      "diameterPx": 140,
+      "bpmSizePx": 28,
+      "pitchSizePx": 13,
+      "modes": ["touch", "pitch"]
+    },
+    "pads": {
+      "grid": "4x2",
+      "labels": ["A", "B", "C", "D", "E", "F", "G", "H"]
+    },
+    "vumeter": {
+      "minDb": -60,
+      "maxDb": 0,
+      "marksDb": [0, -3, -6, -10, -16, -22, -32, -48],
+      "gradient": ["green", "yellow", "red"],
+      "clipLedHeightPx": 4
+    },
+    "eq": {
+      "rangeDb": [-12, 12],
+      "resolutionDb": 0.5,
+      "bands": [
+        { "name": "LOW", "type": "lowShelf", "frequencyHz": 250, "q": 0.7 },
+        { "name": "MID", "type": "peak", "frequencyHz": 1000, "q": 1.0 },
+        { "name": "HIGH", "type": "highShelf", "frequencyHz": 4000, "q": 0.7 }
+      ]
+    },
+    "crossfader": {
+      "orientation": "horizontal",
+      "curve": "constantPower",
+      "centerGain": 0.707
+    }
+  }
+}

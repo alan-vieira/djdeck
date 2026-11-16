@@ -51,6 +51,22 @@ wheel, knobs, VU meter, biblioteca em árvore).
 
 ---
 
+## 0. Configuração centralizada (layout.json)
+
+Todas as proporções, cores, tipografia e regras de espelhamento da UI estão agora centralizadas em [`Source/layout.json`](../../Source/layout.json), editável sem recompilar o C++. Um script Python ([`tools/layout_codegen.py`](../../tools/layout_codegen.py)) converte esse JSON em [`Source/LayoutConfig.hpp`](../../Source/LayoutConfig.hpp) em tempo de build via CMake, injetando `constexpr`/`inline const` direto no binário — zero parsing de JSON em runtime.
+
+Este documento (`DOCUMENTACAO_LAYOUT_UI.md`) continua sendo a referência detalhada de cada seção do layout (§1–§12). O `layout.json` é a **fonte da verdade** para os valores numéricos e de cor; onde houver divergência entre o JSON e este documento, o JSON prevalece.
+
+Para regenerar o header após editar o JSON:
+
+```bash
+python tools/layout_codegen.py
+```
+
+O target CMake `djdeck` depende de `djdeck_layout_codegen`, então o header é regenerado automaticamente em cada build.
+
+---
+
 ## 1. Paleta de cores
 
 ### 1.1 Cores medidas nas referências

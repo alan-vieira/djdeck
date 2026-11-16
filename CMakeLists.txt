@@ -40,6 +40,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(JUCE)
 
 #===============================================================================
+# Codegen do layout (JSON -> header C++)
+#===============================================================================
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(LayoutCodegen)
+
+#===============================================================================
 # TagLib — leitura e escrita de metadados de audio.
 #
 # Decisao registrada em docs/ROADMAP.md. Le e escreve tags ID3 (MP3),
@@ -95,6 +101,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(TAGLIB)
 
 juce_add_gui_app(djdeck)
+
+djdeck_layout_codegen()
 
 file(GLOB_RECURSE SourceFiles
     CONFIGURE_DEPENDS
