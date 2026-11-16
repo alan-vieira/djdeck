@@ -16,7 +16,8 @@ o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
   fluxo espectral + autocorrelação na faixa de 60–200 BPM, com correção de
   oitava e interpolação parabólica. Roda em thread de fundo ao importar ou
   carregar uma faixa, com fallback: tag BPM do arquivo → detecção por áudio →
-  placeholder de 120 BPM. O valor detectado é persistido em `library.xml`.
+  placeholder de “--.--” quando o BPM é desconhecido. O valor detectado é
+  persistido em `library.xml`.
 - Testes `tests/test_bpm_detector.cpp` (Catch2): detecção de 90/128/170 BPM
   em sinais sintéticos e retorno de zero para silêncio.
 

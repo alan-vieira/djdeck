@@ -40,7 +40,7 @@ Ou deixe o CMake fazer isso automaticamente (o target `djdeck` depende de `djdec
 | Big waveform (agulha fixa, onda rolante) | ✅ Funcionando |
 | Mini waveform (faixa estática, agulha móvel) | ✅ Funcionando |
 | Carregamento via FileInputSource (sem ler arquivo inteiro em memória) | ✅ Funcionando |
-| Playlist com colunas de título / artista / duração | ⚠️ Metadados ainda não extraídos |
+|| Playlist com colunas de título / artista / duração | ✅ Funcionando (via TagLib) — metadados extraídos e persistidos em `library.xml` |
 | Arrastar faixa da playlist para um deck | ✅ Funcionando |
 | Duplo-clique na playlist carrega no Deck 1 | ✅ Funcionando |
 | Arrastar arquivo do Explorer para a playlist | ✅ Funcionando |
@@ -197,7 +197,7 @@ arquivo → AudioFormatReader → AudioFormatReaderSource → AudioTransportSour
 
 Alguns pontos que exigem atenção ao mexer no código:
 
-- **Versão:** definida como `0.3.0` em `CMakeLists.txt` e `Source/Main.cpp` (`ProjectInfo::versionString`).
+- **Versão:** definida como `0.4.0` em `CMakeLists.txt` e `Source/Main.cpp` (`ProjectInfo::versionString`).
 - **`MainComponent` herda de `juce::DragAndDropContainer`.** Ele é um *mixin* (não deriva de `Component`), então convive com `juce::AudioAppComponent`. É ele que fornece `startDragging()` e roteia os eventos de drop.
 - **`setSize()` vem depois de `addAndMakeVisible()`.** `setSize()` dispara `resized()`, e é `resized()` que distribui os bounds entre os filhos. Chamar `setSize()` antes dos filhos existirem resulta em **tela preta**.
 - **`juce::Array::getUnchecked()` e `operator[]` retornam por valor** no JUCE 9. Pegar o endereço (`&`) de um deles gera um ponteiro para um temporário. Use `getReference()`.
@@ -225,8 +225,7 @@ Duas decisões de arquitetura já tomadas:
 ### Pendências conhecidas
 
 - **Acentuação quebrada nos textos da interface.** O cabeçalho “Duração” aparece como `DuraÃ§Ã£o` e “Título” como `TÃtulo`. A causa está identificada: no JUCE 9, `juce::String(const char*)` interpreta os bytes como **ASCII/Latin-1** (`CharPointer_ASCII`), não como UTF-8. A flag `/utf-8` já foi adicionada ao `CMakeLists.txt` para o compilador ler os fontes corretamente, mas a conversão para Unicode precisa ser explícita via `juce::String::fromUTF8()`. A correção está pendente.
-- A coluna **duração** exibe sempre `0:00` e o **artista** sempre *“Artista desconhecido”* — os metadados ainda não são extraídos dos arquivos.
-- A playlist não é persistida entre execuções.
+- **Segunda saída de áudio (PFL / fone).** Ainda não implementada — em aberto no [roadmap](docs/ROADMAP.md).
 
 ---
 
