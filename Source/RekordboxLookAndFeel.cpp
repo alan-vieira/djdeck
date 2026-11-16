@@ -96,6 +96,7 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
+        // Pino de posicao: marcador na trilha indicando onde o slider esta.
         g.setColour (RekordboxColours::accent);
         g.fillRect (centreX - 6.0f, handleY - 1.5f, 12.0f, 3.0f);
     }
@@ -130,6 +131,7 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
         g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
         g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
+        // Pino de posicao: marcador na trilha indicando onde o slider esta.
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
         g.setColour (RekordboxColours::accent);
