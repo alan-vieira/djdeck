@@ -31,7 +31,7 @@ class DeckHeaderComponent : public juce::Component,
                             public juce::Button::Listener
 {
 public:
-    DeckHeaderComponent (int deckIdToUse);
+    DeckHeaderComponent (int deckIdToUse, bool isDeck2ToUse = false);
     ~DeckHeaderComponent() override;
 
     void paint (juce::Graphics& g) override;
@@ -65,10 +65,16 @@ public:
     std::function<void (bool isSync)> onSyncToggled;
     std::function<void (bool isMaster)> onMasterToggled;
 
+    // Define a posicao absoluta do deck no canvas do Figma (para posicionar
+    // os elementos de texto nas coordenadas exatas dos nos figmaNode*).
+    void setDeckPosition (int x, int y);
+
 private:
     void drawDeckBadge (juce::Graphics& g, const juce::Rectangle<int>& area);
 
     int deckId;
+    bool isDeck2;
+    juce::Point<int> deckAbsPosition { 0, 0 }; // posicao absoluta do deck no canvas do Figma
 
     juce::String trackTitle { "Sem faixa" };
     juce::String trackArtist;
@@ -83,6 +89,13 @@ private:
 
     // Roda do tom musical (Camelot).
     CamelotKeyComponent camelotKey;
+
+    // Areas de desenho dos elementos de texto (calculadas em resized())
+    juce::Rectangle<int> deckNumberArea;
+    juce::Rectangle<int> titleArea;
+    juce::Rectangle<int> artistArea;
+    juce::Rectangle<int> bpmArea;
+    juce::Rectangle<int> timerArea;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeckHeaderComponent)
 };

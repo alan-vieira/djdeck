@@ -1,5 +1,5 @@
 #include "BigWaveformsComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 BigWaveformsComponent::BigWaveformsComponent (juce::AudioFormatManager& formatManagerToUse,
@@ -26,7 +26,7 @@ BigWaveformsComponent::~BigWaveformsComponent()
 //==============================================================================
 void BigWaveformsComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (RekordboxColours::background);
+    g.fillAll (djdeck::layout::colours::Background);
 }
 
 //==============================================================================

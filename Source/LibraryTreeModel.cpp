@@ -1,5 +1,5 @@
 #include "LibraryTreeModel.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 LibraryTreeModel::LibraryTreeModel (const juce::String& nameToUse, NodeType typeToUse)
@@ -23,17 +23,17 @@ void LibraryTreeModel::paintItem (juce::Graphics& g, int width, int height)
     constexpr float iconSize = 10.0f;
     const auto iconY = (area.getHeight() - iconSize) * 0.5f;
 
-    juce::Colour iconColour = RekordboxColours::textTertiary;
+    juce::Colour iconColour = djdeck::layout::colours::Tertiary;
 
     switch (nodeType)
     {
-        case NodeType::collection: iconColour = RekordboxColours::accent;       break;
-        case NodeType::playlists:  iconColour = RekordboxColours::loop;         break;
-        case NodeType::explorer:   iconColour = RekordboxColours::textTertiary; break;
-        case NodeType::devices:    iconColour = RekordboxColours::textTertiary; break;
-        case NodeType::histories:  iconColour = RekordboxColours::textTertiary; break;
-        case NodeType::recordings: iconColour = RekordboxColours::cue;          break;
-        case NodeType::folder:     iconColour = RekordboxColours::textTertiary; break;
+        case NodeType::collection: iconColour = djdeck::layout::colours::Accent;       break;
+        case NodeType::playlists:  iconColour = djdeck::layout::colours::Loop;         break;
+        case NodeType::explorer:   iconColour = djdeck::layout::colours::Tertiary; break;
+        case NodeType::devices:    iconColour = djdeck::layout::colours::Tertiary; break;
+        case NodeType::histories:  iconColour = djdeck::layout::colours::Tertiary; break;
+        case NodeType::recordings: iconColour = djdeck::layout::colours::Cue;          break;
+        case NodeType::folder:     iconColour = djdeck::layout::colours::Tertiary; break;
     }
 
     g.setColour (iconColour);
@@ -41,7 +41,7 @@ void LibraryTreeModel::paintItem (juce::Graphics& g, int width, int height)
 
     // Texto do no.
     g.setFont (juce::Font (juce::FontOptions (13.0f)));
-    g.setColour (isSelected() ? RekordboxColours::textPrimary : RekordboxColours::textSecondary);
+    g.setColour (isSelected() ? djdeck::layout::colours::Primary : djdeck::layout::colours::Secondary);
 
     // removeFromLeft devolve um Rectangle<float>; drawText aceita essa forma.
     g.drawText (title,

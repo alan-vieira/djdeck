@@ -1,11 +1,11 @@
 #include "KnobComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 KnobComponent::KnobComponent (juce::String labelToUse)
     : juce::Slider (juce::Slider::RotaryVerticalDrag, juce::Slider::NoTextBox),
       caption (std::move (labelToUse)),
-      accentColour (RekordboxColours::accent)
+      accentColour (djdeck::layout::colours::Accent)
 {
     setVelocityBasedMode (false);
 
@@ -62,10 +62,10 @@ void KnobComponent::paint (juce::Graphics& g)
     const auto angle = getRotaryAngle();
 
     // Corpo
-    g.setColour (RekordboxColours::panelRaised);
+    g.setColour (djdeck::layout::colours::KnobBody);
     g.fillEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
 
-    g.setColour (RekordboxColours::separator);
+    g.setColour (djdeck::layout::colours::KnobBorder);
     g.drawEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f, 1.0f);
 
     // Arco de valor: parte do neutro e cresce ate o valor atual.
@@ -91,14 +91,14 @@ void KnobComponent::paint (juce::Graphics& g)
     const auto indicatorX = centre.x + std::sin (angle) * indicatorLength;
     const auto indicatorY = centre.y - std::cos (angle) * indicatorLength;
 
-    g.setColour (RekordboxColours::textPrimary);
+    g.setColour (djdeck::layout::colours::TextPrimary);
     g.drawLine (centre.x, centre.y, indicatorX, indicatorY, 2.0f);
 
     // Rotulo
     if (caption.isNotEmpty())
     {
         g.setFont (juce::Font (juce::FontOptions (11.0f)));
-        g.setColour (RekordboxColours::textSecondary);
+        g.setColour (djdeck::layout::colours::Secondary);
         g.drawText (caption, getLocalBounds().removeFromBottom (14), juce::Justification::centred, true);
     }
 }

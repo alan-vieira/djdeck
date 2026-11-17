@@ -1,5 +1,5 @@
 #include "JogWheelComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 JogWheelComponent::JogWheelComponent (bool mirroredToUse)
@@ -126,7 +126,7 @@ void JogWheelComponent::drawPitchRange (juce::Graphics& g, const juce::Point<flo
     pitchSegment.addCentredArc (centre.x, centre.y, radius - 1.0f, radius - 1.0f, 0.0f,
                                 rangeStart, rangeEnd, true);
 
-    g.setColour (RekordboxColours::cue);
+    g.setColour (djdeck::layout::colours::Cue);
     g.strokePath (pitchSegment, juce::PathStrokeType (3.0f));
 }
 
@@ -135,9 +135,8 @@ void JogWheelComponent::paint (juce::Graphics& g)
 {
     auto area = getLocalBounds();
 
-    g.fillAll (RekordboxColours::panel);
+    g.fillAll (djdeck::layout::colours::Panel);
 
-    const auto radius = static_cast<float> (juce::jmin (area.getWidth(), area.getHeight())) * 0.5f;
     const auto centre = area.getCentre().toFloat();
 
     // Gira o disco proporcional a posicaoRelativa (1 volta inteira = faixa completa).
@@ -146,78 +145,78 @@ void JogWheelComponent::paint (juce::Graphics& g)
         static_cast<float> (positionRelative * 2.0 * juce::MathConstants<double>::pi),
         centre.x, centre.y));
 
-    // Disco
-    g.setColour (RekordboxColours::panelRaised);
-    g.fillEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
+    // ---- 3 circulos concêntricos (medidas do Figma) ----
+    // Forma: 102 x 102 px (bounds do componente)
+    // Meio:  88 x 88 px
+    // Dentro: 64 x 64 px
+    const float circleRadii[] = { djdeck::layout::jogWheel::diameterPx * 0.5f,
+                                  djdeck::layout::jogWheel::innerCirclePx * 0.5f,
+                                  djdeck::layout::jogWheel::centerCirclePx * 0.5f };
 
-    g.setColour (RekordboxColours::separator);
-    g.drawEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f, 1.0f);
+    // Disco preenchido (circulo externo).
+    g.setColour (djdeck::layout::colours::Panelraised);
+    g.fillEllipse (centre.x - circleRadii[0], centre.y - circleRadii[0],
+                   circleRadii[0] * 2.0f, circleRadii[0] * 2.0f);
 
-    // Faixa de pitch na borda.
-    drawPitchRange (g, centre, radius);
+    // Bordo externo do disco.
+    g.setColour (djdeck::layout::colours::Separator);
+    g.drawEllipse (centre.x - circleRadii[0], centre.y - circleRadii[0],
+                   circleRadii[0] * 2.0f, circleRadii[0] * 2.0f, 1.0f);
+
+    // Circulos intermediarios (meio e dentro).
+    for (int i = 1; i < 3; ++i)
+    {
+        g.drawEllipse (centre.x - circleRadii[i], centre.y - circleRadii[i],
+                       circleRadii[i] * 2.0f, circleRadii[i] * 2.0f, 1.0f);
+    }
+
+    // Faixa de pitch na borda (sobre o disco, antes de restaurar o estado).
+    drawPitchRange (g, centre, circleRadii[0]);
 
     g.restoreState();
 
-    // BPM no centro — 28 px, branco (nao gira com o disco).
-    g.setFont (juce::Font (juce::FontOptions (28.0f)));
-    g.setColour (RekordboxColours::textPrimary);
+    // ---- BPM no centro: 58.49 x 20.42 px, Inter Bold 15 (nao gira com o disco) ----
+    g.setFont (juce::Font (juce::FontOptions (djdeck::layout::typography::fontFamily,
+                                              static_cast<float> (djdeck::layout::jogWheel::bpm::sizePx),
+                                              djdeck::layout::jogWheel::bpm::weight)));
+    g.setColour (djdeck::layout::colours::Primary);
 
     const auto bpmText = bpm > 0.0 ? juce::String (getEffectiveBpm(), 2) : juce::String ("--.--");
-    g.drawText (bpmText, area.removeFromTop (static_cast<int> (radius)), juce::Justification::centred, true);
+    const auto bpmArea = juce::Rectangle<float> (
+        centre.x - djdeck::layout::jogWheel::bpm::widthPx * 0.5f,
+        centre.y - djdeck::layout::jogWheel::bpm::heightPx * 0.5f - 4.0f,
+        djdeck::layout::jogWheel::bpm::widthPx, djdeck::layout::jogWheel::bpm::heightPx);
+    g.drawText (bpmText, juce::Rectangle<int> ((int) bpmArea.getX(), (int) bpmArea.getY(),
+                                               (int) bpmArea.getWidth(), (int) bpmArea.getHeight()),
+                juce::Justification::centred, true);
 
-    // ---- Variacao de BPM, com setas para cima e para baixo ----
-    //
-    // A seta indica a DIRECAO do pitch:
-    //   ▲  o BPM esta subindo  (variacao positiva)
-    //   ▼  o BPM esta descendo (variacao negativa)
-    //
-    // O valor e mostrado com sinal explicito (+0.00% / -0.00%), porque e a
-    // variacao que o DJ le para saber o quanto esta desviando do BPM original.
+    // ---- Variacao de pitch em relacao ao BPM: 52 x 11 px, Inter Medium 9 ----
     const auto isUp = pitchPercent > 0.001f;
     const auto isDown = pitchPercent < -0.001f;
 
-    const auto pitchColour = isUp ? RekordboxColours::cue
-                                  : (isDown ? RekordboxColours::loop
-                                            : RekordboxColours::textSecondary);
+    const auto pitchColour = isUp ? djdeck::layout::colours::Cue
+                                  : (isDown ? djdeck::layout::colours::Loop
+                                            : djdeck::layout::colours::Secondary);
 
     g.setColour (pitchColour);
-    g.setFont (juce::Font (juce::FontOptions (13.0f)));
+    g.setFont (juce::Font (juce::FontOptions (djdeck::layout::typography::fontFamily,
+                                              static_cast<float> (djdeck::layout::jogWheel::pitch::sizePx),
+                                              djdeck::layout::jogWheel::pitch::weight)));
 
     const auto percentText = (pitchPercent > 0.001f ? juce::String ("+") : juce::String())
                            + juce::String (pitchPercent, 2) + "%";
 
-    // As setas ficam nas laterais do valor, formando a leitura
-    // "▲ +0.00% ▼" que mostra a direcao da variacao.
-    auto pitchRow = area.removeFromTop (18);
-
-    const auto arrowSize = 7.0f;
-    const auto arrowCentreY = pitchRow.getCentreY();
-
-    // Seta para cima
-    if (isUp)
-    {
-        juce::Path upArrow;
-        upArrow.addTriangle (pitchRow.getX() + 2.0f, arrowCentreY - arrowSize * 0.5f,
-                             pitchRow.getX() + 2.0f + arrowSize, arrowCentreY - arrowSize * 0.5f,
-                             pitchRow.getX() + 2.0f + arrowSize * 0.5f, arrowCentreY + arrowSize * 0.5f);
-        g.fillPath (upArrow);
-    }
-
-    // Seta para baixo
-    if (isDown)
-    {
-        juce::Path downArrow;
-        downArrow.addTriangle (pitchRow.getRight() - 2.0f - arrowSize, arrowCentreY - arrowSize * 0.5f,
-                               pitchRow.getRight() - 2.0f, arrowCentreY - arrowSize * 0.5f,
-                               pitchRow.getRight() - 2.0f - arrowSize * 0.5f, arrowCentreY + arrowSize * 0.5f);
-        g.fillPath (downArrow);
-    }
-
-    g.drawText (percentText, pitchRow.reduced (arrowSize + 4, 0), juce::Justification::centred, true);
+    const auto pitchArea = juce::Rectangle<float> (
+        centre.x - djdeck::layout::jogWheel::pitch::widthPx * 0.5f,
+        centre.y + djdeck::layout::jogWheel::bpm::heightPx * 0.5f - 2.0f,
+        djdeck::layout::jogWheel::pitch::widthPx, djdeck::layout::jogWheel::pitch::heightPx);
+    g.drawText (percentText, juce::Rectangle<int> ((int) pitchArea.getX(), (int) pitchArea.getY(),
+                                                   (int) pitchArea.getWidth(), (int) pitchArea.getHeight()),
+                juce::Justification::centred, true);
 
     // Indicador do modo, no rodape do disco.
-    g.setFont (juce::Font (juce::FontOptions (9.0f)));
-    g.setColour (RekordboxColours::textTertiary);
+    g.setFont (juce::Font (juce::FontOptions ("Inter", 9.0f, juce::Font::plain)));
+    g.setColour (djdeck::layout::colours::Tertiary);
     g.drawText (mode == Mode::touch ? "TOUCH" : "PITCH",
                 getLocalBounds().removeFromBottom (12), juce::Justification::centred, true);
 }

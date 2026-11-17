@@ -1,6 +1,6 @@
 #include "PlaylistComponent.h"
 #include "LibraryStore.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 #include "TagLibReader.h"
 
 #include "BpmDetector.h"
@@ -139,7 +139,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId
     const auto& song = songs.getReference(rowNumber);
 
     g.setFont (juce::Font (juce::FontOptions (13.0f)));
-    g.setColour (RekordboxColours::textPrimary);
+    g.setColour (djdeck::layout::colours::Primary);
 
     switch (columnId)
     {
@@ -148,7 +148,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId
         break;
 
     case artistColumn:
-        g.setColour (RekordboxColours::textSecondary);
+        g.setColour (djdeck::layout::colours::Secondary);
         g.drawText (song.artist, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
         break;
 
@@ -163,19 +163,19 @@ void PlaylistComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId
     case keyColumn:
     {
         // A key vem do arquivo em Camelot ("8A") ou em notacao classica.
-        g.setColour (RekordboxColours::textSecondary);
+        g.setColour (djdeck::layout::colours::Secondary);
         g.drawText (song.key.isEmpty() ? juce::String ("--") : song.key,
                     2, 0, width - 4, height, juce::Justification::centredLeft, true);
         break;
     }
 
     case albumColumn:
-        g.setColour (RekordboxColours::textSecondary);
+        g.setColour (djdeck::layout::colours::Secondary);
         g.drawText (song.album, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
         break;
 
     case genreColumn:
-        g.setColour (RekordboxColours::textTertiary);
+        g.setColour (djdeck::layout::colours::Tertiary);
         g.drawText (song.genre, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
         break;
 
@@ -184,7 +184,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId
         break;
 
     case lengthColumn:
-        g.setColour (RekordboxColours::textSecondary);
+        g.setColour (djdeck::layout::colours::Secondary);
         g.drawText (song.getFormattedLength(), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
         break;
 
@@ -230,7 +230,7 @@ void PlaylistComponent::drawRating (juce::Graphics& g, int rating,
 
         star.closeSubPath();
 
-        g.setColour (i < rating ? RekordboxColours::rating : RekordboxColours::textDisabled);
+        g.setColour (i < rating ? djdeck::layout::colours::Rating : djdeck::layout::colours::Disabled);
         g.fillPath (star);
     }
 }

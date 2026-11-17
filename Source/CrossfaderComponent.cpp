@@ -1,5 +1,5 @@
 #include "CrossfaderComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 CrossfaderComponent::CrossfaderComponent()
@@ -68,11 +68,11 @@ void CrossfaderComponent::sliderValueChanged (juce::Slider* slider)
 //==============================================================================
 void CrossfaderComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (RekordboxColours::mixerBackground);
+    g.fillAll (djdeck::layout::colours::Mixerbackground);
 
     // Rotulos A e B embaixo do fader.
     g.setFont (juce::Font (juce::FontOptions (11.0f)));
-    g.setColour (RekordboxColours::textTertiary);
+    g.setColour (djdeck::layout::colours::Tertiary);
 
     auto labelArea = getLocalBounds().removeFromBottom (14);
     labelArea.removeFromLeft (labelArea.getWidth() / 2);
@@ -89,15 +89,20 @@ void CrossfaderComponent::resized()
     auto area = getLocalBounds();
 
     // Faixa dos botoes de atribuicao, acima do fader.
-    auto buttonRow = area.removeFromTop (juce::jmin (24, area.getHeight() / 4));
-
-    const auto buttonWidth = juce::jmin (32, buttonRow.getWidth() / 4);
-    assignOne.setBounds (buttonRow.removeFromLeft (buttonWidth));
-    assignTwo.setBounds (buttonRow.removeFromLeft (buttonWidth));
+    // Botoes 1 e 2: 12 x 10 px (medida do Figma).
+    auto buttonRow = area.removeFromTop (djdeck::layout::crossfader::assignButton::heightPx);
+    const auto buttonWidth = djdeck::layout::crossfader::assignButton::widthPx;
+    const auto buttonHeight = djdeck::layout::crossfader::assignButton::heightPx;
+    assignOne.setBounds (buttonRow.removeFromLeft (buttonWidth).withSizeKeepingCentre (buttonWidth, buttonHeight));
+    assignTwo.setBounds (buttonRow.removeFromLeft (buttonWidth).withSizeKeepingCentre (buttonWidth, buttonHeight));
 
     // O fader ocupa o resto, com folga para os rotulos A/B.
+    // Trilha do slider: 100 x 2 px (medida do Figma).
     auto faderArea = area;
     faderArea.removeFromBottom (14);
-
-    crossfader.setBounds (faderArea.reduced (4));
+    const auto faderWidth = djdeck::layout::crossfader::rail::widthPx;
+    const auto faderHeight = djdeck::layout::crossfader::rail::heightPx;
+    crossfader.setBounds (faderArea.getX() + (faderArea.getWidth() - faderWidth) / 2,
+                          faderArea.getY() + (faderArea.getHeight() - faderHeight) / 2,
+                          faderWidth, faderHeight);
 }

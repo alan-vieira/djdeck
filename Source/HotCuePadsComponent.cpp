@@ -1,5 +1,5 @@
 #include "HotCuePadsComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 HotCuePadsComponent::HotCuePadsComponent()
@@ -13,8 +13,8 @@ HotCuePadsComponent::HotCuePadsComponent()
         padButtons[i]->addListener (this);
 
         // A cor de cada pad e definida no proprio botao.
-        padButtons[i]->setColour (juce::TextButton::buttonOnColourId, RekordboxColours::hotCue[i]);
-        padButtons[i]->setColour (juce::TextButton::buttonColourId,  RekordboxColours::hotCue[i]);
+        padButtons[i]->setColour (juce::TextButton::buttonOnColourId, djdeck::layout::colours::hotCue[i]);
+        padButtons[i]->setColour (juce::TextButton::buttonColourId,  djdeck::layout::colours::hotCue[i]);
         padButtons[i]->setColour (juce::TextButton::textColourOffId, juce::Colours::black);
 
         addAndMakeVisible (*padButtons[i]);
@@ -84,7 +84,7 @@ void HotCuePadsComponent::buttonClicked (juce::Button* button)
 //==============================================================================
 void HotCuePadsComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (RekordboxColours::panel);
+    g.fillAll (djdeck::layout::colours::Panel);
 }
 
 //==============================================================================

@@ -1,5 +1,5 @@
 #include "VUMeterComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 #include <juce_audio_basics/utilities/juce_Decibels.h>
 
@@ -45,7 +45,7 @@ void VUMeterComponent::paint (juce::Graphics& g)
     auto area = getLocalBounds();
 
     // Fundo
-    g.setColour (RekordboxColours::canvas);
+    g.setColour (djdeck::layout::colours::VuMeter);
     g.fillRect (area);
 
     constexpr float minDb = -60.0f;
@@ -73,7 +73,7 @@ void VUMeterComponent::paint (juce::Graphics& g)
     }
 
     // LED de clip
-    g.setColour (clipDetected ? RekordboxColours::cue : RekordboxColours::canvas);
+    g.setColour (clipDetected ? djdeck::layout::colours::Cue : djdeck::layout::colours::Canvas);
     g.fillRect (area.removeFromTop (4));
 
     drawScale (g, area);
@@ -86,7 +86,7 @@ void VUMeterComponent::drawScale (juce::Graphics& g, const juce::Rectangle<int>&
     constexpr float minDb = -60.0f;
 
     g.setFont (juce::Font (juce::FontOptions (8.0f)));
-    g.setColour (RekordboxColours::textTertiary);
+    g.setColour (djdeck::layout::colours::TextPrimary);
 
     for (const auto mark : marks)
     {

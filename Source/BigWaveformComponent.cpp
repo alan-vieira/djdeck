@@ -1,5 +1,5 @@
 #include "BigWaveformComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 BigWaveformComponent::BigWaveformComponent (juce::AudioFormatManager& formatManagerToUse,
@@ -21,11 +21,11 @@ void BigWaveformComponent::paint (juce::Graphics& g)
 {
     auto area = getLocalBounds();
 
-    g.fillAll (RekordboxColours::canvas);
+    g.fillAll (djdeck::layout::colours::Canvas);
 
     if (! fileLoaded || audioThumb.getTotalLength() <= 0.0)
     {
-        g.setColour (RekordboxColours::textTertiary);
+        g.setColour (djdeck::layout::colours::Tertiary);
         g.setFont (juce::Font (juce::FontOptions (12.0f)));
         g.drawText ("Nenhuma faixa carregada", area,
                     juce::Justification::centred, true);
@@ -52,9 +52,9 @@ void BigWaveformComponent::drawWaveform (juce::Graphics& g, const juce::Rectangl
 
     // A onda e desenhada com gradiente vertical: ciano no topo, azul na base.
     // E o que distingue a onda em camadas da onda simples.
-    juce::ColourGradient waveGradient (RekordboxColours::waveMid, 0.0f, 0.0f,
-                                       RekordboxColours::waveLow, 0.0f, 1.0f, false);
-    waveGradient.addColour (0.5f, RekordboxColours::waveHigh);
+    juce::ColourGradient waveGradient (djdeck::layout::colours::Mid, 0.0f, 0.0f,
+                                       djdeck::layout::colours::Low, 0.0f, 1.0f, false);
+    waveGradient.addColour (0.5f, djdeck::layout::colours::High);
 
     g.setGradientFill (waveGradient);
     audioThumb.drawChannel (g, area, startTime, endTime, 0, 1.0f);
@@ -78,7 +78,7 @@ void BigWaveformComponent::drawBeatGrid (juce::Graphics& g, const juce::Rectangl
     const auto bottom = static_cast<float> (area.getBottom());
 
     // Batidas finas
-    g.setColour (RekordboxColours::beatGrid.withAlpha (0.35f));
+    g.setColour (djdeck::layout::colours::Beatgrid.withAlpha (0.35f));
 
     for (const auto& beat : beatGrid)
     {
@@ -92,7 +92,7 @@ void BigWaveformComponent::drawBeatGrid (juce::Graphics& g, const juce::Rectangl
     }
 
     // Downbeats — mais grossos
-    g.setColour (RekordboxColours::downbeat);
+    g.setColour (djdeck::layout::colours::Downbeat);
 
     for (const auto& beat : beatGrid)
     {
@@ -133,7 +133,7 @@ void BigWaveformComponent::drawCueMarkers (juce::Graphics& g, const juce::Rectan
                             static_cast<float> (x) + 4.0f, static_cast<float> (area.getY()),
                             static_cast<float> (x),         static_cast<float> (area.getY()) + 6.0f);
 
-        g.setColour (RekordboxColours::hotCue[i]);
+        g.setColour (djdeck::layout::colours::hotCue[i]);
         g.fillPath (marker);
     }
 }
@@ -144,7 +144,7 @@ void BigWaveformComponent::drawNeedle (juce::Graphics& g, const juce::Rectangle<
     // A agulha NUNCA se move: ela fica no centro, e a onda rola por baixo.
     const auto needleX = static_cast<float> (area.getCentreX());
 
-    g.setColour (RekordboxColours::needle);
+    g.setColour (djdeck::layout::colours::Needle);
     g.drawLine (needleX, static_cast<float> (area.getY()),
                 needleX, static_cast<float> (area.getBottom()), 1.0f);
 
@@ -159,7 +159,7 @@ void BigWaveformComponent::drawNeedle (juce::Graphics& g, const juce::Rectangle<
                               static_cast<float> (needleX) + 4.0f, static_cast<float> (area.getBottom()),
                               static_cast<float> (needleX),         static_cast<float> (area.getBottom()) - 6.0f);
 
-    g.setColour (RekordboxColours::needle);
+    g.setColour (djdeck::layout::colours::Needle);
     g.fillPath (topMarker);
     g.fillPath (bottomMarker);
 }

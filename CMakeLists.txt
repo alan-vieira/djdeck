@@ -18,7 +18,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 # qualquer computador. No GCC/Clang, as flags equivalentes já são o padrão,
 # mas explicitá-las não causa mal e documenta a intenção.
 if (MSVC)
-    add_compile_options(/utf-8)
+    add_compile_options(/utf-8 /FS)
 else()
     add_compile_options(-finput-charset=UTF-8 -fexec-charset=UTF-8)
 endif()

@@ -1,5 +1,5 @@
 #include "LibraryComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 LibraryComponent::LibraryComponent (juce::AudioFormatManager& formatManagerToUse)
@@ -46,7 +46,7 @@ void LibraryComponent::buildTree()
 //==============================================================================
 void LibraryComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (RekordboxColours::background);
+    g.fillAll (djdeck::layout::colours::Background);
 }
 
 //==============================================================================
@@ -56,8 +56,8 @@ void LibraryComponent::resized()
     // o StretchableLayoutManager.
     //
     // Numeros negativos em setItemLayout sao proporcoes do espaco disponivel.
-    layoutManager.setItemLayout (0, 120, 600, 0.30);   // arvore
-    layoutManager.setItemLayout (1, 200, -0.5, -0.7);  // lista de faixas
+    layoutManager.setItemLayout (0, 100, 400, 0.25);   // arvore (frame1) — 25%
+    layoutManager.setItemLayout (1, 200, -0.5, -0.75);  // lista de faixas (frame2) — 75%
 
     Component* components[] = { &treeView, trackList.get() };
 

@@ -1,5 +1,5 @@
 #include "BeatJumpComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 namespace
@@ -22,14 +22,14 @@ BeatJumpComponent::BeatJumpComponent()
 
         // Os pads de beat jump usam a cor de destaque; os negativos ficam
         // num tom mais escuro para diferenciar a direcao.
-        const auto colour = (i < 4) ? RekordboxColours::panelRaised
-                                    : RekordboxColours::accent;
+        const auto colour = (i < 4) ? djdeck::layout::colours::Panelraised
+                                    : djdeck::layout::colours::Accent;
 
         padButtons[i]->setColour (juce::TextButton::buttonColourId,   colour);
         padButtons[i]->setColour (juce::TextButton::buttonOnColourId, colour);
         padButtons[i]->setColour (juce::TextButton::textColourOffId,
-                                  (i < 4) ? RekordboxColours::textSecondary
-                                          : RekordboxColours::textPrimary);
+                                  (i < 4) ? djdeck::layout::colours::Secondary
+                                          : djdeck::layout::colours::Primary);
 
         addAndMakeVisible (*padButtons[i]);
     }
@@ -72,7 +72,7 @@ void BeatJumpComponent::buttonClicked (juce::Button* button)
 //==============================================================================
 void BeatJumpComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (RekordboxColours::panel);
+    g.fillAll (djdeck::layout::colours::Panel);
 }
 
 //==============================================================================

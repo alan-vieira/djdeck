@@ -1,21 +1,22 @@
 #include "ChannelStripComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
-ChannelStripComponent::ChannelStripComponent (DeckPlayer* playerToUse, bool mirroredToUse)
+ChannelStripComponent::ChannelStripComponent (DeckPlayer* playerToUse,
+                                              bool mirroredToUse,
+                                              int channelOffsetXArg)
     : player (playerToUse),
       mirrored (mirroredToUse),
+      channelOffsetX (channelOffsetXArg),
       // `player` e declarado ANTES de `vuMeter` no header, e os members sao
       // inicializados na ordem da declaracao — entao o ponteiro ja vale aqui.
       vuMeter (playerToUse->getLevelSource (0))
 {
     // ---- Knobs ----
-    // TRIM: ±12 dB, neutro no centro (0 dB).
     trimKnob.setRange (-12.0f, 12.0f, 0.1f);
     trimKnob.setValue (0.0f);
     trimKnob.setDoubleClickReturnValue (true, 0.0);
 
-    // EQ: ±12 dB, 0 dB = flat.
     highKnob.setRange (-12.0f, 12.0f, 0.5f);
     highKnob.setValue (0.0f);
     highKnob.setDoubleClickReturnValue (true, 0.0);
@@ -28,7 +29,6 @@ ChannelStripComponent::ChannelStripComponent (DeckPlayer* playerToUse, bool mirr
     lowKnob.setValue (0.0f);
     lowKnob.setDoubleClickReturnValue (true, 0.0);
 
-    // Filtro: bipolar, 0 = neutro (bypass).
     filterKnob.setRange (-1.0f, 1.0f, 0.01f);
     filterKnob.setValue (0.0f);
     filterKnob.setDoubleClickReturnValue (true, 0.0);
@@ -45,14 +45,18 @@ ChannelStripComponent::ChannelStripComponent (DeckPlayer* playerToUse, bool mirr
     // ---- Botao CUE ----
     cueButton.setClickingTogglesState (true);
     cueButton.setTooltip ("Monitoramento de fone (PFL)");
+    cueButton.setColour (juce::TextButton::buttonColourId, djdeck::layout::colours::CueColor);
+    cueButton.setColour (juce::TextButton::textColourOffId, djdeck::layout::colours::TextPrimary);
+    cueButton.setColour (juce::TextButton::textColourOnId, djdeck::layout::colours::TextPrimary);
     addAndMakeVisible (cueButton);
 
     // ---- Slider de volume ----
-    // Range LINEAR 0-1: mantem a API de DeckPlayer::setGain() sem conversao.
     volumeFader.setRange (0.0, 1.0);
     volumeFader.setValue (player != nullptr ? player->getGain() : 0.5);
     volumeFader.setDoubleClickReturnValue (true, 0.5);
     volumeFader.addListener (this);
+    volumeFader.setColour (juce::Slider::trackColourId, djdeck::layout::colours::VolumeRail);
+    volumeFader.setColour (juce::Slider::thumbColourId, djdeck::layout::colours::VolumeButton);
     addAndMakeVisible (volumeFader);
 
     // ---- VU meter ----
@@ -70,63 +74,69 @@ void ChannelStripComponent::setCueActive (bool shouldBeActive)
 //==============================================================================
 void ChannelStripComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (RekordboxColours::mixerBackground);
+    g.fillAll (djdeck::layout::colours::Panelraised);
 
-    // Borda entre os canais.
-    g.setColour (RekordboxColours::separator);
+    g.setColour (djdeck::layout::colours::Separator);
     g.drawRect (getLocalBounds(), 1);
 }
 
 //==============================================================================
+//==============================================================================
 void ChannelStripComponent::resized()
 {
-    auto area = getLocalBounds().reduced (4);
+    // Coordenadas absolutas do Figma (canvas 1452x813) convertidas para
+    // locais deste canal: figmaX - 672 - channelOffsetX, figmaY - 138.
+    // Canal 1: channelOffsetX = 0 (ocupa x=0..54 do mixer)
+    // Canal 2: channelOffsetX = 54 (ocupa x=54..108 do mixer)
+    const int mixerAbsX = 672;
+    const int mixerAbsY = 138;
 
-    // O VU fica numa coluna estreita AO LADO dos knobs.
-    const auto vuWidth = juce::jlimit (14, 22, area.getWidth() / 6);
-    auto vuArea = area.removeFromLeft (vuWidth);
+    auto xLocal = [&] (int figmaX)  { return figmaX - mixerAbsX - channelOffsetX; };
+    auto yLocal = [&] (int figmaY)  { return figmaY - mixerAbsY; };
+    auto xLocalf = [&] (double figmaX)  { return static_cast<int> (figmaX - mixerAbsX - channelOffsetX); };
+    auto yLocalf = [&] (double figmaY)  { return static_cast<int> (figmaY - mixerAbsY); };
 
-    // O resto: coluna de knobs + coluna de botao/fader.
-    auto controlsArea = area;
+    // ---- VU meter ----
+    // deck1: x680 y145 l2 a118  ; deck2: x732 y145 l1 a118
+    vuMeter.setBounds (xLocal (static_cast<int> (djdeck::layout::figmaNodemixerVu1::xPx)),
+                       yLocal (static_cast<int> (djdeck::layout::figmaNodemixerVu1::yPx)),
+                       djdeck::layout::figmaNodemixerVu1::widthPx,
+                       djdeck::layout::figmaNodemixerVu1::heightPx);
 
-    // A coluna de botao/fader fica do lado oposto ao VU no deck espelhado.
-    auto knobColumn = controlsArea;
-    auto sideColumn = controlsArea;
+    // ---- Knobs (20 x 20 px cada) ----
+    const int knobW = 20;
+    const int knobH = 20;
 
-    if (! mirrored)
-        sideColumn = controlsArea.removeFromRight (juce::jmax (30, controlsArea.getWidth() / 4));
-    else
-        sideColumn = controlsArea.removeFromLeft (juce::jmax (30, controlsArea.getWidth() / 4));
+    trimKnob.setBounds  (xLocalf (djdeck::layout::figmaNodemixerKnobTrim1::xPx),
+                         yLocalf (djdeck::layout::figmaNodemixerKnobTrim1::yPx),
+                         knobW, knobH);
+    highKnob.setBounds  (xLocalf (djdeck::layout::figmaNodemixerKnobHigh1::xPx),
+                         yLocalf (djdeck::layout::figmaNodemixerKnobHigh1::yPx),
+                         knobW, knobH);
+    midKnob.setBounds   (xLocalf (djdeck::layout::figmaNodemixerKnobMid1::xPx),
+                         yLocalf (djdeck::layout::figmaNodemixerKnobMid1::yPx),
+                         knobW, knobH);
+    lowKnob.setBounds   (xLocalf (djdeck::layout::figmaNodemixerKnobLow1::xPx),
+                         yLocalf (djdeck::layout::figmaNodemixerKnobLow1::yPx),
+                         knobW, knobH);
+    filterKnob.setBounds(xLocalf (djdeck::layout::figmaNodemixerKnobTrim1::xPx),
+                         yLocal (static_cast<int> (djdeck::layout::figmaNodemixerKnobLow1::yPx) + 33),
+                         knobW, knobH);
 
-    // ---- Botao CUE e fader na coluna lateral ----
-    // O botao CUE tem tamanho fixo para nao ficar truncado.
-    const auto cueSize = juce::jmin (24, sideColumn.getWidth() - 4);
-    auto cueArea = sideColumn.removeFromTop (cueSize);
-    cueButton.setBounds (cueArea.withSizeKeepingCentre (cueSize, cueSize));
+    // ---- Botao CUE (30 x 14 px) ----
+    cueButton.setBounds (xLocal (djdeck::layout::figmaNodemixerCueBtn1::xPx),
+                         yLocal (djdeck::layout::figmaNodemixerCueBtn1::yPx),
+                         djdeck::layout::figmaNodemixerCueBtn1::widthPx,
+                         djdeck::layout::figmaNodemixerCueBtn1::heightPx);
 
-    // O volume fader ocupa o resto da coluna lateral.
-    volumeFader.setBounds (sideColumn.reduced (2));
-
-    // ---- Knobs empilhados na coluna principal ----
-    const auto knobCount = 5;
-    const auto gap = 4;
-    const auto knobHeight = juce::jmax (24, (knobColumn.getHeight() - gap * (knobCount - 1)) / knobCount);
-
-    KnobComponent* knobs[] = { &trimKnob, &highKnob, &midKnob, &lowKnob, &filterKnob };
-
-    for (auto* knob : knobs)
+    // ---- Fader de volume (trilho 2 x 46) ----
     {
-        auto knobArea = knobColumn.removeFromTop (knobHeight);
-
-        // O knob e quadrado: usa o menor lado, centralizado na faixa.
-        const auto side = juce::jmin (knobArea.getWidth(), knobArea.getHeight());
-        knob->setBounds (knobArea.withSizeKeepingCentre (side, side));
-
-        if (! knobColumn.isEmpty())
-            knobColumn.removeFromTop (gap);
+        int vx = xLocalf (djdeck::layout::figmaNodemixerVolRail1::xPx);
+        int vy = yLocalf (djdeck::layout::figmaNodemixerVolRail1::yPx);
+        int vw = djdeck::layout::figmaNodemixerVolRail1::widthPx;
+        int vh = djdeck::layout::figmaNodemixerVolRail1::heightPx;
+        volumeFader.setBounds (vx, vy, vw, vh);
     }
-
-    vuMeter.setBounds (vuArea.reduced (1));
 }
 
 //==============================================================================

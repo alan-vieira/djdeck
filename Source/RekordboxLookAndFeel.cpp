@@ -1,52 +1,53 @@
 #include "RekordboxLookAndFeel.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 RekordboxLookAndFeel::RekordboxLookAndFeel()
 {
     // Sliders
-    setColour (juce::Slider::backgroundColourId,         RekordboxColours::canvas);
-    setColour (juce::Slider::trackColourId,               RekordboxColours::separator);
-    setColour (juce::Slider::thumbColourId,                RekordboxColours::textSecondary);
-    setColour (juce::Slider::rotarySliderFillColourId,    RekordboxColours::accent);
-    setColour (juce::Slider::rotarySliderOutlineColourId, RekordboxColours::separator);
-    setColour (juce::Slider::textBoxTextColourId,         RekordboxColours::textPrimary);
-    setColour (juce::Slider::textBoxBackgroundColourId,   RekordboxColours::panelRaised);
-    setColour (juce::Slider::textBoxHighlightColourId,    RekordboxColours::accent);
-    setColour (juce::Slider::textBoxOutlineColourId,      RekordboxColours::separator);
+    setColour (juce::Slider::backgroundColourId,         djdeck::layout::colours::Canvas);
+    setColour (juce::Slider::trackColourId,               djdeck::layout::colours::Separator);
+    setColour (juce::Slider::thumbColourId,                djdeck::layout::colours::Secondary);
+    setColour (juce::Slider::rotarySliderFillColourId,    djdeck::layout::colours::Accent);
+    setColour (juce::Slider::rotarySliderOutlineColourId, djdeck::layout::colours::Separator);
+    setColour (juce::Slider::textBoxTextColourId,         djdeck::layout::colours::Primary);
+    setColour (juce::Slider::textBoxBackgroundColourId,   djdeck::layout::colours::Panelraised);
+    setColour (juce::Slider::textBoxHighlightColourId,    djdeck::layout::colours::Accent);
+    setColour (juce::Slider::textBoxOutlineColourId,      djdeck::layout::colours::Separator);
 
     // Botoes
-    setColour (juce::TextButton::buttonColourId,      RekordboxColours::panelRaised);
-    setColour (juce::TextButton::buttonOnColourId,    RekordboxColours::accent);
-    setColour (juce::TextButton::textColourOffId,     RekordboxColours::textSecondary);
-    setColour (juce::TextButton::textColourOnId,      RekordboxColours::textPrimary);
+    setColour (juce::TextButton::buttonColourId,      djdeck::layout::colours::Panelraised);
+    setColour (juce::TextButton::buttonOnColourId,    djdeck::layout::colours::Accent);
+    setColour (juce::TextButton::textColourOffId,     djdeck::layout::colours::Secondary);
+    setColour (juce::TextButton::textColourOnId,      djdeck::layout::colours::Primary);
 
     // Labels
-    setColour (juce::Label::textColourId,      RekordboxColours::textSecondary);
+    setColour (juce::Label::textColourId,      djdeck::layout::colours::Secondary);
     setColour (juce::Label::backgroundColourId, juce::Colours::transparentBlack);
 
     // Listas / scrollbars
-    setColour (juce::ListBox::backgroundColourId,      RekordboxColours::panel);
-    setColour (juce::ListBox::outlineColourId,         RekordboxColours::separator);
-    setColour (juce::ListBox::textColourId,            RekordboxColours::textPrimary);
-    setColour (juce::ScrollBar::thumbColourId,         RekordboxColours::separator);
-    setColour (juce::ScrollBar::trackColourId,         RekordboxColours::canvas);
+    setColour (juce::ListBox::backgroundColourId,      djdeck::layout::colours::Panel);
+    setColour (juce::ListBox::outlineColourId,         djdeck::layout::colours::Separator);
+    setColour (juce::ListBox::textColourId,            djdeck::layout::colours::Primary);
+    setColour (juce::ScrollBar::thumbColourId,         djdeck::layout::colours::Separator);
+    setColour (juce::ScrollBar::trackColourId,         djdeck::layout::colours::Canvas);
 
     // Tabelas — TableListBox nao tem ColourIds proprios; o fundo vem do
     // LookAndFeel da ListBox que ele contem, e o header tem IDs proprios.
-    setColour (juce::TableHeaderComponent::backgroundColourId,     RekordboxColours::panelRaised);
-    setColour (juce::TableHeaderComponent::outlineColourId,        RekordboxColours::separator);
-    setColour (juce::TableHeaderComponent::textColourId,           RekordboxColours::textSecondary);
+    setColour (juce::TableHeaderComponent::backgroundColourId,     djdeck::layout::colours::Panelraised);
+    setColour (juce::TableHeaderComponent::outlineColourId,        djdeck::layout::colours::Separator);
+    setColour (juce::TableHeaderComponent::textColourId,           djdeck::layout::colours::Secondary);
 
     // Arvore
-    setColour (juce::TreeView::backgroundColourId, RekordboxColours::panel);
-    setColour (juce::TreeView::linesColourId,      RekordboxColours::separator);
+    setColour (juce::TreeView::backgroundColourId, djdeck::layout::colours::Panel);
+    setColour (juce::TreeView::linesColourId,      djdeck::layout::colours::Separator);
 
     // Janelas / popups
-    setColour (juce::ResizableWindow::backgroundColourId, RekordboxColours::background);
-    setColour (juce::PopupMenu::backgroundColourId,        RekordboxColours::panelRaised);
-    setColour (juce::PopupMenu::textColourId,              RekordboxColours::textPrimary);
-    setColour (juce::PopupMenu::highlightedBackgroundColourId, RekordboxColours::selection);
-    setColour (juce::PopupMenu::highlightedTextColourId,   RekordboxColours::textPrimary);
+    setColour (juce::ResizableWindow::backgroundColourId, djdeck::layout::colours::Background);
+    setColour (juce::PopupMenu::backgroundColourId,        djdeck::layout::colours::Panelraised);
+    setColour (juce::PopupMenu::textColourId,              djdeck::layout::colours::Primary);
+    setColour (juce::PopupMenu::highlightedBackgroundColourId, djdeck::layout::colours::Selection);
+    setColour (juce::PopupMenu::highlightedTextColourId,   djdeck::layout::colours::Primary);
 }
 
 //==============================================================================
@@ -82,7 +83,7 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         const auto isPitch = slider.getName() == "pitch";
 
         // Trilho
-        g.setColour (RekordboxColours::canvas);
+        g.setColour (djdeck::layout::colours::Canvas);
         g.fillRoundedRectangle (centreX - 2.0f, bounds.getY(), 4.0f, bounds.getHeight(), 2.0f);
 
         // Pinos de referencia do pitch: marcadores horizontais fixos no minimo,
@@ -92,21 +93,21 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
             drawPitchReferencePins (g, bounds, slider);
 
         // Preenchimento: do handle ate a base (a parte ja percorrida).
-        g.setColour (isPitch ? RekordboxColours::accent : RekordboxColours::textDisabled);
+        g.setColour (isPitch ? djdeck::layout::colours::Accent : djdeck::layout::colours::Disabled);
         g.fillRoundedRectangle (centreX - 2.0f, handleY, 4.0f,
                                 bounds.getBottom() - handleY, 2.0f);
 
         // Handle
         auto handle = juce::Rectangle<float> (centreX - 12.0f, handleY - 9.0f, 24.0f, 18.0f);
 
-        g.setColour (RekordboxColours::textSecondary);
+        g.setColour (djdeck::layout::colours::Secondary);
         g.fillRoundedRectangle (handle, 3.0f);
 
-        g.setColour (RekordboxColours::canvas);
+        g.setColour (djdeck::layout::colours::Canvas);
         g.fillRect (handle.getCentreX() - 1.0f, handle.getY(), 2.0f, handle.getHeight());
 
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
-        g.setColour (RekordboxColours::accent);
+        g.setColour (djdeck::layout::colours::Accent);
         g.fillRect (centreX - 6.0f, handleY - 1.5f, 12.0f, 3.0f);
     }
     else
@@ -117,24 +118,24 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         const auto handleX = juce::jlimit (bounds.getX(), bounds.getRight(), sliderPos);
 
         // Trilho
-        g.setColour (RekordboxColours::canvas);
+        g.setColour (djdeck::layout::colours::Canvas);
         g.fillRoundedRectangle (bounds.getX(), centreY - 2.0f, bounds.getWidth(), 4.0f, 2.0f);
 
         // Preenchimento: do inicio ate o handle.
-        g.setColour (RekordboxColours::textDisabled);
+        g.setColour (djdeck::layout::colours::Disabled);
         g.fillRoundedRectangle (bounds.getX(), centreY - 2.0f, handleX - bounds.getX(), 4.0f, 2.0f);
 
         // Handle
         auto handle = juce::Rectangle<float> (handleX - 9.0f, centreY - 12.0f, 18.0f, 24.0f);
 
-        g.setColour (RekordboxColours::textSecondary);
+        g.setColour (djdeck::layout::colours::Secondary);
         g.fillRoundedRectangle (handle, 3.0f);
 
-        g.setColour (RekordboxColours::canvas);
+        g.setColour (djdeck::layout::colours::Canvas);
         g.fillRect (handle.getX(), handle.getCentreY() - 1.0f, handle.getWidth(), 2.0f);
 
         // Pino de posicao
-        g.setColour (RekordboxColours::accent);
+        g.setColour (djdeck::layout::colours::Accent);
         g.fillRect (handleX - 1.5f, centreY - 6.0f, 3.0f, 12.0f);
     }
 }
@@ -177,7 +178,7 @@ void RekordboxLookAndFeel::drawPitchReferencePins (juce::Graphics& g,
         // O pino central (0%) e o mais destacado: e o ponto de retorno ao
         // velocidade original da faixa. Os pinos sao 4 px mais largos que o
         // handle (24 px), para que continuem visiveis sob ele.
-        g.setColour (pin.isCentre ? RekordboxColours::textTertiary : RekordboxColours::textDisabled);
+        g.setColour (pin.isCentre ? djdeck::layout::colours::Tertiary : djdeck::layout::colours::Disabled);
         g.fillRect (centreX - 14.0f, pinY - 1.0f, 28.0f, 2.0f);
     }
 }
@@ -195,10 +196,10 @@ void RekordboxLookAndFeel::drawKnob (juce::Graphics& g, juce::Rectangle<float> a
     const auto centre = area.getCentre();
 
     // Corpo
-    g.setColour (RekordboxColours::panelRaised);
+    g.setColour (djdeck::layout::colours::Panelraised);
     g.fillEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
 
-    g.setColour (RekordboxColours::separator);
+    g.setColour (djdeck::layout::colours::Separator);
     g.drawEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f, 1.0f);
 
     // Arco de valor: do inicio da faixa ate a posicao atual.
@@ -222,7 +223,7 @@ void RekordboxLookAndFeel::drawKnob (juce::Graphics& g, juce::Rectangle<float> a
     const auto indicatorX = centre.x + std::sin (angle) * indicatorLength;
     const auto indicatorY = centre.y - std::cos (angle) * indicatorLength;
 
-    g.setColour (RekordboxColours::textPrimary);
+    g.setColour (djdeck::layout::colours::Primary);
     g.drawLine (centre.x, centre.y, indicatorX, indicatorY, 2.0f);
 }
 
@@ -243,7 +244,7 @@ void RekordboxLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, in
     drawKnob (g, area,
               juce::jlimit (0.0f, 1.0f, sliderPosProportional),
               rotaryStartAngle, rotaryEndAngle,
-              RekordboxColours::accent);
+              djdeck::layout::colours::Accent);
 }
 
 //==============================================================================
@@ -267,11 +268,11 @@ void RekordboxLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button
     juce::Colour fill = backgroundColour;
 
     if (button.getToggleState())
-        fill = RekordboxColours::accent;
+        fill = djdeck::layout::colours::Accent;
     else if (shouldDrawButtonAsDown)
-        fill = RekordboxColours::accent;
+        fill = djdeck::layout::colours::Accent;
     else if (shouldDrawButtonAsHighlighted)
-        fill = RekordboxColours::hover;
+        fill = djdeck::layout::colours::Hover;
 
     if (! button.isEnabled())
         fill = fill.withMultipliedAlpha (0.5f);
@@ -279,7 +280,7 @@ void RekordboxLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button
     g.setColour (fill);
     g.fillRoundedRectangle (area, cornerSize);
 
-    g.setColour (RekordboxColours::separator);
+    g.setColour (djdeck::layout::colours::Separator);
     g.drawRoundedRectangle (area, cornerSize, 1.0f);
 }
 
@@ -287,6 +288,31 @@ void RekordboxLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button
 void RekordboxLookAndFeel::drawButtonText (juce::Graphics& g, juce::TextButton& button,
                                            bool isMouseOverButton, bool /*isButtonDown*/)
 {
+    // Botao PLAY do deck: simbolo de play (triangulo) 14 x 17 px.
+    if (button.getName() == "deckPlay")
+    {
+        auto colour = button.findColour (button.getToggleState()
+                                        ? juce::TextButton::textColourOnId
+                                        : juce::TextButton::textColourOffId);
+        if (! button.isEnabled())
+            colour = colour.withMultipliedAlpha (0.5f);
+        else if (isMouseOverButton)
+            colour = djdeck::layout::colours::Primary;
+
+        g.setColour (colour);
+
+        const auto centre = button.getLocalBounds().getCentre().toFloat();
+        const float triW = 14.0f;
+        const float triH = 17.0f;
+
+        juce::Path playTriangle;
+        playTriangle.addTriangle (centre.x - triW * 0.5f, centre.y - triH * 0.5f,
+                                  centre.x - triW * 0.5f, centre.y + triH * 0.5f,
+                                  centre.x + triW * 0.5f, centre.y);
+        g.fillPath (playTriangle);
+        return;
+    }
+
     g.setFont (getTextButtonFont (button, button.getHeight()));
 
     auto colour = button.findColour (button.getToggleState()
@@ -296,7 +322,7 @@ void RekordboxLookAndFeel::drawButtonText (juce::Graphics& g, juce::TextButton& 
     if (! button.isEnabled())
         colour = colour.withMultipliedAlpha (0.5f);
     else if (isMouseOverButton)
-        colour = RekordboxColours::textPrimary;
+        colour = djdeck::layout::colours::Primary;
 
     g.setColour (colour);
     g.drawFittedText (button.getButtonText(), 2, 2,
@@ -307,6 +333,10 @@ void RekordboxLookAndFeel::drawButtonText (juce::Graphics& g, juce::TextButton& 
 //==============================================================================
 juce::Font RekordboxLookAndFeel::getTextButtonFont (juce::TextButton& button, int buttonHeight)
 {
+    // Botao CUE do deck: Inter Bold 10 px (medida do Figma: texto 21 x 12 px).
+    if (button.getName() == "deckCue")
+        return juce::Font (juce::FontOptions ("Inter", 10.0f, juce::Font::bold));
+
     return juce::Font (juce::FontOptions (juce::jmin (13.0f,
                                                        static_cast<float> (buttonHeight) * 0.5f)));
 }

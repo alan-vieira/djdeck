@@ -1,5 +1,5 @@
 #include "CamelotKeyComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 namespace
@@ -191,10 +191,10 @@ void CamelotKeyComponent::paint (juce::Graphics& g)
     if (code.isEmpty())
     {
         // Tom desconhecido: badge vazio, sem destaque.
-        g.setColour (RekordboxColours::panelRaised);
+        g.setColour (djdeck::layout::colours::Panelraised);
         g.fillRoundedRectangle (area, 2.0f);
 
-        g.setColour (RekordboxColours::textDisabled);
+        g.setColour (djdeck::layout::colours::Disabled);
         g.setFont (juce::Font (juce::FontOptions (11.0f)));
         g.drawText ("--", area, juce::Justification::centred, true);
         return;
@@ -202,10 +202,10 @@ void CamelotKeyComponent::paint (juce::Graphics& g)
 
     // Badge do tom: fundo vermelho, codigo Camelot em cima e notacao
     // classica embaixo.
-    g.setColour (RekordboxColours::cue);
+    g.setColour (djdeck::layout::colours::Cue);
     g.fillRoundedRectangle (area, 2.0f);
 
-    g.setColour (RekordboxColours::textPrimary);
+    g.setColour (djdeck::layout::colours::Primary);
     g.setFont (juce::Font (juce::FontOptions (13.0f)));
     g.drawText (code, area.removeFromTop (area.getHeight() * 0.6f), juce::Justification::centred, true);
 

@@ -31,7 +31,10 @@ public:
     // `mirrored` inverte a posicao dos rotulos: a direita no deck 1, a
     // esquerda no deck 2. Nenhum `if (mirrored)` espalhado no desenho — o
     // componente se posiciona a partir do parametro.
-    ChannelStripComponent (DeckPlayer* playerToUse, bool mirroredToUse);
+    // `mixerOffsetX` e deslocamento X dentro do mixer (0 para deck 1, -54
+    // para deck 2), usado para converter coordenadas absolutas do Figma em
+    // coordenadas locais deste canal.
+    ChannelStripComponent (DeckPlayer* playerToUse, bool mirroredToUse, int mixerOffsetX = 0);
     ~ChannelStripComponent() override;
 
     void paint (juce::Graphics& g) override;
@@ -52,6 +55,7 @@ public:
 private:
     DeckPlayer* player;
     bool mirrored;
+    int channelOffsetX; // deslocamento X para converter coordenadas do Figma em locais
 
     KnobComponent trimKnob { "TRIM" };
     KnobComponent highKnob { "HIGH" };

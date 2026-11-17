@@ -1,5 +1,5 @@
 #include "MiniWaveformComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 MiniWaveformComponent::MiniWaveformComponent (juce::AudioFormatManager& formatManagerToUse,
@@ -20,11 +20,11 @@ void MiniWaveformComponent::paint (juce::Graphics& g)
 {
     auto area = getLocalBounds();
 
-    g.fillAll (RekordboxColours::canvas);
+    g.fillAll (djdeck::layout::colours::Canvas);
 
     if (! fileLoaded)
     {
-        g.setColour (RekordboxColours::textTertiary);
+        g.setColour (djdeck::layout::colours::Tertiary);
         g.setFont (juce::Font (juce::FontOptions (12.0f)));
         g.drawText ("Nenhuma faixa carregada", area, juce::Justification::centred, true);
         return;
@@ -47,7 +47,7 @@ void MiniWaveformComponent::paint (juce::Graphics& g)
 //==============================================================================
 void MiniWaveformComponent::drawOverview (juce::Graphics& g, const juce::Rectangle<int>& area)
 {
-    g.setColour (RekordboxColours::panel);
+    g.setColour (djdeck::layout::colours::Panel);
     g.fillRect (area);
 
     const auto totalLength = audioThumb.getTotalLength();
@@ -56,13 +56,13 @@ void MiniWaveformComponent::drawOverview (juce::Graphics& g, const juce::Rectang
         return;
 
     // A faixa inteira, desenhada na altura da miniatura.
-    g.setColour (RekordboxColours::textDisabled);
+    g.setColour (djdeck::layout::colours::Disabled);
     audioThumb.drawChannel (g, area, 0.0, totalLength, 0, 1.0f);
 
     // A posicao atual, destacada.
     const auto x = area.getX() + static_cast<int> (position * area.getWidth());
 
-    g.setColour (RekordboxColours::accent);
+    g.setColour (djdeck::layout::colours::Accent);
     g.fillRect (x, area.getY(), 2, area.getHeight());
 }
 
@@ -75,9 +75,9 @@ void MiniWaveformComponent::drawWaveform (juce::Graphics& g, const juce::Rectang
         return;
 
     // Gradiente vertical: ciano no topo, azul na base.
-    juce::ColourGradient waveGradient (RekordboxColours::waveMid, 0.0f, 0.0f,
-                                       RekordboxColours::waveLow, 0.0f, 1.0f, false);
-    waveGradient.addColour (0.5f, RekordboxColours::waveHigh);
+    juce::ColourGradient waveGradient (djdeck::layout::colours::Mid, 0.0f, 0.0f,
+                                       djdeck::layout::colours::Low, 0.0f, 1.0f, false);
+    waveGradient.addColour (0.5f, djdeck::layout::colours::High);
 
     // A faixa completa fica visivel e parada: drawChannel de 0 ao total.
     g.setGradientFill (waveGradient);
@@ -101,7 +101,7 @@ void MiniWaveformComponent::drawBeatGrid (juce::Graphics& g, const juce::Rectang
     const auto bottom = static_cast<float> (area.getBottom());
 
     // Batidas finas
-    g.setColour (RekordboxColours::beatGrid.withAlpha (0.35f));
+    g.setColour (djdeck::layout::colours::Beatgrid.withAlpha (0.35f));
 
     for (const auto& beat : beatGrid)
     {
@@ -115,7 +115,7 @@ void MiniWaveformComponent::drawBeatGrid (juce::Graphics& g, const juce::Rectang
     }
 
     // Downbeats
-    g.setColour (RekordboxColours::downbeat);
+    g.setColour (djdeck::layout::colours::Downbeat);
 
     for (const auto& beat : beatGrid)
     {
@@ -155,7 +155,7 @@ void MiniWaveformComponent::drawCueMarkers (juce::Graphics& g, const juce::Recta
             continue;
 
         // Marcador na borda superior, na cor do pad correspondente.
-        g.setColour (RekordboxColours::hotCue[i]);
+        g.setColour (djdeck::layout::colours::hotCue[i]);
         g.fillRect (x - 1.0f, static_cast<float> (area.getY()), 2.0f,
                     static_cast<float> (area.getHeight() / 4));
     }
@@ -173,7 +173,7 @@ void MiniWaveformComponent::drawPlayhead (juce::Graphics& g, const juce::Rectang
     const auto playheadX = static_cast<float> (area.getX())
                          + static_cast<float> (position * area.getWidth());
 
-    g.setColour (RekordboxColours::needle);
+    g.setColour (djdeck::layout::colours::Needle);
     g.drawLine (playheadX, static_cast<float> (area.getY()),
                 playheadX, static_cast<float> (area.getBottom()), 2.0f);
 

@@ -25,6 +25,23 @@ def hex_to_juce_colour(hex_str):
     return f"juce::Colour(0xff{h})"
 
 
+def weight_to_juce(weight):
+    """Converte nome de peso para o estilo JUCE Font."""
+    if weight == "bold":
+        return "juce::Font::bold"
+    if weight == "regular":
+        return "juce::Font::plain"
+    return "juce::Font::plain"
+
+
+def fmt_float(v):
+    """Formata um valor como float literal C++ válido."""
+    s = str(v)
+    if '.' in s:
+        return s + 'f'
+    return s + '.0f'
+
+
 def format_array(name, values, cpp_type="constexpr int"):
     lines = [f"{cpp_type} {name}[] = {{" ]
     lines.append("    " + ", ".join(str(v) for v in values) + ",")
@@ -78,6 +95,21 @@ def generate_header(spec):
     out.append(f"constexpr int mixerWidthPercent  = {dm['mixer']};")
     out.append(f"constexpr int deckBWidthPercent  = {dm['deckB']};")
 
+    # Larguras/alturas absolutas dos decks (px)
+    dmd = spec["decksAndMixer"]
+    if "deckWidths" in dmd:
+        out.append(f"")
+        out.append(f"// Larguras absolutas dos decks (px, medida do Figma)")
+        out.append(f"constexpr int deckAWidthPx  = {dmd['deckWidths']['deckA']};")
+        out.append(f"constexpr int mixerWidthPx  = {dmd['deckWidths']['mixer']};")
+        out.append(f"constexpr int deckBWidthPx  = {dmd['deckWidths']['deckB']};")
+    if "deckHeights" in dmd:
+        out.append(f"")
+        out.append(f"// Alturas absolutas dos decks (px, medida do Figma)")
+        out.append(f"constexpr int deckAHeightPx  = {dmd['deckHeights']['deckA']};")
+        out.append(f"constexpr int mixerHeightPx  = {dmd['deckHeights']['mixer']};")
+        out.append(f"constexpr int deckBHeightPx  = {dmd['deckHeights']['deckB']};")
+
     # ---- library ----
     out.append(f"")
     out.append(f"// Colunas da Biblioteca (% da largura)")
@@ -97,7 +129,7 @@ def generate_header(spec):
     out.append(f"// Cores (valores medidos no Rekordbox — docs/DOCUMENTACAO_LAYOUT_UI.md §1)")
     out.append(f"namespace colours {{")
     col = spec["colors"]
-    for group in ("surfaces", "text", "states", "djSemantics", "waveform"):
+    for group in ("surfaces", "text", "states", "djSemantics", "waveform", "mixer"):
         out.append(f"    // {group}")
         for name, hexval in col[group].items():
             cpp_name = "".join(w.capitalize() for w in name.split("_"))
@@ -115,8 +147,12 @@ def generate_header(spec):
     out.append(f"")
     out.append(f"// Tipografia (px)")
     out.append(f"namespace typography {{")
-    for role, spec_role in spec["typography"]["roles"].items():
+    tf = spec["typography"]
+    if "fontFamily" in tf:
+        out.append(f'    inline const char* fontFamily = "{tf["fontFamily"]}";')
+    for role, spec_role in tf["roles"].items():
         out.append(f"    constexpr int {role}SizePx = {spec_role['sizePx']};")
+        out.append(f"    constexpr int {role}Weight  = {weight_to_juce(spec_role['weight'])};")
     out.append(f"}}")
 
     # ---- mirroring ----
@@ -132,6 +168,69 @@ def generate_header(spec):
         right_val = rule["mirrored=true"]
         out.append(f"constexpr bool {ident}MirroredLeft  = {str(left_val == 'left').lower()};")
         out.append(f"constexpr bool {ident}MirroredRight = {str(right_val == 'left').lower()};")
+
+    # ---- deck ----
+    out.append(f"")
+    out.append(f"// Especificações do deck")
+    dk = spec["deck"]
+    if "header" in dk:
+        hdr = dk["header"]
+        out.append(f"namespace deckHeader {{")
+        if "heightPx" in hdr:
+            out.append(f"    constexpr int heightPx = {hdr['heightPx']};")
+        for el in hdr["elements"]:
+            el_id = el["id"]
+            cpp_name = "".join(w.capitalize() for w in el_id.split("_"))
+            if "widthPx" in el:
+                out.append(f"    constexpr int {cpp_name}WidthPx  = {el['widthPx']};")
+            if "heightPx" in el:
+                out.append(f"    constexpr int {cpp_name}HeightPx = {el['heightPx']};")
+        out.append(f"}}")
+    if "transport" in dk:
+        out.append(f"namespace deckTransport {{")
+        out.append(f"    constexpr int heightPx = {dk['transport']['heightPx']};")
+        out.append(f"}}")
+    if "miniWaveform" in dk:
+        mw = dk["miniWaveform"]
+        out.append(f"namespace deckMiniWaveform {{")
+        out.append(f"    constexpr int widthPx  = {mw['widthPx']};")
+        out.append(f"    constexpr int heightPx = {mw['heightPx']};")
+        out.append(f"}}")
+    if "cue" in dk:
+        cue = dk["cue"]
+        out.append(f"namespace deckCue {{")
+        out.append(f"    constexpr int widthPx  = {cue['widthPx']};")
+        out.append(f"    constexpr int heightPx = {cue['heightPx']};")
+        out.append(f"}}")
+    if "play" in dk:
+        play = dk["play"]
+        out.append(f"namespace deckPlay {{")
+        out.append(f"    constexpr int widthPx  = {play['widthPx']};")
+        out.append(f"    constexpr int heightPx = {play['heightPx']};")
+        if "symbol" in play:
+            out.append(f"    namespace symbol {{")
+            out.append(f"        constexpr int widthPx  = {play['symbol']['widthPx']};")
+            out.append(f"        constexpr int heightPx = {play['symbol']['heightPx']};")
+            out.append(f"    }}")
+        out.append(f"}}")
+    if "stop" in dk:
+        stop = dk["stop"]
+        out.append(f"namespace deckStop {{")
+        out.append(f"    constexpr int widthPx  = {stop['widthPx']};")
+        out.append(f"    constexpr int heightPx = {stop['heightPx']};")
+        out.append(f"}}")
+    if "sync" in dk:
+        sync = dk["sync"]
+        out.append(f"namespace deckSync {{")
+        out.append(f"    constexpr int widthPx  = {sync['widthPx']};")
+        out.append(f"    constexpr int heightPx = {sync['heightPx']};")
+        out.append(f"}}")
+    if "camelotKey" in dk:
+        ck = dk["camelotKey"]
+        out.append(f"namespace deckCamelotKey {{")
+        out.append(f"    constexpr int widthPx  = {ck['widthPx']};")
+        out.append(f"    constexpr int heightPx = {ck['heightPx']};")
+        out.append(f"}}")
 
     # ---- components ----
     out.append(f"")
@@ -160,11 +259,32 @@ def generate_header(spec):
     out.append(f"    }}")
     out.append(f"}}")
 
+    def fmt_float(v):
+        """Formata um valor como float literal C++ válido."""
+        s = str(v)
+        if '.' in s:
+            return s + 'f'
+        return s + '.0f'
+
     out.append(f"namespace jogWheel {{")
     jw = comp["jogWheel"]
     out.append(f"    constexpr int diameterPx  = {jw['diameterPx']};")
-    out.append(f"    constexpr int bpmSizePx   = {jw['bpmSizePx']};")
-    out.append(f"    constexpr int pitchSizePx = {jw['pitchSizePx']};")
+    out.append(f"    constexpr int innerCirclePx = {jw['innerCirclePx']};")
+    out.append(f"    constexpr int centerCirclePx = {jw['centerCirclePx']};")
+    if "bpm" in jw:
+        out.append(f"    namespace bpm {{")
+        out.append(f"        constexpr float widthPx  = {fmt_float(jw['bpm']['widthPx'])};")
+        out.append(f"        constexpr float heightPx = {fmt_float(jw['bpm']['heightPx'])};")
+        out.append(f"        constexpr int   sizePx   = {jw['bpm']['sizePx']};")
+        out.append(f"        constexpr int   weight   = {weight_to_juce(jw['bpm']['weight'])};")
+        out.append(f"    }}")
+    if "pitch" in jw:
+        out.append(f"    namespace pitch {{")
+        out.append(f"        constexpr float widthPx  = {fmt_float(jw['pitch']['widthPx'])};")
+        out.append(f"        constexpr float heightPx = {fmt_float(jw['pitch']['heightPx'])};")
+        out.append(f"        constexpr int   sizePx   = {jw['pitch']['sizePx']};")
+        out.append(f"        constexpr int   weight   = {weight_to_juce(jw['pitch']['weight'])};")
+        out.append(f"    }}")
     out.append(f"}}")
 
     out.append(f"namespace pads {{")
@@ -175,6 +295,10 @@ def generate_header(spec):
 
     out.append(f"namespace vumeter {{")
     vm = comp["vumeter"]
+    if "widthPx" in vm:
+        out.append(f"    constexpr int widthPx  = {vm['widthPx']};")
+    if "heightPx" in vm:
+        out.append(f"    constexpr int heightPx = {vm['heightPx']};")
     out.append(f"    constexpr float minDb = {vm['minDb']};")
     out.append(f"    constexpr float maxDb = {vm['maxDb']};")
     marks = format_array("vumeterMarksDb", vm["marksDb"])
@@ -185,20 +309,79 @@ def generate_header(spec):
 
     out.append(f"namespace eq {{")
     eq = comp["eq"]
-    out.append(f"    constexpr float minDb = {eq['rangeDb'][0]};")
-    out.append(f"    constexpr float maxDb = {eq['rangeDb'][1]};")
-    out.append(f"    constexpr float resolutionDb = {eq['resolutionDb']};")
+    out.append(f"    constexpr float minDb = {fmt_float(eq['rangeDb'][0])};")
+    out.append(f"    constexpr float maxDb = {fmt_float(eq['rangeDb'][1])};")
+    out.append(f"    constexpr float resolutionDb = {fmt_float(eq['resolutionDb'])};")
     out.append(f"    struct Band {{ const char* name; const char* type; float frequencyHz; float q; }};")
     out.append(f"    constexpr Band bands[] = {{")
     for b in eq["bands"]:
-        out.append(f"        {{\"{b['name']}\", \"{b['type']}\", {b['frequencyHz']}f, {b['q']}f}},")
+        out.append(f"        {{\"{b['name']}\", \"{b['type']}\", {b['frequencyHz']}.0f, {b['q']}f}},")
     out.append(f"    }};")
     out.append(f"}}")
 
     out.append(f"namespace crossfader {{")
     cf = comp["crossfader"]
-    out.append(f"    constexpr float centerGain = {cf['centerGain']};")
+    out.append(f"    constexpr float centerGain = {fmt_float(cf['centerGain'])};")
+    if "assignButton" in cf:
+        out.append(f"    namespace assignButton {{")
+        out.append(f"        constexpr int widthPx  = {cf['assignButton']['widthPx']};")
+        out.append(f"        constexpr int heightPx = {cf['assignButton']['heightPx']};")
+        out.append(f"    }}")
+    if "rail" in cf:
+        out.append(f"    namespace rail {{")
+        out.append(f"        constexpr int widthPx  = {cf['rail']['widthPx']};")
+        out.append(f"        constexpr int heightPx = {cf['rail']['heightPx']};")
+        out.append(f"    }}")
     out.append(f"}}")
+
+    out.append(f"namespace volumeFader {{")
+    vf = comp["volumeFader"]
+    if "thumb" in vf:
+        out.append(f"    namespace thumb {{")
+        out.append(f"        constexpr int widthPx  = {vf['thumb']['widthPx']};")
+        out.append(f"        constexpr int heightPx = {vf['thumb']['heightPx']};")
+        out.append(f"    }}")
+    if "rail" in vf:
+        out.append(f"    namespace rail {{")
+        out.append(f"        constexpr int widthPx  = {vf['rail']['widthPx']};")
+        out.append(f"        constexpr int heightPx = {vf['rail']['heightPx']};")
+        out.append(f"    }}")
+    out.append(f"}}")
+
+    out.append(f"namespace mixerCue {{")
+    mc = comp["mixerCue"]
+    out.append(f"    constexpr int widthPx  = {mc['widthPx']};")
+    out.append(f"    constexpr int heightPx = {mc['heightPx']};")
+    out.append(f"}}")
+
+    def cpp_type_for_value(v):
+        """Retorna o tipo C++ (int ou float) apropriado para o valor."""
+        return "float" if isinstance(v, float) else "int"
+
+    def cpp_literal(v):
+        """Formata o valor como literal C++ com sufixo quando for float."""
+        if isinstance(v, float):
+            return f"{v}f"
+        return str(v)
+
+    # ---- figmaNodes ----
+    out.append(f"")
+    out.append(f"// Nós do Figma (profundidade 0 e 1) — fileKey {spec['figmaNodes']['fileKey']}")
+    canvas = spec["figmaNodes"]["canvas"]
+    out.append(f"namespace figmaCanvas {{")
+    out.append(f"    constexpr {cpp_type_for_value(canvas['width'])}  widthPx  = {cpp_literal(canvas['width'])};")
+    out.append(f"    constexpr {cpp_type_for_value(canvas['height'])} heightPx = {cpp_literal(canvas['height'])};")
+    out.append(f"}}")
+
+    for node in spec["figmaNodes"]["nodes"]:
+        ident = "figmaNode" + node["id"].replace(":", "_")
+        out.append(f"")
+        out.append(f"namespace {ident} {{")
+        out.append(f"    constexpr {cpp_type_for_value(node['x'])}  xPx  = {cpp_literal(node['x'])};")
+        out.append(f"    constexpr {cpp_type_for_value(node['y'])}  yPx  = {cpp_literal(node['y'])};")
+        out.append(f"    constexpr {cpp_type_for_value(node['width'])}  widthPx  = {cpp_literal(node['width'])};")
+        out.append(f"    constexpr {cpp_type_for_value(node['height'])} heightPx = {cpp_literal(node['height'])};")
+        out.append(f"}}")
 
     out.append(f"}} // namespace layout")
     out.append(f"}} // namespace djdeck")

@@ -1,10 +1,12 @@
 #include "MainComponent.h"
 #include "SettingsDialog.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 MainComponent::MainComponent()
     : deviceScanner (deviceManager)   // usa o AudioDeviceManager herdado de AudioAppComponent
 {
+    juce::Logger::writeToLog ("[DIAG] MainComponent constructor start");
     formatManager.registerBasicFormats();
 
     // Cria os componentes filhos ANTES de setAudioChannels(), porque o callback de
@@ -23,11 +25,13 @@ MainComponent::MainComponent()
                                              deckPlayer1.get(),
                                              formatManager,
                                              miniThumbnailCache);
+    juce::Logger::writeToLog ("[DIAG] deck1 created");
 
     deck2 = std::make_unique<DeckComponent>(2, true, true,
                                              deckPlayer2.get(),
                                              formatManager,
                                              miniThumbnailCache);
+    juce::Logger::writeToLog ("[DIAG] deck2 created");
 
     // Seções do layout raiz.
     globalHeader = std::make_unique<GlobalHeaderComponent>();
@@ -86,10 +90,12 @@ MainComponent::MainComponent()
     // roda com a lista de filhos vazia e eles ficam com tamanho 0x0 -> tela preta.
     // Como a janela depois define bounds idênticos (1600x900), resized() não
     // dispara novamente, e os filhos nunca receberiam bounds.
-    setSize (1600, 900);
+    setSize (djdeck::layout::screenWidth, djdeck::layout::screenHeight);
+    juce::Logger::writeToLog ("[DIAG] setSize done");
 
     // Só inicializa o áudio depois que tudo acima existe.
     setAudioChannels(0, 2);
+    juce::Logger::writeToLog ("[DIAG] setAudioChannels done");
 
     deviceManager.addChangeListener(&deviceScanner);
 }
@@ -129,66 +135,50 @@ void MainComponent::releaseResources()
 //==============================================================================
 void MainComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(RekordboxColours::background);
+    g.fillAll(djdeck::layout::colours::Background);
 }
 
 void MainComponent::resized()
 {
     auto area = getLocalBounds();
 
-    // ---- Seção 1: header (~10%) ----
-    {
-        const auto headerHeight = juce::jlimit (40, 90, area.getHeight() / 10);
+    // Canvas do Figma eh 1452x813; a tela JUCE eh 1600x900.
+    // Centraliza o canvas do Figma dentro da tela para nao ficar grudado no canto.
+    const int offsetX = (djdeck::layout::screenWidth  - djdeck::layout::figmaCanvas::widthPx)  / 2;
+    const int offsetY = (djdeck::layout::screenHeight - djdeck::layout::figmaCanvas::heightPx) / 2;
 
-        if (globalHeader != nullptr)
-            globalHeader->setBounds (area.removeFromTop (headerHeight));
+    // Big waveforms: alturas dos nós do Figma (bigwaveform1 + bigwaveform2)
+    const auto waveformsHeight =
+        djdeck::layout::figmaNode8_824::heightPx + djdeck::layout::figmaNode8_670::heightPx;
+
+    if (bigWaveforms != nullptr)
+        bigWaveforms->setBounds (area.removeFromTop (waveformsHeight));
+
+    // deck1 | mixer | deck2 — posições e tamanhos exatos do Figma (fonte: layout.json / figmaNodes)
+    if (deck1 != nullptr && mixer != nullptr && deck2 != nullptr)
+    {
+        deck1->setBounds (djdeck::layout::figmaNode8_979::xPx + offsetX,
+                          djdeck::layout::figmaNode8_979::yPx + offsetY,
+                          djdeck::layout::figmaNode8_979::widthPx,
+                          djdeck::layout::figmaNode8_979::heightPx);
+
+        mixer->setBounds (djdeck::layout::figmaNode8_1134::xPx + offsetX,
+                          djdeck::layout::figmaNode8_1134::yPx + offsetY,
+                          djdeck::layout::figmaNode8_1134::widthPx,
+                          djdeck::layout::figmaNode8_1134::heightPx);
+
+        deck2->setBounds (djdeck::layout::figmaNode8_1166::xPx + offsetX,
+                          djdeck::layout::figmaNode8_1166::yPx + offsetY,
+                          djdeck::layout::figmaNode8_1166::widthPx,
+                          djdeck::layout::figmaNode8_1166::heightPx);
     }
 
-    // ---- Seção 2: big waveforms (~22%) ----
-    {
-        const auto waveformHeight = juce::jlimit (80, 220, area.getHeight() / 5);
-
-        if (bigWaveforms != nullptr)
-            bigWaveforms->setBounds (area.removeFromTop (waveformHeight));
-    }
-
-    // ---- Seção 3: decks + mixer (~39%) ----
-    {
-        const auto decksHeight = juce::jlimit (200, 400,
-                                  static_cast<int> (area.getHeight() * 0.39));
-
-        auto decksArea = area.removeFromTop (decksHeight);
-
-        // Colunas: deck A ~45%, mixer ~10%, deck B ~45%.
-        if (deck1 != nullptr && mixer != nullptr && deck2 != nullptr)
-        {
-            const auto totalWidth = decksArea.getWidth();
-            const auto mixerWidth = juce::jlimit (140, 260, totalWidth / 10);
-            const auto deckWidth = (totalWidth - mixerWidth) / 2;
-
-            // Posicoes explicitas: deck A | mixer | deck B.
-            deck1->setBounds (decksArea.getX(), decksArea.getY(), deckWidth, decksArea.getHeight());
-
-            mixer->setBounds (decksArea.getX() + deckWidth, decksArea.getY(),
-                              mixerWidth, decksArea.getHeight());
-
-            deck2->setBounds (decksArea.getX() + deckWidth + mixerWidth, decksArea.getY(),
-                              totalWidth - deckWidth - mixerWidth, decksArea.getHeight());
-        }
-    }
-
-    // ---- Seção 4: biblioteca (~28%) ----
-    {
-        if (library != nullptr)
-            library->setBounds (area);
-    }
-
-    // Botão de settings, sobreposto ao header.
-    if (globalHeader != nullptr)
-    {
-        auto headerBounds = globalHeader->getBounds();
-        settingsButton.setBounds (headerBounds.removeFromRight (110).reduced (4, 8));
-    }
+    // biblioteca — nó do Figma preenche o restante abaixo dos decks
+    if (library != nullptr)
+        library->setBounds (djdeck::layout::figmaNode39_2::xPx + offsetX,
+                            djdeck::layout::figmaNode39_2::yPx + offsetY,
+                            djdeck::layout::figmaNode39_2::widthPx,
+                            djdeck::layout::figmaNode39_2::heightPx);
 }
 
 //==============================================================================

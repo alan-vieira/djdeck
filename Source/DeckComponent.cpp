@@ -1,5 +1,5 @@
 #include "DeckComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 #include "TagLibReader.h"
 #include "TrackMetadata.h"
 
@@ -14,7 +14,7 @@ DeckComponent::DeckComponent (int deckId,
       mirrored (mirroredToUse),
       useHotCuePads (useHotCuePadsToUse),
       player (playerToUse),
-      header (deckId),
+      header (deckId, mirrored),
       waveformDisplay (formatManagerToUse, cacheToUse),
       jogWheel (mirroredToUse)
 {
@@ -22,31 +22,15 @@ DeckComponent::DeckComponent (int deckId,
     addAndMakeVisible (waveformDisplay);
     addAndMakeVisible (jogWheel);
 
-    // Só a grade correspondente a este deck fica visível.
-    addAndMakeVisible (beatJump);
-    addAndMakeVisible (hotCuePads);
-    beatJump.setVisible (! useHotCuePads);
-    hotCuePads.setVisible (useHotCuePads);
-
     // ---- Transport ----
     playButton.addListener (this);
     playButton.setTooltip ("Iniciar / pausar reproducao");
+    playButton.setName ("deckPlay");
     addAndMakeVisible (playButton);
-
-    stopButton.addListener (this);
-    stopButton.setTooltip ("Parar reproducao");
-    addAndMakeVisible (stopButton);
-
-    forwardButton.addListener (this);
-    forwardButton.setTooltip ("Avancar 5%");
-    addAndMakeVisible (forwardButton);
-
-    reverseButton.addListener (this);
-    reverseButton.setTooltip ("Retroceder 5%");
-    addAndMakeVisible (reverseButton);
 
     cueButton.setClickingTogglesState (true);
     cueButton.setTooltip ("Monitoramento de fone (PFL)");
+    cueButton.setName ("deckCue");
     addAndMakeVisible (cueButton);
 
     // ---- Velocidade (pitch) ----
@@ -151,19 +135,19 @@ DeckComponent::~DeckComponent()
 //==============================================================================
 void DeckComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (RekordboxColours::panel);
+    g.fillAll (djdeck::layout::colours::Panel);
 
     // Feedback visual quando uma faixa esta sendo arrastada sobre este deck.
     if (dragOverActive)
     {
-        g.setColour (RekordboxColours::accent.withAlpha (0.25f));
+        g.setColour (djdeck::layout::colours::Accent.withAlpha (0.25f));
         g.fillRect (getLocalBounds());
 
-        g.setColour (RekordboxColours::accent);
+        g.setColour (djdeck::layout::colours::Accent);
         g.drawRect (getLocalBounds(), 2);
 
         g.setFont (juce::Font (juce::FontOptions (18.0f)));
-        g.setColour (RekordboxColours::textPrimary);
+        g.setColour (djdeck::layout::colours::Primary);
         g.drawText ("Solte para carregar", getLocalBounds(), juce::Justification::centred, true);
     }
 }
@@ -173,81 +157,97 @@ void DeckComponent::resized()
 {
     auto area = getLocalBounds().reduced (2);
 
-    // ---- Cabecalho: ~64 px ----
-    header.setBounds (area.removeFromTop (64));
+    // Posicao absoluta do deck no canvas do Figma (para calcular posicoes relativas dos filhos)
+    const auto deckAbsX = ! mirrored ? djdeck::layout::figmaNode8_979::xPx
+                                     : djdeck::layout::figmaNode8_1166::xPx;
+    const auto deckAbsY = ! mirrored ? djdeck::layout::figmaNode8_979::yPx
+                                     : djdeck::layout::figmaNode8_1166::yPx;
 
-    // ---- Faixa de transporte no rodape: ~44 px ----
-    auto transportArea = area.removeFromBottom (44);
+    // Passa a posicao absoluta do deck para o cabecalho (posicionamento dos textos)
+    header.setDeckPosition (static_cast<int> (deckAbsX), static_cast<int> (deckAbsY));
 
-    // Os botoes de transporte ficam na lateral do jog wheel.
-    auto playArea = transportArea.removeFromLeft (transportArea.getWidth() / 3);
-    auto buttonRow = playArea.removeFromTop (24);
+    // ---- Cabecalho: altura do nó do Figma (deckHeader) ----
+    // Posicionado em (0, 0) relativo ao deck, com altura do nó do Figma.
+    header.setBounds (0, 0, area.getWidth(), djdeck::layout::deckHeader::heightPx);
 
-    const auto buttonWidth = buttonRow.getWidth() / 2;
+    // ---- Miniwaveform: abaixo do cabecalho (miniwaveform1 ou miniwaveform2 relativo ao deck) ----
+    const auto mwNodeX = ! mirrored ? djdeck::layout::figmaNode8_989::xPx
+                                    : djdeck::layout::figmaNodeminiwaveform2::xPx;
+    const auto mwNodeY = ! mirrored ? djdeck::layout::figmaNode8_989::yPx
+                                    : djdeck::layout::figmaNodeminiwaveform2::yPx;
+    const auto mwNodeW = ! mirrored ? djdeck::layout::figmaNode8_989::widthPx
+                                    : djdeck::layout::figmaNodeminiwaveform2::widthPx;
+    const auto mwNodeH = ! mirrored ? djdeck::layout::figmaNode8_989::heightPx
+                                    : djdeck::layout::figmaNodeminiwaveform2::heightPx;
 
-    playButton.setBounds (buttonRow.removeFromLeft (buttonWidth));
-    stopButton.setBounds (buttonRow.removeFromLeft (buttonWidth));
+    const auto mwRelX = static_cast<int> (mwNodeX - deckAbsX);
+    const auto mwRelY = static_cast<int> (mwNodeY - deckAbsY);
+    const auto mwW    = static_cast<int> (mwNodeW);
+    const auto mwH    = static_cast<int> (mwNodeH);
+    auto waveformArea = juce::Rectangle<int> (mwRelX, mwRelY, mwW, mwH);
+    waveformDisplay.setBounds (waveformArea.reduced (2));
 
-    auto navRow = playArea.removeFromTop (24);
-    const auto navWidth = navRow.getWidth() / 2;
+    // ---- Transport no rodape: altura do nó do Figma ----
+    auto transportArea = juce::Rectangle<int> (0, area.getHeight() - djdeck::layout::deckTransport::heightPx,
+                                               area.getWidth(), djdeck::layout::deckTransport::heightPx);
 
-    reverseButton.setBounds (navRow.removeFromLeft (navWidth));
-    forwardButton.setBounds (navRow.removeFromLeft (navWidth));
-
-    // ---- Area central: pads + jog wheel + pitch slider ----
+    // ---- Area central: jog wheel, CUE, Play, pitch ----
     auto middleArea = area;
+    middleArea.removeFromTop (djdeck::layout::deckHeader::heightPx);
+    middleArea.removeFromBottom (djdeck::layout::deckTransport::heightPx);
 
-    // O jog wheel e quadrado, com ~140 px de diametro.
-    const auto jogSize = juce::jmin (140, juce::jmin (middleArea.getWidth(), middleArea.getHeight()));
+    // Jog wheel: posicao relativa ao deck (jog1 para deck 1, jog2 para deck 2)
+    const auto jogNodeX = ! mirrored ? djdeck::layout::figmaNode8_1971::xPx
+                                     : djdeck::layout::figmaNodejog2::xPx;
+    const auto jogNodeY = ! mirrored ? djdeck::layout::figmaNode8_1971::yPx
+                                     : djdeck::layout::figmaNodejog2::yPx;
+    const auto jogNodeW = ! mirrored ? djdeck::layout::figmaNode8_1971::widthPx
+                                     : djdeck::layout::figmaNodejog2::widthPx;
+    const auto jogNodeH = ! mirrored ? djdeck::layout::figmaNode8_1971::heightPx
+                                     : djdeck::layout::figmaNodejog2::heightPx;
+
+    const auto jogRelX = static_cast<int> (jogNodeX - deckAbsX);
+    const auto jogRelY = static_cast<int> (jogNodeY - deckAbsY);
+    const auto jogSize = static_cast<int> (jogNodeW);
+
+    auto jogArea = juce::Rectangle<int> (jogRelX, jogRelY, jogSize, jogSize);
+    jogWheel.setBounds (jogArea);
+
+    // Pitch slider ao lado do jog wheel
     const auto pitchWidth = 48;
-    const auto cueWidth = 40;
-
     if (! mirrored)
     {
-        // Deck 1 (nao espelhado): [pads] [CUE] [jog] [pitch]
-        // Pitch fica à direita do jog wheel.
         auto pitchArea = middleArea.removeFromRight (pitchWidth);
         pitchArea = pitchArea.withSizeKeepingCentre (pitchWidth, jogSize);
-        auto jogArea = middleArea.removeFromRight (jogSize);
-        jogArea = jogArea.withSizeKeepingCentre (jogSize, jogSize);
-        auto cueStrip = middleArea.removeFromRight (cueWidth);
-        auto cueArea = juce::Rectangle<int> (cueStrip.getX() + (cueStrip.getWidth() - 38) / 2,
-                                             jogArea.getY(), 38, 28);
-
-        jogWheel.setBounds (jogArea);
         pitchSlider.setBounds (pitchArea.reduced (2));
-        cueButton.setBounds (cueArea);
     }
     else
     {
-        // Deck 2 (espelhado): [jog] [pitch] [CUE] [pads]
-        // Pitch fica à direita do jog wheel.
-        auto jogArea = middleArea.removeFromLeft (jogSize);
-        jogArea = jogArea.withSizeKeepingCentre (jogSize, jogSize);
-
         auto pitchArea = middleArea.removeFromLeft (pitchWidth);
         pitchArea = pitchArea.withSizeKeepingCentre (pitchWidth, jogSize);
-
-        auto cueStrip = middleArea.removeFromLeft (cueWidth);
-        auto cueArea = juce::Rectangle<int> (cueStrip.getX() + (cueStrip.getWidth() - 38) / 2,
-                                             jogArea.getY(), 38, 28);
-
-        jogWheel.setBounds (jogArea);
         pitchSlider.setBounds (pitchArea.reduced (2));
-        cueButton.setBounds (cueArea);
     }
 
-    // Os pads ocupam o resto da area central.
-    if (! useHotCuePads)
-        beatJump.setBounds (middleArea);
-    else
-        hotCuePads.setBounds (middleArea);
+    // CUE e Play: posicoes relativas ao deck (CUE1/play1 para deck 1, cue2/play2 para deck 2)
+    const auto cueNodeX = ! mirrored ? djdeck::layout::figmaNode8_1981::xPx
+                                     : djdeck::layout::figmaNodecue2::xPx;
+    const auto cueNodeY = ! mirrored ? djdeck::layout::figmaNode8_1981::yPx
+                                     : djdeck::layout::figmaNodecue2::yPx;
+    const auto playNodeX = ! mirrored ? djdeck::layout::figmaNode8_1977::xPx
+                                      : djdeck::layout::figmaNodeplay2::xPx;
+    const auto playNodeY = ! mirrored ? djdeck::layout::figmaNode8_1977::yPx
+                                      : djdeck::layout::figmaNodeplay2::yPx;
+    const auto buttonSize = djdeck::layout::deckCue::widthPx;
 
-    // ---- Waveform: ocupa o espaco entre o cabecalho e a area central ----
-    auto waveformArea = area;
-    waveformArea.removeFromBottom (juce::jmin (120, waveformArea.getHeight() / 2));
-    waveformDisplay.setBounds (waveformArea.reduced (2));
+    const auto cueRelX  = static_cast<int> (cueNodeX  - deckAbsX);
+    const auto cueRelY  = static_cast<int> (cueNodeY  - deckAbsY);
+    const auto playRelX = static_cast<int> (playNodeX - deckAbsX);
+    const auto playRelY = static_cast<int> (playNodeY - deckAbsY);
+
+    playButton.setBounds (playRelX, playRelY, buttonSize, buttonSize);
+    cueButton.setBounds  (cueRelX,  cueRelY,  buttonSize, buttonSize);
 }
+
 
 //==============================================================================
 void DeckComponent::buttonClicked (juce::Button* button)
@@ -262,24 +262,7 @@ void DeckComponent::buttonClicked (juce::Button* button)
         else
             player->start();
     }
-    else if (button == &stopButton)
-    {
-        player->stop();
-        player->setPositionRelative (0.0);
-    }
-    else if (button == &forwardButton)
-    {
-        const auto pos = player->getPositionRelative();
-        if (pos < 0.95)
-            player->setPositionRelative (pos + 0.05);
-    }
-    else if (button == &reverseButton)
-    {
-        const auto pos = player->getPositionRelative();
-        if (pos > 0.05)
-            player->setPositionRelative(pos - 0.05);
-    }
-    // --- NOVO: Handler para o botao CUE (PFL / monitoramento de fone) ---
+    // --- Handler para o botao CUE (PFL / monitoramento de fone) ---
     else if (button == &cueButton)
     {
         if (player != nullptr)

@@ -119,9 +119,6 @@ private:
 
     // Transport
     juce::TextButton playButton { "Play" };
-    juce::TextButton stopButton { "Stop" };
-    juce::TextButton forwardButton { ">>" };
-    juce::TextButton reverseButton { "<<" };
     juce::TextButton cueButton { "CUE" };
 
     juce::Slider pitchSlider { juce::Slider::LinearVertical, juce::Slider::NoTextBox };

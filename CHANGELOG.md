@@ -9,6 +9,10 @@ o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [0.4.0] — 2026-11-15
 
+### Corrigido
+- **Display dos decks: títulos e artistas truncados nos cabeçalhos** — `DeckHeaderComponent::paint()` usava `useClipping=true` nos `drawText`, recortando títulos longos e nomes de artista. Removido o clipping para que o texto seja desenhado completo.
+- **Miniwaveform do deck 2 desalinhada** — `layout.json` / `LayoutConfig.hpp`: `figmaNodeminiwaveform2.xPx` corrigido de 780 para 789 (medida real do Figma).
+
 ### Adicionado
 
 - **Detecção de BPM por análise de áudio** (`Source/BpmDetector.h/.cpp`):

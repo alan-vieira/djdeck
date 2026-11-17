@@ -1,5 +1,5 @@
 #include "GlobalHeaderComponent.h"
-#include "RekordboxColours.h"
+#include "LayoutConfig.hpp"
 
 //==============================================================================
 GlobalHeaderComponent::GlobalHeaderComponent()
@@ -36,24 +36,24 @@ void GlobalHeaderComponent::paint (juce::Graphics& g)
 {
     auto area = getLocalBounds();
 
-    g.fillAll (RekordboxColours::panelRaised);
+    g.fillAll (djdeck::layout::colours::Panelraised);
 
     // Borda inferior: separa o header do resto da tela.
-    g.setColour (RekordboxColours::separator);
+    g.setColour (djdeck::layout::colours::Separator);
     g.drawLine (0.0f, static_cast<float> (area.getBottom() - 1),
                 static_cast<float> (area.getRight()), static_cast<float> (area.getBottom() - 1), 1.0f);
 
     // ---- Marca, a esquerda ----
     g.setFont (juce::Font (juce::FontOptions (18.0f)));
-    g.setColour (RekordboxColours::textPrimary);
+    g.setColour (djdeck::layout::colours::Primary);
     g.drawText ("djdeck", area.removeFromLeft (100), juce::Justification::centredLeft, true);
 
     // ---- Modo e layout ----
     g.setFont (juce::Font (juce::FontOptions (13.0f)));
-    g.setColour (RekordboxColours::accent);
+    g.setColour (djdeck::layout::colours::Accent);
     g.drawText (mode, area.removeFromLeft (110), juce::Justification::centredLeft, true);
 
-    g.setColour (RekordboxColours::textSecondary);
+    g.setColour (djdeck::layout::colours::Secondary);
     g.drawText (layoutName, area.removeFromLeft (150), juce::Justification::centredLeft, true);
 
     // ---- Modulos ativos: pips coloridos ----
@@ -65,17 +65,17 @@ void GlobalHeaderComponent::paint (juce::Graphics& g)
     {
         const auto pipY = static_cast<float> (modulesArea.getCentreY()) - 3.0f;
 
-        g.setColour (RekordboxColours::accent);
+        g.setColour (djdeck::layout::colours::Accent);
         g.fillEllipse (static_cast<float> (modulesArea.getX()), pipY, 6.0f, 6.0f);
 
-        g.setColour (RekordboxColours::textTertiary);
+        g.setColour (djdeck::layout::colours::Tertiary);
         g.drawText (module, modulesArea.removeFromLeft (70).withTrimmedRight (8),
                     juce::Justification::centredLeft, true);
     }
 
     // ---- Relogio, a direita ----
     g.setFont (juce::Font (juce::FontOptions (16.0f)));
-    g.setColour (RekordboxColours::textPrimary);
+    g.setColour (djdeck::layout::colours::Primary);
 
     const auto now = juce::Time::getCurrentTime();
     const auto clock = juce::String (now.getHours()).paddedLeft ('0', 2) + ":"
