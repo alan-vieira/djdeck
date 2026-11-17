@@ -28,14 +28,14 @@ PlaylistComponent::PlaylistComponent (juce::AudioFormatManager& formatManagerToU
     playlistTable.setModel(this);
 
     // Colunas da biblioteca (docs/DOCUMENTACAO_LAYOUT_UI.md §8.3).
-    playlistTable.getHeader().addColumn("Título", titleColumn, 200);
-    playlistTable.getHeader().addColumn("Artista", artistColumn, 150);
-    playlistTable.getHeader().addColumn("BPM", bpmColumn, 70);
-    playlistTable.getHeader().addColumn("Key", keyColumn, 60);
-    playlistTable.getHeader().addColumn("Álbum", albumColumn, 150);
-    playlistTable.getHeader().addColumn("Gênero", genreColumn, 100);
-    playlistTable.getHeader().addColumn("Rating", ratingColumn, 90);
-    playlistTable.getHeader().addColumn("Duração", lengthColumn, 70);
+    playlistTable.getHeader().addColumn(u8"Título", titleColumn, 200);
+    playlistTable.getHeader().addColumn(u8"Artista", artistColumn, 150);
+    playlistTable.getHeader().addColumn(u8"BPM", bpmColumn, 70);
+    playlistTable.getHeader().addColumn(u8"Key", keyColumn, 60);
+    playlistTable.getHeader().addColumn(u8"Álbum", albumColumn, 150);
+    playlistTable.getHeader().addColumn(u8"Gênero", genreColumn, 100);
+    playlistTable.getHeader().addColumn(u8"Rating", ratingColumn, 90);
+    playlistTable.getHeader().addColumn(u8"Duração", lengthColumn, 70);
 
     addAndMakeVisible(addButton);
     addButton.addListener(this);

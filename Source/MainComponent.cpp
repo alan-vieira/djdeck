@@ -73,8 +73,8 @@ MainComponent::MainComponent()
 
     addAndMakeVisible(*globalHeader);
     addAndMakeVisible(*bigWaveforms);
-    addAndMakeVisible(*deck1);
     addAndMakeVisible(*mixer);
+    addAndMakeVisible(*deck1);
     addAndMakeVisible(*deck2);
     addAndMakeVisible(*library);
     addAndMakeVisible(settingsButton);
