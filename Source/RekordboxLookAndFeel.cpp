@@ -56,24 +56,43 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
 {
     const auto isVertical = style == juce::Slider::LinearVertical;
 
-    // A area util e a do slider menos a folga de 4 px usada no handle.
+    // No JUCE, x/y/width/height sao o sliderBounds (a regiao percorrida pelo
+    // thumb) e sliderPos/minSliderPos/maxSliderPos chegam em PIXELS, dentro
+    // dessa mesma regiao — ver Slider::getLinearSliderPos(), que devolve
+    // sliderRegionStart + pos * sliderRegionSize.
+    //
+    // Vertical: pos e invertido (1 - proporcao), logo o valor MAXIMO fica no
+    // TOPO e o MINIMO na BASE. Tratar sliderPos como proporcao 0..1 (o bug
+    // anterior) jogava o handle para y - 9660 e o hide do componente.
     const auto bounds = juce::Rectangle<float> (static_cast<float> (x),
                                                 static_cast<float> (y),
                                                 static_cast<float> (width),
-                                                static_cast<float> (height)).reduced (4.0f);
+                                                static_cast<float> (height));
 
     if (isVertical)
     {
         const auto centreX = bounds.getCentreX();
 
+        // sliderPos e o Y (em pixels) do centro do thumb.
+        const auto handleY = juce::jlimit (bounds.getY(), bounds.getBottom(), sliderPos);
+
+        // O slider de pitch tem desenho proprio (linha de valor azul + pinos de
+        // referencia), conforme a referencia visual do Rekordbox. Os demais
+        // faders verticais (volume, EQ) mantem o preenchimento cinza.
+        const auto isPitch = slider.getName() == "pitch";
+
         // Trilho
         g.setColour (RekordboxColours::canvas);
         g.fillRoundedRectangle (centreX - 2.0f, bounds.getY(), 4.0f, bounds.getHeight(), 2.0f);
 
-        // Preenchimento: do handle ate o fundo.
-        const auto handleY = bounds.getY() + bounds.getHeight() * (1.0f - sliderPos);
+        // Pinos de referencia do pitch: marcadores horizontais fixos no minimo,
+        // no 0% e no maximo da faixa. Desenhados ANTES do preenchimento para
+        // que a linha azul de valor atravesse eles sem ser interrompida.
+        if (isPitch)
+            drawPitchReferencePins (g, bounds, slider);
 
-        g.setColour (RekordboxColours::textDisabled);
+        // Preenchimento: do handle ate a base (a parte ja percorrida).
+        g.setColour (isPitch ? RekordboxColours::accent : RekordboxColours::textDisabled);
         g.fillRoundedRectangle (centreX - 2.0f, handleY, 4.0f,
                                 bounds.getBottom() - handleY, 2.0f);
 
@@ -86,40 +105,6 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         g.setColour (RekordboxColours::canvas);
         g.fillRect (handle.getCentreX() - 1.0f, handle.getY(), 2.0f, handle.getHeight());
 
-                        // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
-                // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
-        // Pino de posicao: marcador na trilha indicando onde o slider esta.
-                // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
-        // Pino de posicao: marcador na trilha indicando onde o slider esta.
-                // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
         // Pino de posicao: marcador na trilha indicando onde o slider esta.
         g.setColour (RekordboxColours::accent);
         g.fillRect (centreX - 6.0f, handleY - 1.5f, 12.0f, 3.0f);
@@ -128,13 +113,14 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
     {
         const auto centreY = bounds.getCentreY();
 
+        // sliderPos e o X (em pixels) do centro do thumb.
+        const auto handleX = juce::jlimit (bounds.getX(), bounds.getRight(), sliderPos);
+
         // Trilho
         g.setColour (RekordboxColours::canvas);
         g.fillRoundedRectangle (bounds.getX(), centreY - 2.0f, bounds.getWidth(), 4.0f, 2.0f);
 
         // Preenchimento: do inicio ate o handle.
-        const auto handleX = bounds.getX() + bounds.getWidth() * sliderPos;
-
         g.setColour (RekordboxColours::textDisabled);
         g.fillRoundedRectangle (bounds.getX(), centreY - 2.0f, handleX - bounds.getX(), 4.0f, 2.0f);
 
@@ -147,43 +133,52 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
         g.setColour (RekordboxColours::canvas);
         g.fillRect (handle.getX(), handle.getCentreY() - 1.0f, handle.getWidth(), 2.0f);
 
-                        // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
-                // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
-        // Pino de posicao: marcador na trilha indicando onde o slider esta.
-                // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
-        // Pino de posicao: marcador na trilha indicando onde o slider esta.
-                // Pinos de referencia fixos (Min=0.0, Centro=0.5, Max=1.0)
-        g.setColour (RekordboxColours::separator);
-        const auto handleYMin = bounds.getY() + bounds.getHeight() * (1.0f - 0.0f);
-        const auto handleYMid = bounds.getY() + bounds.getHeight() * 0.5f;
-        const auto handleYMax = bounds.getY() + bounds.getHeight() * (1.0f - 1.0f);
-        g.fillRect (centreX - 6.0f, handleYMin - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMid - 1.5f, 12.0f, 3.0f);
-        g.fillRect (centreX - 6.0f, handleYMax - 1.5f, 12.0f, 3.0f);
-        // Pino de posicao: marcador na trilha indicando onde o slider esta.
+        // Pino de posicao
         g.setColour (RekordboxColours::accent);
         g.fillRect (handleX - 1.5f, centreY - 6.0f, 3.0f, 12.0f);
+    }
+}
+
+//==============================================================================
+void RekordboxLookAndFeel::drawPitchReferencePins (juce::Graphics& g,
+                                                   juce::Rectangle<float> bounds,
+                                                   juce::Slider& slider)
+{
+    // As posicoes sao derivadas do range REAL do slider (valueToProportionOfLength
+    // devolve 0..1 dentro da faixa), e nao de proporcoes fixas: assim o pino
+    // central cai no 0% real do pitch, e os extremos nos limites do range.
+    const auto minValue = slider.getMinimum();
+    const auto maxValue = slider.getMaximum();
+
+    if (minValue >= maxValue)
+        return;
+
+    // Tres pinos igualmente espacados: minimo, 0% e maximo da faixa. Num
+    // range simetrico (+-16%) o 0% cai no meio do trilho, como na referencia
+    // visual do Rekordbox. As posicoes sao derivadas do range REAL do slider
+    // via valueToProportionOfLength() — nunca de proporcoes fixas.
+    struct Pin { double value; bool isCentre; };
+    const Pin pins[] = { { minValue, false }, { 0.0, true }, { maxValue, false } };
+
+    const auto centreX = bounds.getCentreX();
+
+    for (const auto& pin : pins)
+    {
+        if (pin.value < minValue || pin.value > maxValue)
+            continue;
+
+        const auto proportion = juce::jlimit (0.0, 1.0, slider.valueToProportionOfLength (pin.value));
+
+        // Vertical: proporcao 0 = base (minimo), 1 = topo (maximo).
+        const auto pinY = juce::jlimit (bounds.getY() + 1.0f,
+                                       bounds.getBottom() - 1.0f,
+                                       bounds.getBottom() - bounds.getHeight() * static_cast<float> (proportion));
+
+        // O pino central (0%) e o mais destacado: e o ponto de retorno ao
+        // velocidade original da faixa. Os pinos sao 4 px mais largos que o
+        // handle (24 px), para que continuem visiveis sob ele.
+        g.setColour (pin.isCentre ? RekordboxColours::textTertiary : RekordboxColours::textDisabled);
+        g.fillRect (centreX - 14.0f, pinY - 1.0f, 28.0f, 2.0f);
     }
 }
 

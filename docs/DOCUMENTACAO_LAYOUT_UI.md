@@ -5,7 +5,7 @@ construção dos componentes que ainda não existem (big waveform, mixer, jog
 wheel, knobs, VU meter, biblioteca em árvore).
 
 > **Status:** referência técnica. As seções "Estado atual" descrevem o código
-> existente em `Source/` (verificado no commit `7d0b704`). As seções
+> existente em `Source/` (verificado no commit `48b402a`, HEAD). As seções
 > "Especificação" descrevem o alvo. Onde os dois divergem, a divergência está
 > explícita.
 >
@@ -1433,9 +1433,25 @@ Fader linear — usado no canal de volume (vertical) e no crossfader
 #### Vertical (fader de canal)
 
 - Trilho: 4 px de largura, cor `canvas`
-- Preenchimento: `accent`, da posição atual até o topo
+- Preenchimento: `accent`, da posição atual até a base
 - Handle: retângulo arredondado de 18 px de altura, `textSecondary`, com
   uma linha central escura
+
+#### Pinos de referência (slider de pitch)
+
+O slider de pitch do deck (`DeckComponent::pitchSlider`, nomeado `"pitch"`)
+recebe marcas fixas de referência, em vez de apenas o marcador de posição:
+
+- 3 pinos horizontais de 28 px (4 px mais largos que o handle de 24 px, para
+  continuarem visíveis sob ele): **mínimo**, **0%** e **máximo** da faixa
+- Posições derivadas do range REAL do slider via
+  `valueToProportionOfLength()` — nunca de proporções fixas, para que o pino
+  central caia sempre no 0% e os extremos nos limites do range
+- O pino central (0%) usa `textTertiary`; os demais, `textDisabled`
+- Desenhados ANTES do preenchimento, para que a linha azul de valor os
+  atravesse sem interrompê-los
+
+Os demais sliders verticais (volume, EQ) não recebem pinos.
 
 #### Horizontal (crossfader)
 
@@ -1462,7 +1478,7 @@ public:
             g.fillRoundedRectangle (centre.x - 2.0f, (float) y, 4.0f, (float) height, 2.0f);
 
             // Preenchimento
-            const auto handleY = y + height * (1.0f - sliderPos);
+            const auto handleY = juce::jlimit (bounds.getY(), bounds.getBottom(), sliderPos);
             g.setColour (RekordboxColours::accent);
             g.fillRoundedRectangle (centre.x - 2.0f, handleY, 4.0f,
                                     (float) (y + height) - handleY, 2.0f);
@@ -2259,7 +2275,7 @@ Para o djdeck, um formato próprio simplificado em memória é suficiente — o
 
 ## 11. Estado atual vs. alvo
 
-Verificado na tag `v0.3.0`.
+Verificado na tag `v0.4.0`.
 
 || Área | Estado | Observação |
 |---|---|---|---|

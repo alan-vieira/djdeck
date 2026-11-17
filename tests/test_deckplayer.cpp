@@ -117,19 +117,29 @@ TEST_CASE("DeckPlayer::setSpeed / getSpeed - variacao de pitch", "[DeckPlayer]")
     player.setSpeed(1.0);
     REQUIRE(player.getSpeed() == Approx(1.0));
 
-    player.setSpeed(0.5);  // limite inferior
+    player.setSpeed(0.5);
     REQUIRE(player.getSpeed() == Approx(0.5));
 
-    player.setSpeed(3.0);  // limite superior
-    REQUIRE(player.getSpeed() == Approx(3.0));
+    // O player clampar em 0.01x .. 2.0x (0.01 evita ratio zero no
+    // ResamplingAudioSource). O slider de pitch do deck expoe +-16%, que
+    // mapeia para 0.84x .. 1.16x — bem dentro dessa faixa.
+    player.setSpeed(3.0);  // acima do limite superior -> clamp em 2.0
+    REQUIRE(player.getSpeed() == Approx(2.0));
 
-    // Clamp abaixo de 0.5
-    player.setSpeed(0.1);
-    REQUIRE(player.getSpeed() == Approx(0.5));
+    // Clamp abaixo do limite inferior
+    player.setSpeed(0.001);
+    REQUIRE(player.getSpeed() == Approx(0.01));
 
-    // Clamp acima de 3.0
+    // Clamp acima do limite superior
     player.setSpeed(10.0);
-    REQUIRE(player.getSpeed() == Approx(3.0));
+    REQUIRE(player.getSpeed() == Approx(2.0));
+
+    // O pitch do deck (+-16%) deve passar sem clamp
+    player.setSpeed(1.16);
+    REQUIRE(player.getSpeed() == Approx(1.16));
+
+    player.setSpeed(0.84);
+    REQUIRE(player.getSpeed() == Approx(0.84));
 }
 
 TEST_CASE("DeckPlayer::setBpm / getBpm - BPM armazenado no player", "[DeckPlayer]")

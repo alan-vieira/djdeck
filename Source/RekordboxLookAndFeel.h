@@ -54,5 +54,11 @@ private:
                    float proportion, float startAngle, float endAngle,
                    juce::Colour fillColour);
 
+    // Pinos de referencia do slider de pitch: marcadores horizontais fixos
+    // nos valores notaveis da faixa (-8%, 0%, +8%). Derivados do range real
+    // do slider via valueToProportionOfLength(), nunca de proporcoes fixas.
+    void drawPitchReferencePins (juce::Graphics& g, juce::Rectangle<float> bounds,
+                                 juce::Slider& slider);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RekordboxLookAndFeel)
 };

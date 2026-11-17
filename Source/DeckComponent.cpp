@@ -52,6 +52,9 @@ DeckComponent::DeckComponent (int deckId,
     // ---- Velocidade (pitch) ----
     pitchSlider.setRange (-16.0, 16.0, 0.1);
     pitchSlider.setValue (0.0);
+    // Nomeia o slider: o LookAndFeel usa este nome para desenhar os pinos de
+    // referencia apenas no pitch (e nao nos faders de volume/EQ do mixer).
+    pitchSlider.setName ("pitch");
     pitchSlider.setTooltip ("Pitch / velocidade (+-16%)");
     pitchSlider.setDoubleClickReturnValue (true, 0.0);
     pitchSlider.addListener (this);
@@ -134,8 +137,8 @@ DeckComponent::DeckComponent (int deckId,
         safeThis->header.setBpm (bpm);
         safeThis->jogWheel.setBpm (bpm);
         // Propaga o BPM detectado para a biblioteca, se houver um listener registrado
-        if (safeThis->libraryListener != nullptr)
-            safeThis->libraryListener->onBpmDetected (safeThis->id, bpm);
+        if (safeThis->onBpmDetected != nullptr)
+            safeThis->onBpmDetected (safeThis->id, bpm);
         safeThis->jogWheel.setBpm (bpm);
     });
 }

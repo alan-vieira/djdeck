@@ -91,6 +91,11 @@ public:
     // circular: DeckComponent.h nao conhece MainComponent.
     std::function<void (int deckId, const juce::URL&)> onTrackLoaded;
 
+    // Notificado quando o BPM desta faixa e detectado por analise de audio.
+    // Mesmo padrao de onTrackLoaded (callback em vez de cast para o pai) para
+    // nao criar include circular entre DeckComponent e a biblioteca.
+    std::function<void (int deckId, double bpm)> onBpmDetected;
+
     DeckPlayer* getPlayer() const { return player; }
     int getDeckId() const { return id; }
 
