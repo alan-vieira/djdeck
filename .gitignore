@@ -1,5 +1,6 @@
 # ---- Build ----
 Builds/
+Builds2/
 BuildsTests/
 build/
 build-*/
@@ -63,3 +64,9 @@ compile_commands.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ---- Build alternativo (criado para contornar lock de PDB) ----
+Builds2/
+
+# ---- Figma / design (arquivos de layout, não código-fonte) ----
+figma/
