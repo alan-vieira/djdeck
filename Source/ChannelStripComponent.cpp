@@ -121,9 +121,9 @@ void ChannelStripComponent::resized()
     vuMeter.setBounds (xLocal (static_cast<int> (vux)), yLocal (static_cast<int> (vuy)),
                        static_cast<int> (vuw), static_cast<int> (vuh));
 
-    // ---- Knobs (20 x 20 px cada) ----
-    const int knobW = 20;
-    const int knobH = 20;
+    // ---- Knobs (conforme layout.json) ----
+    const int knobW = djdeck::layout::figmaNodemixerKnobTrim1::widthPx;
+    const int knobH = djdeck::layout::figmaNodemixerKnobTrim1::heightPx;
 
     trimKnob.setBounds  (xLocalf (k1x), yLocalf (k1y), knobW, knobH);
     highKnob.setBounds  (xLocalf (k2x), yLocalf (k2y), knobW, knobH);

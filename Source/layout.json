@@ -832,8 +832,8 @@
     "widthPx": 109,
     "heightPx": 242,
     "knob": {
-      "widthPx": 20,
-      "heightPx": 20
+      "widthPx": 32,
+      "heightPx": 32
     },
     "cueBtn": {
       "widthPx": 29.82,
@@ -922,7 +922,8 @@
       "arcDegrees": 270,
       "labelBelow": true,
       "labelSizePx": 11,
-      "labelColor": "textSecondary"
+      "labelColor": "textSecondary",
+      "knobSizePx": 32
     },
     "slider": {
       "vertical": {
