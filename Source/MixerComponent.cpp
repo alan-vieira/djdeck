@@ -57,7 +57,7 @@ void MixerComponent::resized()
     // Todas as coordenadas são absolutas do canvas do Figma, convertidas
     // para locais do mixer subtraindo (672, 138).
     const int mixerAbsX = 672;
-    const int mixerAbsY = 138;
+    const int mixerAbsY = 137;
 
     auto xLocal = [&] (int figmaX)  { return figmaX - mixerAbsX; };
     auto yLocal = [&] (int figmaY)  { return figmaY - mixerAbsY; };

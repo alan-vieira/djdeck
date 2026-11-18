@@ -84,7 +84,7 @@ void ChannelStripComponent::resized()
     // Os nos do Figma ja estao em coordenadas absolutas do mixer inteiro,
     // entao subtraimos tambem o deslocamento X deste canal dentro do mixer.
     const int mixerAbsX = 672;
-    const int mixerAbsY = 138;
+    const int mixerAbsY = 137;
 
     auto xLocal = [&] (int figmaX)  { return figmaX - mixerAbsX - channelOffsetX; };
     auto yLocal = [&] (int figmaY)  { return figmaY - mixerAbsY; };
