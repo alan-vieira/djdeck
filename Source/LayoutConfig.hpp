@@ -281,42 +281,42 @@ namespace figmaCanvas {
     constexpr int heightPx = 813;
 }
 
-namespace figmaNode45_3 {
+namespace figmaNodeframePrincipal {
     constexpr int  xPx  = 0;
     constexpr int  yPx  = 0;
     constexpr int  widthPx  = 1452;
     constexpr int heightPx = 813;
 }
 
-namespace figmaNode8_824 {
+namespace figmaNodebigwaveform1 {
     constexpr int  xPx  = 0;
     constexpr int  yPx  = 0;
     constexpr int  widthPx  = 1452;
     constexpr int heightPx = 71;
 }
 
-namespace figmaNode8_670 {
+namespace figmaNodebigwaveform2 {
     constexpr int  xPx  = 0;
     constexpr int  yPx  = 71;
     constexpr int  widthPx  = 1452;
     constexpr int heightPx = 66;
 }
 
-namespace figmaNode8_979 {
+namespace figmaNodedeck1 {
     constexpr int  xPx  = 0;
     constexpr int  yPx  = 137;
     constexpr int  widthPx  = 671;
     constexpr int heightPx = 242;
 }
 
-namespace figmaNode8_1166 {
+namespace figmaNodedeck2 {
     constexpr int  xPx  = 781;
     constexpr int  yPx  = 137;
     constexpr int  widthPx  = 671;
     constexpr int heightPx = 242;
 }
 
-namespace figmaNode8_989 {
+namespace figmaNodeminiwaveform1 {
     constexpr int  xPx  = 0;
     constexpr int  yPx  = 181;
     constexpr int  widthPx  = 670;
@@ -428,7 +428,7 @@ namespace figmaNodebeatSync2 {
     constexpr int heightPx = 32;
 }
 
-namespace figmaNode8_1971 {
+namespace figmaNodejog1 {
     constexpr int  xPx  = 535;
     constexpr float  yPx  = 226.62f;
     constexpr float  widthPx  = 102.12f;
@@ -484,7 +484,7 @@ namespace figmaNodepitch_slider_2 {
     constexpr int heightPx = 103;
 }
 
-namespace figmaNode8_1134 {
+namespace figmaNodemixer {
     constexpr int  xPx  = 672;
     constexpr int  yPx  = 137;
     constexpr int  widthPx  = 109;
@@ -617,7 +617,7 @@ namespace figmaNodemixerCrossfaderBtn1 {
     constexpr int heightPx = 10;
 }
 
-namespace figmaNode39_2 {
+namespace figmaNodebiblioteca {
     constexpr int  xPx  = 0;
     constexpr int  yPx  = 379;
     constexpr int  widthPx  = 1452;

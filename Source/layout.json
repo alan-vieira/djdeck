@@ -17,7 +17,7 @@
     },
     "nodes": [
       {
-        "id": "45:3",
+        "id": "framePrincipal",
         "name": "Frame principal",
         "type": "frame",
         "x": 0,
@@ -27,54 +27,54 @@
         "parent": null
       },
       {
-        "id": "8:824",
+        "id": "bigwaveform1",
         "name": "Bigwaveform1",
         "type": "frame",
         "x": 0,
         "y": 0,
         "width": 1452,
         "height": 71,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
-        "id": "8:670",
+        "id": "bigwaveform2",
         "name": "Bigwaveform2",
         "type": "frame",
         "x": 0,
         "y": 71,
         "width": 1452,
         "height": 66,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
-        "id": "8:979",
+        "id": "deck1",
         "name": "deck1",
         "type": "frame",
         "x": 0,
         "y": 137,
         "width": 671,
         "height": 242,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
-        "id": "8:1166",
+        "id": "deck2",
         "name": "deck2",
         "type": "frame",
         "x": 781,
         "y": 137,
         "width": 671,
         "height": 242,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
-        "id": "8:989",
+        "id": "miniwaveform1",
         "name": "miniwaveform1",
         "type": "frame",
         "x": 0,
         "y": 181,
         "width": 670,
         "height": 34,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "miniwaveform2",
@@ -84,7 +84,7 @@
         "y": 181,
         "width": 670,
         "height": 34,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck1Number",
@@ -94,7 +94,7 @@
         "y": 139,
         "width": 7,
         "height": 17,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck1Title",
@@ -104,7 +104,7 @@
         "y": 145,
         "width": 161,
         "height": 18,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck1Artist",
@@ -114,7 +114,7 @@
         "y": 163,
         "width": 58,
         "height": 13,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck1BpmKey",
@@ -124,7 +124,7 @@
         "y": 163,
         "width": 55,
         "height": 13,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck1Timer",
@@ -134,7 +134,7 @@
         "y": 160,
         "width": 122,
         "height": 17,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck2Number",
@@ -144,7 +144,7 @@
         "y": 138,
         "width": 9,
         "height": 17,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck2Title",
@@ -154,7 +154,7 @@
         "y": 145,
         "width": 49,
         "height": 18,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck2Artist",
@@ -164,7 +164,7 @@
         "y": 162,
         "width": 74,
         "height": 16,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck2BpmKey",
@@ -174,7 +174,7 @@
         "y": 163,
         "width": 66,
         "height": 15,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "deck2Timer",
@@ -184,7 +184,7 @@
         "y": 161,
         "width": 129,
         "height": 18,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "keySync1",
@@ -194,7 +194,7 @@
         "y": 146,
         "width": 41,
         "height": 32,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "beatSync1",
@@ -204,7 +204,7 @@
         "y": 146,
         "width": 39,
         "height": 32,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "keySync2",
@@ -214,7 +214,7 @@
         "y": 144,
         "width": 50,
         "height": 32,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "beatSync2",
@@ -224,17 +224,17 @@
         "y": 144,
         "width": 44,
         "height": 32,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
-        "id": "8:1971",
+        "id": "jog1",
         "name": "jog1",
         "type": "frame",
         "x": 535,
         "y": 226.62,
         "width": 102.12,
         "height": 102.12,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "jog2",
@@ -244,7 +244,7 @@
         "y": 227.31,
         "width": 102.06,
         "height": 102.06,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "cue1",
@@ -254,7 +254,7 @@
         "y": 275.14,
         "width": 26,
         "height": 26,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "play1",
@@ -264,7 +264,7 @@
         "y": 306.4,
         "width": 26,
         "height": 26,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "cue2",
@@ -274,7 +274,7 @@
         "y": 275.57,
         "width": 26,
         "height": 26,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "play2",
@@ -284,7 +284,7 @@
         "y": 305.7,
         "width": 26,
         "height": 26,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "pitch_slider_1",
@@ -294,7 +294,7 @@
         "y": 227,
         "width": 9.94,
         "height": 103,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "pitch_slider_2",
@@ -304,17 +304,17 @@
         "y": 227,
         "width": 9.94,
         "height": 103,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
-        "id": "8:1134",
+        "id": "mixer",
         "name": "mixer",
         "type": "frame",
         "x": 672,
         "y": 137,
         "width": 109,
         "height": 242,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerVu1",
@@ -324,7 +324,7 @@
         "y": 145,
         "width": 2,
         "height": 118,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerVu2",
@@ -334,7 +334,7 @@
         "y": 145,
         "width": 2,
         "height": 118,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobTrim1",
@@ -344,7 +344,7 @@
         "y": 145.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobHigh1",
@@ -354,7 +354,7 @@
         "y": 178.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobMid1",
@@ -364,7 +364,7 @@
         "y": 211.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobLow1",
@@ -374,7 +374,7 @@
         "y": 244.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobTrim2",
@@ -384,7 +384,7 @@
         "y": 145.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobHigh2",
@@ -394,7 +394,7 @@
         "y": 178.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobMid2",
@@ -404,7 +404,7 @@
         "y": 211.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerKnobLow2",
@@ -414,7 +414,7 @@
         "y": 244.04,
         "width": 20,
         "height": 20,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerCueBtn1",
@@ -424,7 +424,7 @@
         "y": 276,
         "width": 29.82,
         "height": 14,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerCueBtn2",
@@ -434,7 +434,7 @@
         "y": 276,
         "width": 29.82,
         "height": 14,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerVolRail1",
@@ -444,7 +444,7 @@
         "y": 293,
         "width": 2,
         "height": 46,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerVolBtn1",
@@ -454,7 +454,7 @@
         "y": 293,
         "width": 9.94,
         "height": 7,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerVolRail2",
@@ -464,7 +464,7 @@
         "y": 293,
         "width": 2,
         "height": 46,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerVolBtn2",
@@ -474,7 +474,7 @@
         "y": 293,
         "width": 9.94,
         "height": 7,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerCrossfaderRail1",
@@ -484,7 +484,7 @@
         "y": 358,
         "width": 99.39,
         "height": 2,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "mixerCrossfaderBtn1",
@@ -494,17 +494,17 @@
         "y": 354,
         "width": 11.93,
         "height": 10,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
-        "id": "39:2",
+        "id": "biblioteca",
         "name": "Biblioteca",
         "type": "frame",
         "x": 0,
         "y": 379,
         "width": 1452,
         "height": 434,
-        "parent": "45:3"
+        "parent": "framePrincipal"
       },
       {
         "id": "libraryTree",
@@ -514,7 +514,7 @@
         "y": 379,
         "width": 249,
         "height": 434,
-        "parent": "39:2"
+        "parent": "biblioteca"
       },
       {
         "id": "trackTable",
@@ -524,7 +524,7 @@
         "y": 379,
         "width": 1203,
         "height": 434,
-        "parent": "39:2"
+        "parent": "biblioteca"
       },
       {
         "id": "bigWaveform1Label",
@@ -534,7 +534,7 @@
         "y": 8,
         "width": 200,
         "height": 20,
-        "parent": "8:824"
+        "parent": "bigwaveform1"
       },
       {
         "id": "bigWaveform2Label",
@@ -544,7 +544,7 @@
         "y": 8,
         "width": 200,
         "height": 20,
-        "parent": "8:670"
+        "parent": "bigwaveform2"
       }
     ]
   },

@@ -158,10 +158,10 @@ void DeckComponent::resized()
     auto area = getLocalBounds().reduced (2);
 
     // Posicao absoluta do deck no canvas do Figma (para calcular posicoes relativas dos filhos)
-    auto deckAbsX = ! mirrored ? djdeck::layout::figmaNode8_979::xPx
-                                     : djdeck::layout::figmaNode8_1166::xPx;
-    auto deckAbsY = ! mirrored ? djdeck::layout::figmaNode8_979::yPx
-                                     : djdeck::layout::figmaNode8_1166::yPx;
+    auto deckAbsX = ! mirrored ? djdeck::layout::figmaNodedeck1::xPx
+                                     : djdeck::layout::figmaNodedeck2::xPx;
+    auto deckAbsY = ! mirrored ? djdeck::layout::figmaNodedeck1::yPx
+                                     : djdeck::layout::figmaNodedeck2::yPx;
 
     // Passa a posicao absoluta do deck para o cabecalho (posicionamento dos textos)
     header.setDeckPosition (static_cast<int> (deckAbsX), static_cast<int> (deckAbsY));
@@ -171,13 +171,13 @@ void DeckComponent::resized()
     header.setBounds (0, 0, area.getWidth(), djdeck::layout::deckHeader::heightPx);
 
     // ---- Miniwaveform: abaixo do cabecalho (miniwaveform1 ou miniwaveform2 relativo ao deck) ----
-    auto mwNodeX = ! mirrored ? djdeck::layout::figmaNode8_989::xPx
+    auto mwNodeX = ! mirrored ? djdeck::layout::figmaNodeminiwaveform1::xPx
                                     : djdeck::layout::figmaNodeminiwaveform2::xPx;
-    auto mwNodeY = ! mirrored ? djdeck::layout::figmaNode8_989::yPx
+    auto mwNodeY = ! mirrored ? djdeck::layout::figmaNodeminiwaveform1::yPx
                                     : djdeck::layout::figmaNodeminiwaveform2::yPx;
-    auto mwNodeW = ! mirrored ? djdeck::layout::figmaNode8_989::widthPx
+    auto mwNodeW = ! mirrored ? djdeck::layout::figmaNodeminiwaveform1::widthPx
                                     : djdeck::layout::figmaNodeminiwaveform2::widthPx;
-    auto mwNodeH = ! mirrored ? djdeck::layout::figmaNode8_989::heightPx
+    auto mwNodeH = ! mirrored ? djdeck::layout::figmaNodeminiwaveform1::heightPx
                                     : djdeck::layout::figmaNodeminiwaveform2::heightPx;
 
     const auto mwRelX = static_cast<int> (mwNodeX - deckAbsX);
@@ -194,13 +194,13 @@ void DeckComponent::resized()
     // ---- Jog wheel, CUE, Play e pitch (todos a partir dos nos do Figma, relativos ao deck) ----
 
         // Jog wheel: posicao relativa ao deck (jog1 para deck 1, jog2 para deck 2)
-    auto jogNodeX = ! mirrored ? djdeck::layout::figmaNode8_1971::xPx
+    auto jogNodeX = ! mirrored ? djdeck::layout::figmaNodejog1::xPx
                                      : djdeck::layout::figmaNodejog2::xPx;
-    auto jogNodeY = ! mirrored ? djdeck::layout::figmaNode8_1971::yPx
+    auto jogNodeY = ! mirrored ? djdeck::layout::figmaNodejog1::yPx
                                      : djdeck::layout::figmaNodejog2::yPx;
-    auto jogNodeW = ! mirrored ? djdeck::layout::figmaNode8_1971::widthPx
+    auto jogNodeW = ! mirrored ? djdeck::layout::figmaNodejog1::widthPx
                                      : djdeck::layout::figmaNodejog2::widthPx;
-    auto jogNodeH = ! mirrored ? djdeck::layout::figmaNode8_1971::heightPx
+    auto jogNodeH = ! mirrored ? djdeck::layout::figmaNodejog1::heightPx
                                      : djdeck::layout::figmaNodejog2::heightPx;
 
     const auto jogRelX = static_cast<int> (jogNodeX - deckAbsX);
