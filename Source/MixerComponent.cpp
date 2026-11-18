@@ -53,7 +53,7 @@ void MixerComponent::paint (juce::Graphics& g)
 //==============================================================================
 void MixerComponent::resized()
 {
-    // Mixer: x672 y138 l108 a241 (medida do Figma: figmaNode8_1134)
+    // Mixer: x672 y138 l108 a241 (medida do Figma: figmaNodemixer)
     // Todas as coordenadas são absolutas do canvas do Figma, convertidas
     // para locais do mixer subtraindo (672, 138).
     const int mixerAbsX = 672;
@@ -69,11 +69,11 @@ void MixerComponent::resized()
     // (knobs, VU, CUE, faders) sao posicionados por ChannelStripComponent::resized()
     // usando coordenadas absolutas do mixer (figmaX - mixerAbsX - stripAbsX).
     channelA.setBounds (0, 0,
-                        djdeck::layout::figmaNode8_1134::widthPx / 2,
-                        djdeck::layout::figmaNode8_1134::heightPx);
-    channelB.setBounds (djdeck::layout::figmaNode8_1134::widthPx / 2, 0,
-                        djdeck::layout::figmaNode8_1134::widthPx / 2,
-                        djdeck::layout::figmaNode8_1134::heightPx);
+                        djdeck::layout::figmaNodemixer::widthPx / 2,
+                        djdeck::layout::figmaNodemixer::heightPx);
+    channelB.setBounds (djdeck::layout::figmaNodemixer::widthPx / 2, 0,
+                        djdeck::layout::figmaNodemixer::widthPx / 2,
+                        djdeck::layout::figmaNodemixer::heightPx);
 
     // ---- Crossfader button ----
     // Figma: x719 y354 l12 a10  -> relativo ao mixer: x47 y216

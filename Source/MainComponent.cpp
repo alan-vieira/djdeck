@@ -142,7 +142,7 @@ void MainComponent::resized()
 
     // Big waveforms: alturas dos nós do Figma (bigwaveform1 + bigwaveform2)
     const auto waveformsHeight =
-        djdeck::layout::figmaNode8_824::heightPx + djdeck::layout::figmaNode8_670::heightPx;
+        djdeck::layout::figmaNodebigwaveform1::heightPx + djdeck::layout::figmaNodebigwaveform2::heightPx;
 
     if (bigWaveforms != nullptr)
         bigWaveforms->setBounds (area.removeFromTop (waveformsHeight));
@@ -150,28 +150,28 @@ void MainComponent::resized()
     // deck1 | mixer | deck2 — posições e tamanhos exatos do Figma (fonte: layout.json / figmaNodes)
     if (deck1 != nullptr && mixer != nullptr && deck2 != nullptr)
     {
-        deck1->setBounds (djdeck::layout::figmaNode8_979::xPx + offsetX,
-                          djdeck::layout::figmaNode8_979::yPx + offsetY,
-                          djdeck::layout::figmaNode8_979::widthPx,
-                          djdeck::layout::figmaNode8_979::heightPx);
+        deck1->setBounds (djdeck::layout::figmaNodedeck1::xPx + offsetX,
+                          djdeck::layout::figmaNodedeck1::yPx + offsetY,
+                          djdeck::layout::figmaNodedeck1::widthPx,
+                          djdeck::layout::figmaNodedeck1::heightPx);
 
-        mixer->setBounds (djdeck::layout::figmaNode8_1134::xPx + offsetX,
-                          djdeck::layout::figmaNode8_1134::yPx + offsetY,
-                          djdeck::layout::figmaNode8_1134::widthPx,
-                          djdeck::layout::figmaNode8_1134::heightPx);
+        mixer->setBounds (djdeck::layout::figmaNodemixer::xPx + offsetX,
+                          djdeck::layout::figmaNodemixer::yPx + offsetY,
+                          djdeck::layout::figmaNodemixer::widthPx,
+                          djdeck::layout::figmaNodemixer::heightPx);
 
-        deck2->setBounds (djdeck::layout::figmaNode8_1166::xPx + offsetX,
-                          djdeck::layout::figmaNode8_1166::yPx + offsetY,
-                          djdeck::layout::figmaNode8_1166::widthPx,
-                          djdeck::layout::figmaNode8_1166::heightPx);
+        deck2->setBounds (djdeck::layout::figmaNodedeck2::xPx + offsetX,
+                          djdeck::layout::figmaNodedeck2::yPx + offsetY,
+                          djdeck::layout::figmaNodedeck2::widthPx,
+                          djdeck::layout::figmaNodedeck2::heightPx);
     }
 
     // biblioteca — nó do Figma preenche o restante abaixo dos decks
     if (library != nullptr)
-        library->setBounds (djdeck::layout::figmaNode39_2::xPx + offsetX,
-                            djdeck::layout::figmaNode39_2::yPx + offsetY,
-                            djdeck::layout::figmaNode39_2::widthPx,
-                            djdeck::layout::figmaNode39_2::heightPx);
+        library->setBounds (djdeck::layout::figmaNodebiblioteca::xPx + offsetX,
+                            djdeck::layout::figmaNodebiblioteca::yPx + offsetY,
+                            djdeck::layout::figmaNodebiblioteca::widthPx,
+                            djdeck::layout::figmaNodebiblioteca::heightPx);
 }
 
 //==============================================================================
