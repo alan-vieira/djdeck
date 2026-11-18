@@ -1,16 +1,14 @@
 #include "KnobComponent.h"
+#include <functional>
 #include "LayoutConfig.hpp"
 
 //==============================================================================
 KnobComponent::KnobComponent (juce::String labelToUse)
-    : juce::Slider (juce::Slider::RotaryVerticalDrag, juce::Slider::NoTextBox),
-      caption (std::move (labelToUse)),
+    : caption (std::move (labelToUse)),
       accentColour (djdeck::layout::colours::Accent)
 {
-    setVelocityBasedMode (false);
-
-    // Arco de 270 graus, com o neutro apontando para cima.
-    setRotaryParameters (startAngle, endAngle, false);
+    setWantsKeyboardFocus (false);
+    setMouseCursor (juce::MouseCursor::PointingHandCursor);
 }
 
 void KnobComponent::setCaption (const juce::String& text)
@@ -31,12 +29,26 @@ void KnobComponent::setAccentColour (const juce::Colour& colour)
     repaint();
 }
 
+void KnobComponent::setValue (float newValue)
+{
+    value = juce::jlimit (minValue, maxValue, newValue);
+    repaint();
+}
+
+void KnobComponent::setRange (float newMin, float newMax)
+{
+    minValue = newMin;
+    maxValue = newMax;
+    value = juce::jlimit (minValue, maxValue, value);
+    repaint();
+}
+
 //==============================================================================
 float KnobComponent::getRotaryAngle()
 {
-    // valueToProportionOfLength mapeia o valor da faixa para 0..1.
+    // Mapeia o valor da faixa para 0..1.
     // Para bipolar, o neutro (0) fica em 0.5 — que deve virar o angulo 0.
-    const auto proportion = static_cast<float> (valueToProportionOfLength (getValue()));
+    const auto proportion = static_cast<float> ((value - minValue) / (maxValue - minValue));
 
     if (bipolar)
         return (proportion * 2.0f - 1.0f) * (endAngle - startAngle) * 0.5f;
@@ -101,4 +113,24 @@ void KnobComponent::paint (juce::Graphics& g)
         g.setColour (djdeck::layout::colours::Secondary);
         g.drawText (caption, getLocalBounds().removeFromBottom (14), juce::Justification::centred, true);
     }
+}
+
+//==============================================================================
+void KnobComponent::mouseDown (const juce::MouseEvent& e)
+{
+    lastMouseY = e.position.y;
+}
+
+void KnobComponent::mouseDrag (const juce::MouseEvent& e)
+{
+    const auto deltaY = e.position.y - lastMouseY;
+    lastMouseY = e.position.y;
+
+    // Arrastar para cima aumenta, para baixo diminui.
+    // Cada 100 pixels = faixa completa.
+    const auto change = -static_cast<float> (deltaY) * (maxValue - minValue) / 100.0f;
+    setValue (value + change);
+
+    if (onValueChanged != nullptr)
+        onValueChanged (value);
 }

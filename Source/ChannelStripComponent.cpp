@@ -13,29 +13,27 @@ ChannelStripComponent::ChannelStripComponent (DeckPlayer* playerToUse,
       vuMeter (playerToUse->getLevelSource (0))
 {
     // ---- Knobs ----
-    trimKnob.setRange (-12.0f, 12.0f, 0.1f);
+    trimKnob.setRange (-12.0f, 12.0f);
     trimKnob.setValue (0.0f);
-    trimKnob.setDoubleClickReturnValue (true, 0.0);
 
-    highKnob.setRange (-12.0f, 12.0f, 0.5f);
+    highKnob.setRange (-12.0f, 12.0f);
     highKnob.setValue (0.0f);
-    highKnob.setDoubleClickReturnValue (true, 0.0);
 
-    midKnob.setRange (-12.0f, 12.0f, 0.5f);
+    midKnob.setRange (-12.0f, 12.0f);
     midKnob.setValue (0.0f);
-    midKnob.setDoubleClickReturnValue (true, 0.0);
 
-    lowKnob.setRange (-12.0f, 12.0f, 0.5f);
+    lowKnob.setRange (-12.0f, 12.0f);
     lowKnob.setValue (0.0f);
-    lowKnob.setDoubleClickReturnValue (true, 0.0);
 
     addAndMakeVisible (trimKnob);
     addAndMakeVisible (highKnob);
     addAndMakeVisible (midKnob);
     addAndMakeVisible (lowKnob);
 
-    for (auto* knob : { &trimKnob, &highKnob, &midKnob, &lowKnob })
-        knob->addListener (this);
+    trimKnob.onValueChanged = [this] (float v) { player->setTrimDb (v); };
+    highKnob.onValueChanged = [this] (float v) { player->setEqHighDb (v); };
+    midKnob.onValueChanged  = [this] (float v) { player->setEqMidDb (v);  };
+    lowKnob.onValueChanged  = [this] (float v) { player->setEqLowDb (v);  };
 
     // ---- Botao CUE ----
     cueButton.setClickingTogglesState (true);
@@ -144,15 +142,7 @@ void ChannelStripComponent::sliderValueChanged (juce::Slider* slider)
     if (player == nullptr)
         return;
 
-    if (slider == &trimKnob)
-        player->setTrimDb (trimKnob.getValue());
-    else if (slider == &highKnob)
-        player->setEqHighDb (highKnob.getValue());
-    else if (slider == &midKnob)
-        player->setEqMidDb (midKnob.getValue());
-    else if (slider == &lowKnob)
-        player->setEqLowDb (lowKnob.getValue());
-    else if (slider == &volumeFader)
+    if (slider == &volumeFader)
         player->setGain (volumeFader.getValue());
 }
 

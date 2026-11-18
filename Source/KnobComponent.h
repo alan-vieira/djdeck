@@ -13,12 +13,14 @@
 // comeca no minimo da faixa.
 //
 // Ver docs/DOCUMENTACAO_LAYOUT_UI.md §6.1.
-class KnobComponent : public juce::Slider
+class KnobComponent : public juce::Component
 {
 public:
     explicit KnobComponent (juce::String labelToUse);
 
     void paint (juce::Graphics& g) override;
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
 
     // Rotulo desenhado abaixo do knob. Vazio = sem rotulo.
     void setCaption (const juce::String& text);
@@ -30,6 +32,13 @@ public:
     // Cor do arco de valor.
     void setAccentColour (const juce::Colour& colour);
 
+    // Valor do knob, em -12..+12 dB (ou 0..1 para unipolar).
+    void setValue (float newValue);
+    float getValue() const { return value; }
+
+    // Range do knob.
+    void setRange (float newMin, float newMax);
+
     // Angulo do indicador, em radianos, com 0 no topo e sentido horario.
     // O mesmo sistema do setRotaryParameters() do Slider.
     //
@@ -37,10 +46,17 @@ public:
     // no JUCE 9.
     float getRotaryAngle();
 
+    // Chamado quando o usuario altera o valor arrastando o mouse.
+    std::function<void (float)> onValueChanged;
+
 private:
     juce::String caption;
     bool bipolar = true;
     juce::Colour accentColour;
+    float value = 0.0f;
+    float minValue = -12.0f;
+    float maxValue = 12.0f;
+    int lastMouseY = 0;
 
     static constexpr float startAngle = -juce::MathConstants<float>::pi * 0.75f;
     static constexpr float endAngle   =  juce::MathConstants<float>::pi * 0.75f;
