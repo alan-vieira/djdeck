@@ -84,7 +84,7 @@ def generate_header(spec):
     out.append(f"// Seções verticais (percentagem da altura da janela)")
     for s in spec["sections"]["vertical"]:
         ident = s["id"].replace("And", "And")
-        out.append(f"constexpr int section{ident.capitalize()}HeightPercent = {s['heightPercent']};")
+        out.append(f"constexpr int section{ident.capitalize()}HeightPercent = {s.get('heightPercent', 0)};")
         out.append(f"constexpr int section{ident.capitalize()}HeightPx        = {s['heightPx']};")
 
     # ---- decksAndMixer ----

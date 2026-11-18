@@ -31,28 +31,6 @@ private:
 
     CrossfaderComponent crossfader;
 
-    // MIXING / LEVEL faders (verticais)
-    juce::Slider mixingFader { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
-    juce::Slider levelFader  { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
-
-    // Knobs EQ/Trim do deck 1 (esquerda)
-    KnobComponent knobTrim1 { "TRIM" };
-    KnobComponent knobHigh1 { "HIGH" };
-    KnobComponent knobMid1  { "MID" };
-    KnobComponent knobLow1  { "LOW" };
-    KnobComponent knobFilter1 { "FILTER" };
-
-    // Knobs EQ/Trim do deck 2 (direita)
-    KnobComponent knobTrim2 { "TRIM" };
-    KnobComponent knobHigh2 { "HIGH" };
-    KnobComponent knobMid2  { "MID" };
-    KnobComponent knobLow2  { "LOW" };
-    KnobComponent knobFilter2 { "FILTER" };
-
-    // Botões CUE
-    juce::TextButton cueBtn1 { "CUE" };
-    juce::TextButton cueBtn2 { "CUE" };
-
     DeckPlayer* playerA;
     DeckPlayer* playerB;
 

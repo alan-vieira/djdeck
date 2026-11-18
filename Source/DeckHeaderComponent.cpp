@@ -16,6 +16,10 @@ DeckHeaderComponent::DeckHeaderComponent (int deckIdToUse, bool isDeck2ToUse)
     masterButton.setColour (juce::TextButton::buttonOnColourId, djdeck::layout::colours::Loop);
     masterButton.addListener (this);
     addAndMakeVisible (masterButton);
+
+    // Botao SYNC: texto e borda amarelos (conforme o HTML de referência).
+    syncButton.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
+    syncButton.setColour (juce::TextButton::textColourOffId, djdeck::layout::colours::Accent);
 }
 
 void DeckHeaderComponent::setDeckPosition (int x, int y)

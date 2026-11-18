@@ -158,9 +158,9 @@ void DeckComponent::resized()
     auto area = getLocalBounds().reduced (2);
 
     // Posicao absoluta do deck no canvas do Figma (para calcular posicoes relativas dos filhos)
-    const auto deckAbsX = ! mirrored ? djdeck::layout::figmaNode8_979::xPx
+    auto deckAbsX = ! mirrored ? djdeck::layout::figmaNode8_979::xPx
                                      : djdeck::layout::figmaNode8_1166::xPx;
-    const auto deckAbsY = ! mirrored ? djdeck::layout::figmaNode8_979::yPx
+    auto deckAbsY = ! mirrored ? djdeck::layout::figmaNode8_979::yPx
                                      : djdeck::layout::figmaNode8_1166::yPx;
 
     // Passa a posicao absoluta do deck para o cabecalho (posicionamento dos textos)
@@ -171,13 +171,13 @@ void DeckComponent::resized()
     header.setBounds (0, 0, area.getWidth(), djdeck::layout::deckHeader::heightPx);
 
     // ---- Miniwaveform: abaixo do cabecalho (miniwaveform1 ou miniwaveform2 relativo ao deck) ----
-    const auto mwNodeX = ! mirrored ? djdeck::layout::figmaNode8_989::xPx
+    auto mwNodeX = ! mirrored ? djdeck::layout::figmaNode8_989::xPx
                                     : djdeck::layout::figmaNodeminiwaveform2::xPx;
-    const auto mwNodeY = ! mirrored ? djdeck::layout::figmaNode8_989::yPx
+    auto mwNodeY = ! mirrored ? djdeck::layout::figmaNode8_989::yPx
                                     : djdeck::layout::figmaNodeminiwaveform2::yPx;
-    const auto mwNodeW = ! mirrored ? djdeck::layout::figmaNode8_989::widthPx
+    auto mwNodeW = ! mirrored ? djdeck::layout::figmaNode8_989::widthPx
                                     : djdeck::layout::figmaNodeminiwaveform2::widthPx;
-    const auto mwNodeH = ! mirrored ? djdeck::layout::figmaNode8_989::heightPx
+    auto mwNodeH = ! mirrored ? djdeck::layout::figmaNode8_989::heightPx
                                     : djdeck::layout::figmaNodeminiwaveform2::heightPx;
 
     const auto mwRelX = static_cast<int> (mwNodeX - deckAbsX);
@@ -191,19 +191,16 @@ void DeckComponent::resized()
     auto transportArea = juce::Rectangle<int> (0, area.getHeight() - djdeck::layout::deckTransport::heightPx,
                                                area.getWidth(), djdeck::layout::deckTransport::heightPx);
 
-    // ---- Area central: jog wheel, CUE, Play, pitch ----
-    auto middleArea = area;
-    middleArea.removeFromTop (djdeck::layout::deckHeader::heightPx);
-    middleArea.removeFromBottom (djdeck::layout::deckTransport::heightPx);
+    // ---- Jog wheel, CUE, Play e pitch (todos a partir dos nos do Figma, relativos ao deck) ----
 
-    // Jog wheel: posicao relativa ao deck (jog1 para deck 1, jog2 para deck 2)
-    const auto jogNodeX = ! mirrored ? djdeck::layout::figmaNode8_1971::xPx
+        // Jog wheel: posicao relativa ao deck (jog1 para deck 1, jog2 para deck 2)
+    auto jogNodeX = ! mirrored ? djdeck::layout::figmaNode8_1971::xPx
                                      : djdeck::layout::figmaNodejog2::xPx;
-    const auto jogNodeY = ! mirrored ? djdeck::layout::figmaNode8_1971::yPx
+    auto jogNodeY = ! mirrored ? djdeck::layout::figmaNode8_1971::yPx
                                      : djdeck::layout::figmaNodejog2::yPx;
-    const auto jogNodeW = ! mirrored ? djdeck::layout::figmaNode8_1971::widthPx
+    auto jogNodeW = ! mirrored ? djdeck::layout::figmaNode8_1971::widthPx
                                      : djdeck::layout::figmaNodejog2::widthPx;
-    const auto jogNodeH = ! mirrored ? djdeck::layout::figmaNode8_1971::heightPx
+    auto jogNodeH = ! mirrored ? djdeck::layout::figmaNode8_1971::heightPx
                                      : djdeck::layout::figmaNodejog2::heightPx;
 
     const auto jogRelX = static_cast<int> (jogNodeX - deckAbsX);
@@ -213,29 +210,33 @@ void DeckComponent::resized()
     auto jogArea = juce::Rectangle<int> (jogRelX, jogRelY, jogSize, jogSize);
     jogWheel.setBounds (jogArea);
 
-    // Pitch slider ao lado do jog wheel
-    const auto pitchWidth = 48;
-    if (! mirrored)
-    {
-        auto pitchArea = middleArea.removeFromRight (pitchWidth);
-        pitchArea = pitchArea.withSizeKeepingCentre (pitchWidth, jogSize);
-        pitchSlider.setBounds (pitchArea.reduced (2));
-    }
-    else
-    {
-        auto pitchArea = middleArea.removeFromLeft (pitchWidth);
-        pitchArea = pitchArea.withSizeKeepingCentre (pitchWidth, jogSize);
-        pitchSlider.setBounds (pitchArea.reduced (2));
-    }
+    // Pitch slider: posicao absoluta do Figma convertida para relativa ao deck.
+    // Fica SEMPRE à direita do jog wheel nos dois decks (o espelhamento inverte o
+    // lado do jog, o pitch acompanha o jog).
+        auto pitchNodeX = ! mirrored ? djdeck::layout::figmaNodepitch_slider_1::xPx
+                                           : djdeck::layout::figmaNodepitch_slider_2::xPx;
+        auto pitchNodeY = ! mirrored ? djdeck::layout::figmaNodepitch_slider_1::yPx
+                                           : djdeck::layout::figmaNodepitch_slider_2::yPx;
+        auto pitchNodeW = ! mirrored ? djdeck::layout::figmaNodepitch_slider_1::widthPx
+                                           : djdeck::layout::figmaNodepitch_slider_2::widthPx;
+        auto pitchNodeH = ! mirrored ? djdeck::layout::figmaNodepitch_slider_1::heightPx
+                                           : djdeck::layout::figmaNodepitch_slider_2::heightPx;
+
+        const auto pitchRelX = static_cast<int> (pitchNodeX - deckAbsX);
+        const auto pitchRelY = static_cast<int> (pitchNodeY - deckAbsY);
+        const auto pitchW    = static_cast<int> (juce::roundToInt (pitchNodeW));
+        const auto pitchH    = static_cast<int> (juce::roundToInt (pitchNodeH));
+
+        pitchSlider.setBounds (pitchRelX, pitchRelY, pitchW, pitchH);
 
     // CUE e Play: posicoes relativas ao deck (CUE1/play1 para deck 1, cue2/play2 para deck 2)
-    const auto cueNodeX = ! mirrored ? djdeck::layout::figmaNode8_1981::xPx
+    auto cueNodeX = ! mirrored ? djdeck::layout::figmaNodecue1::xPx
                                      : djdeck::layout::figmaNodecue2::xPx;
-    const auto cueNodeY = ! mirrored ? djdeck::layout::figmaNode8_1981::yPx
+    auto cueNodeY = ! mirrored ? djdeck::layout::figmaNodecue1::yPx
                                      : djdeck::layout::figmaNodecue2::yPx;
-    const auto playNodeX = ! mirrored ? djdeck::layout::figmaNode8_1977::xPx
+    auto playNodeX = ! mirrored ? djdeck::layout::figmaNodeplay1::xPx
                                       : djdeck::layout::figmaNodeplay2::xPx;
-    const auto playNodeY = ! mirrored ? djdeck::layout::figmaNode8_1977::yPx
+    auto playNodeY = ! mirrored ? djdeck::layout::figmaNodeplay1::yPx
                                       : djdeck::layout::figmaNodeplay2::yPx;
     const auto buttonSize = djdeck::layout::deckCue::widthPx;
 

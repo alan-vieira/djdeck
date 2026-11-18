@@ -24,11 +24,11 @@ constexpr int screenHeight = 813;
 
 // Seções verticais (percentagem da altura da janela)
 constexpr int sectionBigwaveformsHeightPercent = 0;
-constexpr int sectionBigwaveformsHeightPx        = 71;
-constexpr int sectionDecksandmixerHeightPercent = 40;
-constexpr int sectionDecksandmixerHeightPx        = 360;
-constexpr int sectionLibraryHeightPercent = 27;
-constexpr int sectionLibraryHeightPx        = 243;
+constexpr int sectionBigwaveformsHeightPx        = 137;
+constexpr int sectionDecksandmixerHeightPercent = 0;
+constexpr int sectionDecksandmixerHeightPx        = 242;
+constexpr int sectionLibraryHeightPercent = 0;
+constexpr int sectionLibraryHeightPx        = 434;
 
 // Colunas da seção Decks+Mixer (% da largura)
 constexpr int deckAWidthPercent  = 45;
@@ -37,17 +37,17 @@ constexpr int deckBWidthPercent  = 45;
 
 // Larguras absolutas dos decks (px, medida do Figma)
 constexpr int deckAWidthPx  = 671;
-constexpr int mixerWidthPx  = 108;
-constexpr int deckBWidthPx  = 672;
+constexpr int mixerWidthPx  = 109;
+constexpr int deckBWidthPx  = 671;
 
 // Alturas absolutas dos decks (px, medida do Figma)
-constexpr int deckAHeightPx  = 239;
-constexpr int mixerHeightPx  = 241;
-constexpr int deckBHeightPx  = 201;
+constexpr int deckAHeightPx  = 242;
+constexpr int mixerHeightPx  = 242;
+constexpr int deckBHeightPx  = 242;
 
 // Colunas da Biblioteca (% da largura)
-constexpr int libraryTreeWidthPercent  = 25;
-constexpr int trackListWidthPercent    = 75;
+constexpr int libraryTreeWidthPercent  = 249;
+constexpr int trackListWidthPercent    = 1203;
 
 // Espaçamento (px)
 constexpr int gapTiny = 2;
@@ -74,16 +74,17 @@ namespace colours {
     // states
     inline const juce::Colour Accent = juce::Colour(0xff007DE1);
     inline const juce::Colour Selection = juce::Colour(0xff052E64);
-    inline const juce::Colour Selectiontext = juce::Colour(0xff158016);
     inline const juce::Colour Hover = juce::Colour(0xff2A2A2A);
     // djSemantics
     inline const juce::Colour Loop = juce::Colour(0xffFF8C00);
     inline const juce::Colour Cue = juce::Colour(0xffA63031);
     inline const juce::Colour Rating = juce::Colour(0xffDEAB38);
+    inline const juce::Colour Needle = juce::Colour(0xffFFFFFF);
     inline const juce::Colour Beatgrid = juce::Colour(0xffB8B8B8);
     inline const juce::Colour Downbeat = juce::Colour(0xffA30000);
-    inline const juce::Colour Needle = juce::Colour(0xffFFFFFF);
     // waveform
+    inline const juce::Colour Deck1 = juce::Colour(0xff007DE1);
+    inline const juce::Colour Deck2 = juce::Colour(0xffA63031);
     inline const juce::Colour Low = juce::Colour(0xff006EFF);
     inline const juce::Colour Mid = juce::Colour(0xff00B4C2);
     inline const juce::Colour High = juce::Colour(0xff3EB4B4);
@@ -115,24 +116,24 @@ namespace typography {
     inline const char* fontFamily = "Inter";
     constexpr int deckNumberSizePx = 14;
     constexpr int deckNumberWeight  = juce::Font::bold;
-    constexpr int displaySizePx = 28;
-    constexpr int displayWeight  = juce::Font::plain;
     constexpr int titleSizePx = 15;
     constexpr int titleWeight  = juce::Font::bold;
     constexpr int artistSizePx = 11;
     constexpr int artistWeight  = juce::Font::plain;
-    constexpr int bodySizePx = 13;
-    constexpr int bodyWeight  = juce::Font::plain;
-    constexpr int captionSizePx = 11;
-    constexpr int captionWeight  = juce::Font::plain;
-    constexpr int microSizePx = 9;
-    constexpr int microWeight  = juce::Font::plain;
     constexpr int bpmSizePx = 11;
     constexpr int bpmWeight  = juce::Font::plain;
     constexpr int timeSizePx = 14;
     constexpr int timeWeight  = juce::Font::bold;
-    constexpr int pitchSizePx = 9;
-    constexpr int pitchWeight  = juce::Font::plain;
+    constexpr int jogBpmSizePx = 15;
+    constexpr int jogBpmWeight  = juce::Font::bold;
+    constexpr int jogPitchSizePx = 9;
+    constexpr int jogPitchWeight  = juce::Font::plain;
+    constexpr int bigWaveformLabelSizePx = 11;
+    constexpr int bigWaveformLabelWeight  = juce::Font::bold;
+    constexpr int libraryHeaderSizePx = 11;
+    constexpr int libraryHeaderWeight  = juce::Font::bold;
+    constexpr int libraryRowSizePx = 11;
+    constexpr int libraryRowWeight  = juce::Font::plain;
 }
 
 // Regras de espelhamento dos decks
@@ -153,7 +154,7 @@ constexpr bool EqlabelsMirroredRight = true;
 
 // Especificações do deck
 namespace deckHeader {
-    constexpr int heightPx = 64;
+    constexpr int heightPx = 44;
     constexpr int DecknumberWidthPx  = 7;
     constexpr int DecknumberHeightPx = 17;
     constexpr int TitleWidthPx  = 161;
@@ -185,22 +186,6 @@ namespace deckCue {
 namespace deckPlay {
     constexpr int widthPx  = 26;
     constexpr int heightPx = 26;
-    namespace symbol {
-        constexpr int widthPx  = 14;
-        constexpr int heightPx = 17;
-    }
-}
-namespace deckStop {
-    constexpr int widthPx  = 26;
-    constexpr int heightPx = 26;
-}
-namespace deckSync {
-    constexpr int widthPx  = 39;
-    constexpr int heightPx = 32;
-}
-namespace deckCamelotKey {
-    constexpr int widthPx  = 41;
-    constexpr int heightPx = 32;
 }
 
 // Especificações de componentes
@@ -286,7 +271,7 @@ namespace volumeFader {
     }
 }
 namespace mixerCue {
-    constexpr int widthPx  = 30;
+    constexpr int widthPx  = 29.82;
     constexpr int heightPx = 14;
 }
 
@@ -319,198 +304,30 @@ namespace figmaNode8_670 {
 
 namespace figmaNode8_979 {
     constexpr int  xPx  = 0;
-    constexpr int  yPx  = 139;
+    constexpr int  yPx  = 137;
     constexpr int  widthPx  = 671;
-    constexpr int heightPx = 201;
+    constexpr int heightPx = 242;
+}
+
+namespace figmaNode8_1166 {
+    constexpr int  xPx  = 781;
+    constexpr int  yPx  = 137;
+    constexpr int  widthPx  = 671;
+    constexpr int heightPx = 242;
 }
 
 namespace figmaNode8_989 {
     constexpr int  xPx  = 0;
-    constexpr int  yPx  = 183;
+    constexpr int  yPx  = 181;
     constexpr int  widthPx  = 670;
     constexpr int heightPx = 34;
 }
 
-namespace figmaNode16_2477 {
-    constexpr int  xPx  = 0;
-    constexpr int  yPx  = 341;
-    constexpr int  widthPx  = 672;
-    constexpr int heightPx = 38;
-}
-
-namespace figmaNode8_1166 {
-    constexpr int  xPx  = 780;
-    constexpr int  yPx  = 139;
-    constexpr int  widthPx  = 672;
-    constexpr int heightPx = 201;
-}
-
-namespace figmaNode16_2476 {
-    constexpr int  xPx  = 780;
-    constexpr int  yPx  = 341;
-    constexpr int  widthPx  = 672;
-    constexpr int heightPx = 38;
-}
-
-namespace figmaNode39_2 {
-    constexpr int  xPx  = 3;
-    constexpr int  yPx  = 382;
-    constexpr int  widthPx  = 1449;
-    constexpr int heightPx = 431;
-}
-
-namespace figmaNode36_3 {
-    constexpr int  xPx  = 676;
-    constexpr int  yPx  = 145;
-    constexpr int  widthPx  = 100;
-    constexpr int heightPx = 219;
-}
-
-namespace figmaNode8_1134 {
-    constexpr int  xPx  = 672;
-    constexpr int  yPx  = 138;
-    constexpr int  widthPx  = 108;
-    constexpr int heightPx = 241;
-}
-
-namespace figmaNode8_981 {
-    constexpr int  xPx  = 71;
-    constexpr int  yPx  = 145;
-    constexpr int  widthPx  = 161;
-    constexpr int heightPx = 18;
-}
-
-namespace figmaNode8_1171 {
-    constexpr int  xPx  = 1201;
-    constexpr int  yPx  = 161;
-    constexpr int  widthPx  = 129;
-    constexpr int heightPx = 18;
-}
-
-namespace figmaNode8_984 {
-    constexpr int  xPx  = 428;
-    constexpr int  yPx  = 160;
-    constexpr int  widthPx  = 122;
-    constexpr int heightPx = 17;
-}
-
-namespace figmaNode8_1169 {
-    constexpr int  xPx  = 842;
-    constexpr int  yPx  = 162;
-    constexpr int  widthPx  = 74;
-    constexpr int heightPx = 16;
-}
-
-namespace figmaNode8_982 {
-    constexpr int  xPx  = 70;
-    constexpr int  yPx  = 163;
-    constexpr int  widthPx  = 58;
-    constexpr int heightPx = 13;
-}
-
-namespace figmaNode8_1170 {
-    constexpr int  xPx  = 1007;
-    constexpr int  yPx  = 163;
-    constexpr int  widthPx  = 66;
-    constexpr int heightPx = 15;
-}
-
-namespace figmaNode8_983 {
-    constexpr int  xPx  = 236;
-    constexpr int  yPx  = 163;
-    constexpr int  widthPx  = 55;
-    constexpr int heightPx = 13;
-}
-
-namespace figmaNode8_1168 {
-    constexpr int  xPx  = 842;
-    constexpr int  yPx  = 145;
-    constexpr int  widthPx  = 49;
-    constexpr int heightPx = 18;
-}
-
-namespace figmaNode8_980 {
-    constexpr int  xPx  = 6;
-    constexpr int  yPx  = 139;
-    constexpr int  widthPx  = 7;
-    constexpr int heightPx = 17;
-}
-
-namespace figmaNode8_1167 {
-    constexpr int  xPx  = 785;
-    constexpr int  yPx  = 138;
-    constexpr int  widthPx  = 9;
-    constexpr int heightPx = 17;
-}
-
-namespace figmaNode8_985 {
-    constexpr int  xPx  = 570;
-    constexpr int  yPx  = 146;
-    constexpr int  widthPx  = 41;
-    constexpr int heightPx = 32;
-}
-
-namespace figmaNode8_987 {
-    constexpr int  xPx  = 626;
-    constexpr int  yPx  = 146;
-    constexpr int  widthPx  = 39;
-    constexpr int heightPx = 32;
-}
-
-namespace figmaNode8_1971 {
-    constexpr int  xPx  = 535;
-    constexpr float  yPx  = 227.88f;
-    constexpr float  widthPx  = 102.12f;
-    constexpr float heightPx = 102.12f;
-}
-
-namespace figmaNode8_1957 {
-    constexpr int  xPx  = 825;
-    constexpr float  yPx  = 227.94f;
-    constexpr float  widthPx  = 102.06f;
-    constexpr float heightPx = 102.06f;
-}
-
-namespace figmaNode8_1981 {
-    constexpr int  xPx  = 500;
-    constexpr int  yPx  = 276;
-    constexpr int  widthPx  = 26;
-    constexpr int heightPx = 26;
-}
-
-namespace figmaNode8_1972 {
-    constexpr int  xPx  = 790;
-    constexpr int  yPx  = 276;
-    constexpr int  widthPx  = 26;
-    constexpr int heightPx = 26;
-}
-
-namespace figmaNode8_1970 {
-    constexpr int  xPx  = 790;
-    constexpr int  yPx  = 306;
-    constexpr int  widthPx  = 26;
-    constexpr int heightPx = 26;
-}
-
-namespace figmaNode8_1977 {
-    constexpr int  xPx  = 500;
-    constexpr int  yPx  = 307;
-    constexpr int  widthPx  = 26;
-    constexpr int heightPx = 26;
-}
-
-namespace figmaNode8_1172 {
-    constexpr int  xPx  = 1344;
-    constexpr int  yPx  = 144;
-    constexpr int  widthPx  = 50;
-    constexpr int heightPx = 32;
-}
-
-namespace figmaNode8_1174 {
-    constexpr int  xPx  = 1402;
-    constexpr int  yPx  = 144;
-    constexpr int  widthPx  = 44;
-    constexpr int heightPx = 32;
+namespace figmaNodeminiwaveform2 {
+    constexpr int  xPx  = 781;
+    constexpr int  yPx  = 181;
+    constexpr int  widthPx  = 670;
+    constexpr int heightPx = 34;
 }
 
 namespace figmaNodedeck1Number {
@@ -583,25 +400,18 @@ namespace figmaNodedeck2Timer {
     constexpr int heightPx = 18;
 }
 
-namespace figmaNodecue2 {
-    constexpr int  xPx  = 790;
-    constexpr int  yPx  = 276;
-    constexpr int  widthPx  = 26;
-    constexpr int heightPx = 26;
+namespace figmaNodekeySync1 {
+    constexpr int  xPx  = 570;
+    constexpr int  yPx  = 146;
+    constexpr int  widthPx  = 41;
+    constexpr int heightPx = 32;
 }
 
-namespace figmaNodeplay2 {
-    constexpr int  xPx  = 790;
-    constexpr int  yPx  = 306;
-    constexpr int  widthPx  = 26;
-    constexpr int heightPx = 26;
-}
-
-namespace figmaNodejog2 {
-    constexpr int  xPx  = 825;
-    constexpr float  yPx  = 227.94f;
-    constexpr float  widthPx  = 102.06f;
-    constexpr float heightPx = 102.06f;
+namespace figmaNodebeatSync1 {
+    constexpr int  xPx  = 626;
+    constexpr int  yPx  = 146;
+    constexpr int  widthPx  = 39;
+    constexpr int heightPx = 32;
 }
 
 namespace figmaNodekeySync2 {
@@ -618,137 +428,228 @@ namespace figmaNodebeatSync2 {
     constexpr int heightPx = 32;
 }
 
-namespace figmaNodeminiwaveform2 {
-    constexpr int  xPx  = 789;
-    constexpr int  yPx  = 185;
-    constexpr int  widthPx  = 672;
-    constexpr int heightPx = 31;
+namespace figmaNode8_1971 {
+    constexpr int  xPx  = 535;
+    constexpr float  yPx  = 226.62f;
+    constexpr float  widthPx  = 102.12f;
+    constexpr float heightPx = 102.12f;
 }
 
-namespace figmaNodemixerCrossfaderBtn1 {
-    constexpr int  xPx  = 719;
-    constexpr int  yPx  = 354;
-    constexpr int  widthPx  = 12;
-    constexpr int heightPx = 10;
+namespace figmaNodejog2 {
+    constexpr int  xPx  = 825;
+    constexpr float  yPx  = 227.31f;
+    constexpr float  widthPx  = 102.06f;
+    constexpr float heightPx = 102.06f;
 }
 
-namespace figmaNodemixerCrossfaderRail1 {
-    constexpr int  xPx  = 676;
-    constexpr int  yPx  = 358;
-    constexpr int  widthPx  = 100;
-    constexpr int heightPx = 2;
+namespace figmaNodecue1 {
+    constexpr int  xPx  = 500;
+    constexpr float  yPx  = 275.14f;
+    constexpr int  widthPx  = 26;
+    constexpr int heightPx = 26;
 }
 
-namespace figmaNodemixerKnobLow1 {
-    constexpr int  xPx  = 690;
-    constexpr float  yPx  = 244.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
+namespace figmaNodeplay1 {
+    constexpr int  xPx  = 500;
+    constexpr float  yPx  = 306.4f;
+    constexpr int  widthPx  = 26;
+    constexpr int heightPx = 26;
 }
 
-namespace figmaNodemixerKnobMid1 {
-    constexpr int  xPx  = 690;
-    constexpr float  yPx  = 211.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
+namespace figmaNodecue2 {
+    constexpr int  xPx  = 790;
+    constexpr float  yPx  = 275.57f;
+    constexpr int  widthPx  = 26;
+    constexpr int heightPx = 26;
 }
 
-namespace figmaNodemixerKnobHigh1 {
-    constexpr int  xPx  = 690;
-    constexpr float  yPx  = 178.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
+namespace figmaNodeplay2 {
+    constexpr int  xPx  = 790;
+    constexpr float  yPx  = 305.7f;
+    constexpr int  widthPx  = 26;
+    constexpr int heightPx = 26;
 }
 
-namespace figmaNodemixerKnobTrim1 {
-    constexpr int  xPx  = 690;
-    constexpr float  yPx  = 145.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
+namespace figmaNodepitch_slider_1 {
+    constexpr int  xPx  = 648;
+    constexpr int  yPx  = 227;
+    constexpr float  widthPx  = 9.94f;
+    constexpr int heightPx = 103;
 }
 
-namespace figmaNodemixerKnobLow2 {
-    constexpr int  xPx  = 742;
-    constexpr float  yPx  = 244.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
+namespace figmaNodepitch_slider_2 {
+    constexpr int  xPx  = 934;
+    constexpr int  yPx  = 227;
+    constexpr float  widthPx  = 9.94f;
+    constexpr int heightPx = 103;
 }
 
-namespace figmaNodemixerKnobMid2 {
-    constexpr int  xPx  = 742;
-    constexpr float  yPx  = 211.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
-}
-
-namespace figmaNodemixerKnobHigh2 {
-    constexpr int  xPx  = 742;
-    constexpr float  yPx  = 178.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
-}
-
-namespace figmaNodemixerKnobTrim2 {
-    constexpr int  xPx  = 742;
-    constexpr float  yPx  = 145.04f;
-    constexpr int  widthPx  = 20;
-    constexpr float heightPx = 20.35f;
-}
-
-namespace figmaNodemixerVolBtn1 {
-    constexpr int  xPx  = 695;
-    constexpr int  yPx  = 293;
-    constexpr int  widthPx  = 10;
-    constexpr int heightPx = 7;
-}
-
-namespace figmaNodemixerVolRail1 {
-    constexpr int  xPx  = 699;
-    constexpr int  yPx  = 293;
-    constexpr int  widthPx  = 2;
-    constexpr int heightPx = 46;
-}
-
-namespace figmaNodemixerVolBtn2 {
-    constexpr int  xPx  = 747;
-    constexpr int  yPx  = 293;
-    constexpr int  widthPx  = 10;
-    constexpr int heightPx = 7;
-}
-
-namespace figmaNodemixerVolRail2 {
-    constexpr int  xPx  = 751;
-    constexpr int  yPx  = 293;
-    constexpr int  widthPx  = 2;
-    constexpr int heightPx = 46;
-}
-
-namespace figmaNodemixerCueBtn1 {
-    constexpr int  xPx  = 685;
-    constexpr int  yPx  = 276;
-    constexpr int  widthPx  = 30;
-    constexpr int heightPx = 14;
-}
-
-namespace figmaNodemixerCueBtn2 {
-    constexpr int  xPx  = 737;
-    constexpr int  yPx  = 276;
-    constexpr int  widthPx  = 30;
-    constexpr int heightPx = 14;
+namespace figmaNode8_1134 {
+    constexpr int  xPx  = 672;
+    constexpr int  yPx  = 137;
+    constexpr int  widthPx  = 109;
+    constexpr int heightPx = 242;
 }
 
 namespace figmaNodemixerVu1 {
-    constexpr int  xPx  = 680;
+    constexpr float  xPx  = 682.8f;
     constexpr int  yPx  = 145;
     constexpr int  widthPx  = 2;
     constexpr int heightPx = 118;
 }
 
 namespace figmaNodemixerVu2 {
-    constexpr int  xPx  = 732;
+    constexpr float  xPx  = 734.48f;
     constexpr int  yPx  = 145;
-    constexpr int  widthPx  = 1;
+    constexpr int  widthPx  = 2;
     constexpr int heightPx = 118;
+}
+
+namespace figmaNodemixerKnobTrim1 {
+    constexpr float  xPx  = 692.74f;
+    constexpr float  yPx  = 145.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerKnobHigh1 {
+    constexpr float  xPx  = 692.74f;
+    constexpr float  yPx  = 178.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerKnobMid1 {
+    constexpr float  xPx  = 692.74f;
+    constexpr float  yPx  = 211.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerKnobLow1 {
+    constexpr float  xPx  = 692.74f;
+    constexpr float  yPx  = 244.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerKnobTrim2 {
+    constexpr float  xPx  = 744.42f;
+    constexpr float  yPx  = 145.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerKnobHigh2 {
+    constexpr float  xPx  = 744.42f;
+    constexpr float  yPx  = 178.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerKnobMid2 {
+    constexpr float  xPx  = 744.42f;
+    constexpr float  yPx  = 211.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerKnobLow2 {
+    constexpr float  xPx  = 744.42f;
+    constexpr float  yPx  = 244.04f;
+    constexpr int  widthPx  = 20;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodemixerCueBtn1 {
+    constexpr float  xPx  = 687.77f;
+    constexpr int  yPx  = 276;
+    constexpr float  widthPx  = 29.82f;
+    constexpr int heightPx = 14;
+}
+
+namespace figmaNodemixerCueBtn2 {
+    constexpr float  xPx  = 739.45f;
+    constexpr int  yPx  = 276;
+    constexpr float  widthPx  = 29.82f;
+    constexpr int heightPx = 14;
+}
+
+namespace figmaNodemixerVolRail1 {
+    constexpr float  xPx  = 701.68f;
+    constexpr int  yPx  = 293;
+    constexpr int  widthPx  = 2;
+    constexpr int heightPx = 46;
+}
+
+namespace figmaNodemixerVolBtn1 {
+    constexpr float  xPx  = 697.71f;
+    constexpr int  yPx  = 293;
+    constexpr float  widthPx  = 9.94f;
+    constexpr int heightPx = 7;
+}
+
+namespace figmaNodemixerVolRail2 {
+    constexpr float  xPx  = 753.36f;
+    constexpr int  yPx  = 293;
+    constexpr int  widthPx  = 2;
+    constexpr int heightPx = 46;
+}
+
+namespace figmaNodemixerVolBtn2 {
+    constexpr float  xPx  = 749.39f;
+    constexpr int  yPx  = 293;
+    constexpr float  widthPx  = 9.94f;
+    constexpr int heightPx = 7;
+}
+
+namespace figmaNodemixerCrossfaderRail1 {
+    constexpr float  xPx  = 678.82f;
+    constexpr int  yPx  = 358;
+    constexpr float  widthPx  = 99.39f;
+    constexpr int heightPx = 2;
+}
+
+namespace figmaNodemixerCrossfaderBtn1 {
+    constexpr float  xPx  = 721.56f;
+    constexpr int  yPx  = 354;
+    constexpr float  widthPx  = 11.93f;
+    constexpr int heightPx = 10;
+}
+
+namespace figmaNode39_2 {
+    constexpr int  xPx  = 0;
+    constexpr int  yPx  = 379;
+    constexpr int  widthPx  = 1452;
+    constexpr int heightPx = 434;
+}
+
+namespace figmaNodelibraryTree {
+    constexpr int  xPx  = 0;
+    constexpr int  yPx  = 379;
+    constexpr int  widthPx  = 249;
+    constexpr int heightPx = 434;
+}
+
+namespace figmaNodetrackTable {
+    constexpr int  xPx  = 249;
+    constexpr int  yPx  = 379;
+    constexpr int  widthPx  = 1203;
+    constexpr int heightPx = 434;
+}
+
+namespace figmaNodebigWaveform1Label {
+    constexpr int  xPx  = 12;
+    constexpr int  yPx  = 8;
+    constexpr int  widthPx  = 200;
+    constexpr int heightPx = 20;
+}
+
+namespace figmaNodebigWaveform2Label {
+    constexpr int  xPx  = 12;
+    constexpr int  yPx  = 8;
+    constexpr int  widthPx  = 200;
+    constexpr int heightPx = 20;
 }
 } // namespace layout
 } // namespace djdeck

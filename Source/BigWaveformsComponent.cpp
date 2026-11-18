@@ -26,7 +26,25 @@ BigWaveformsComponent::~BigWaveformsComponent()
 //==============================================================================
 void BigWaveformsComponent::paint (juce::Graphics& g)
 {
+    auto area = getLocalBounds();
+
     g.fillAll (djdeck::layout::colours::Background);
+
+    const auto halfHeight = area.getHeight() / 2;
+
+    // ---- Labels de track (conforme o HTML de referência) ----
+    // Deck 1 (azul) — top half
+    g.setColour (djdeck::layout::colours::Accent);
+    g.setFont (juce::Font (juce::FontOptions ("Segoe UI", 11.0f, juce::Font::bold)));
+    g.drawText ("DECK 1 — " + trackTitleA,
+                juce::Rectangle<int> (12, 8, area.getWidth() - 24, 16),
+                juce::Justification::centredLeft, false);
+
+    // Deck 2 (vermelho) — bottom half
+    g.setColour (djdeck::layout::colours::Cue);
+    g.drawText ("DECK 2 — " + trackTitleB,
+                juce::Rectangle<int> (12, halfHeight + 8, area.getWidth() - 24, 16),
+                juce::Justification::centredLeft, false);
 }
 
 //==============================================================================
@@ -39,6 +57,16 @@ void BigWaveformsComponent::resized()
 
     waveformA.setBounds (area.removeFromTop (halfHeight).reduced (2));
     waveformB.setBounds (area.reduced (2));
+}
+
+//==============================================================================
+void BigWaveformsComponent::setTrackTitle (int deckId, const juce::String& title)
+{
+    if (deckId == 1)
+        trackTitleA = title;
+    else if (deckId == 2)
+        trackTitleB = title;
+    repaint();
 }
 
 //==============================================================================

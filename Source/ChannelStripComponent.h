@@ -61,7 +61,6 @@ private:
     KnobComponent highKnob { "HIGH" };
     KnobComponent midKnob  { "MID" };
     KnobComponent lowKnob  { "LOW" };
-    KnobComponent filterKnob { "FILTER" };
 
     juce::TextButton cueButton { "CUE" };
 

@@ -10,14 +10,11 @@
 // IDs das colunas da tabela
 enum PlaylistColumns
 {
-    titleColumn = 1,
-    artistColumn,
-    lengthColumn,
-    bpmColumn,
-    keyColumn,
-    albumColumn,
-    genreColumn,
-    ratingColumn
+    infoColumn = 1,      // Titulo + artista
+    albumColumn = 2,
+    genreColumn = 3,
+    ratingColumn = 4,
+    lengthColumn = 5     // Duracao
 };
 
 //==============================================================================
@@ -28,14 +25,11 @@ PlaylistComponent::PlaylistComponent (juce::AudioFormatManager& formatManagerToU
     playlistTable.setModel(this);
 
     // Colunas da biblioteca (docs/DOCUMENTACAO_LAYOUT_UI.md §8.3).
-    playlistTable.getHeader().addColumn(u8"Título", titleColumn, 200);
-    playlistTable.getHeader().addColumn(u8"Artista", artistColumn, 150);
-    playlistTable.getHeader().addColumn(u8"BPM", bpmColumn, 70);
-    playlistTable.getHeader().addColumn(u8"Key", keyColumn, 60);
-    playlistTable.getHeader().addColumn(u8"Álbum", albumColumn, 150);
-    playlistTable.getHeader().addColumn(u8"Gênero", genreColumn, 100);
+    playlistTable.getHeader().addColumn(u8"Título / Artista", infoColumn, 300);
+    playlistTable.getHeader().addColumn(u8"Álbum", albumColumn, 180);
+    playlistTable.getHeader().addColumn(u8"Gênero", genreColumn, 150);
     playlistTable.getHeader().addColumn(u8"Rating", ratingColumn, 90);
-    playlistTable.getHeader().addColumn(u8"Duração", lengthColumn, 70);
+    playlistTable.getHeader().addColumn(u8"Duração", lengthColumn, 80);
 
     addAndMakeVisible(addButton);
     addButton.addListener(this);
@@ -142,32 +136,13 @@ void PlaylistComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId
     g.setColour (djdeck::layout::colours::Primary);
 
     switch (columnId)
-    {
-    case titleColumn:
+{
+    case infoColumn:
+        g.setColour (djdeck::layout::colours::Primary);
         g.drawText (song.title, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
-        break;
-
-    case artistColumn:
         g.setColour (djdeck::layout::colours::Secondary);
-        g.drawText (song.artist, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
+        g.drawText (song.artist, 2, 15, width - 4, height, juce::Justification::centredLeft, true);
         break;
-
-    case bpmColumn:
-    {
-        // "140.00" — ou "--" quando o BPM nao foi detectado.
-        const auto bpmText = song.bpm > 0.0 ? juce::String (song.bpm, 2) : juce::String ("--");
-        g.drawText (bpmText, 2, 0, width - 4, height, juce::Justification::centredLeft, true);
-        break;
-    }
-
-    case keyColumn:
-    {
-        // A key vem do arquivo em Camelot ("8A") ou em notacao classica.
-        g.setColour (djdeck::layout::colours::Secondary);
-        g.drawText (song.key.isEmpty() ? juce::String ("--") : song.key,
-                    2, 0, width - 4, height, juce::Justification::centredLeft, true);
-        break;
-    }
 
     case albumColumn:
         g.setColour (djdeck::layout::colours::Secondary);
@@ -187,7 +162,6 @@ void PlaylistComponent::paintCell(juce::Graphics& g, int rowNumber, int columnId
         g.setColour (djdeck::layout::colours::Secondary);
         g.drawText (song.getFormattedLength(), 2, 0, width - 4, height, juce::Justification::centredLeft, true);
         break;
-
     default: break;
     }
 }

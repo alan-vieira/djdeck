@@ -1,8 +1,8 @@
 {
   "$schema": "layout.schema.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "djdeck UI Layout",
-  "description": "Centralized UI configuration for djdeck — colors, typography, proportions, and mirror rules. Editable without recompiling C++. Source: docs/DOCUMENTACAO_LAYOUT_UI.md + Source/RekordboxColours.h.",
+  "description": "Centralized UI configuration for djdeck. Source of truth: visualdj/djdeck-layout.html + Figma canvas 1452x813. Waveforms (big/mini) are rendered at runtime by JUCE (AudioThumbnail / MiniWaveformComponent) — only geometry is stored here.",
   "screen": {
     "width": 1452,
     "height": 813
@@ -51,9 +51,19 @@
         "name": "deck1",
         "type": "frame",
         "x": 0,
-        "y": 139,
+        "y": 137,
         "width": 671,
-        "height": 201,
+        "height": 242,
+        "parent": "45:3"
+      },
+      {
+        "id": "8:1166",
+        "name": "deck2",
+        "type": "frame",
+        "x": 781,
+        "y": 137,
+        "width": 671,
+        "height": 242,
         "parent": "45:3"
       },
       {
@@ -61,269 +71,19 @@
         "name": "miniwaveform1",
         "type": "frame",
         "x": 0,
-        "y": 183,
+        "y": 181,
         "width": 670,
         "height": 34,
         "parent": "45:3"
       },
       {
-        "id": "16:2477",
-        "name": "faixa em baixo do deck1",
-        "type": "rounded-rectangle",
-        "x": 0,
-        "y": 341,
-        "width": 672,
-        "height": 38,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1166",
-        "name": "deck2",
+        "id": "miniwaveform2",
+        "name": "miniwaveform2",
         "type": "frame",
-        "x": 780,
-        "y": 139,
-        "width": 672,
-        "height": 201,
-        "parent": "45:3"
-      },
-      {
-        "id": "16:2476",
-        "name": "faixa em baixo do deck 2",
-        "type": "rounded-rectangle",
-        "x": 780,
-        "y": 341,
-        "width": 672,
-        "height": 38,
-        "parent": "45:3"
-      },
-      {
-        "id": "39:2",
-        "name": "Biblioteca",
-        "type": "frame",
-        "x": 3,
-        "y": 382,
-        "width": 1449,
-        "height": 431,
-        "parent": "45:3"
-      },
-      {
-        "id": "36:3",
-        "name": "Mixer",
-        "type": "frame",
-        "x": 676,
-        "y": 145,
-        "width": 100,
-        "height": 219,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1134",
-        "name": "mixer",
-        "type": "frame",
-        "x": 672,
-        "y": 138,
-        "width": 108,
-        "height": 241,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:981",
-        "name": "Too Hot For Drumstep",
-        "type": "text",
-        "x": 71,
-        "y": 145,
-        "width": 161,
-        "height": 18,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1171",
-        "name": "-00:24.8 03:25.7",
-        "type": "text",
-        "x": 1201,
-        "y": 161,
-        "width": 129,
-        "height": 18,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:984",
-        "name": "-05:10.5 00:00.4",
-        "type": "text",
-        "x": 428,
-        "y": 160,
-        "width": 122,
-        "height": 17,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1169",
-        "name": "WATAPACHI",
-        "type": "text",
-        "x": 842,
-        "y": 162,
-        "width": 74,
-        "height": 16,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:982",
-        "name": "Wondawulf",
-        "type": "text",
-        "x": 70,
-        "y": 163,
-        "width": 58,
-        "height": 13,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1170",
-        "name": "140.00 Gm",
-        "type": "text",
-        "x": 1007,
-        "y": 163,
-        "width": 66,
-        "height": 15,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:983",
-        "name": "90.00 Gm",
-        "type": "text",
-        "x": 236,
-        "y": 163,
-        "width": 55,
-        "height": 13,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1168",
-        "name": "Ocelot",
-        "type": "text",
-        "x": 842,
-        "y": 145,
-        "width": 49,
-        "height": 18,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:980",
-        "name": "1",
-        "type": "text",
-        "x": 6,
-        "y": 139,
-        "width": 7,
-        "height": 17,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1167",
-        "name": "2",
-        "type": "text",
-        "x": 785,
-        "y": 138,
-        "width": 9,
-        "height": 17,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:985",
-        "name": "key sync1",
-        "type": "frame",
-        "x": 570,
-        "y": 146,
-        "width": 41,
-        "height": 32,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:987",
-        "name": "beat sync1",
-        "type": "frame",
-        "x": 626,
-        "y": 146,
-        "width": 39,
-        "height": 32,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1971",
-        "name": "jog1",
-        "type": "frame",
-        "x": 535,
-        "y": 227.88,
-        "width": 102.12,
-        "height": 102.12,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1957",
-        "name": "Group 1",
-        "type": "frame",
-        "x": 825,
-        "y": 227.94,
-        "width": 102.06,
-        "height": 102.06,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1981",
-        "name": "CUE1",
-        "type": "frame",
-        "x": 500,
-        "y": 276,
-        "width": 26,
-        "height": 26,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1972",
-        "name": "Group 5",
-        "type": "frame",
-        "x": 790,
-        "y": 276,
-        "width": 26,
-        "height": 26,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1970",
-        "name": "Group 4",
-        "type": "frame",
-        "x": 790,
-        "y": 306,
-        "width": 26,
-        "height": 26,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1977",
-        "name": "play1",
-        "type": "frame",
-        "x": 500,
-        "y": 307,
-        "width": 26,
-        "height": 26,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1172",
-        "name": "Frame",
-        "type": "frame",
-        "x": 1344,
-        "y": 144,
-        "width": 50,
-        "height": 32,
-        "parent": "45:3"
-      },
-      {
-        "id": "8:1174",
-        "name": "Frame",
-        "type": "frame",
-        "x": 1402,
-        "y": 144,
-        "width": 44,
-        "height": 32,
+        "x": 781,
+        "y": 181,
+        "width": 670,
+        "height": 34,
         "parent": "45:3"
       },
       {
@@ -427,33 +187,23 @@
         "parent": "45:3"
       },
       {
-        "id": "cue2",
-        "name": "cue2",
+        "id": "keySync1",
+        "name": "key sync1",
         "type": "frame",
-        "x": 790,
-        "y": 276,
-        "width": 26,
-        "height": 26,
+        "x": 570,
+        "y": 146,
+        "width": 41,
+        "height": 32,
         "parent": "45:3"
       },
       {
-        "id": "play2",
-        "name": "play2",
+        "id": "beatSync1",
+        "name": "beat sync1",
         "type": "frame",
-        "x": 790,
-        "y": 306,
-        "width": 26,
-        "height": 26,
-        "parent": "45:3"
-      },
-      {
-        "id": "jog2",
-        "name": "jog2",
-        "type": "frame",
-        "x": 825,
-        "y": 227.94,
-        "width": 102.06,
-        "height": 102.06,
+        "x": 626,
+        "y": 146,
+        "width": 39,
+        "height": 32,
         "parent": "45:3"
       },
       {
@@ -477,180 +227,100 @@
         "parent": "45:3"
       },
       {
-        "id": "miniwaveform2",
-        "name": "miniwaveform2",
+        "id": "8:1971",
+        "name": "jog1",
         "type": "frame",
-        "x": 789,
-        "y": 185,
-        "width": 672,
-        "height": 31,
+        "x": 535,
+        "y": 226.62,
+        "width": 102.12,
+        "height": 102.12,
         "parent": "45:3"
       },
       {
-        "id": "mixerCrossfaderBtn1",
-        "name": "crossfader btn1",
-        "type": "button",
-        "x": 719,
-        "y": 354,
-        "width": 12,
-        "height": 10,
+        "id": "jog2",
+        "name": "jog2",
+        "type": "frame",
+        "x": 825,
+        "y": 227.31,
+        "width": 102.06,
+        "height": 102.06,
         "parent": "45:3"
       },
       {
-        "id": "mixerCrossfaderRail1",
-        "name": "crossfader rail1",
+        "id": "cue1",
+        "name": "CUE1",
+        "type": "frame",
+        "x": 500,
+        "y": 275.14,
+        "width": 26,
+        "height": 26,
+        "parent": "45:3"
+      },
+      {
+        "id": "play1",
+        "name": "play1",
+        "type": "frame",
+        "x": 500,
+        "y": 306.4,
+        "width": 26,
+        "height": 26,
+        "parent": "45:3"
+      },
+      {
+        "id": "cue2",
+        "name": "cue2",
+        "type": "frame",
+        "x": 790,
+        "y": 275.57,
+        "width": 26,
+        "height": 26,
+        "parent": "45:3"
+      },
+      {
+        "id": "play2",
+        "name": "play2",
+        "type": "frame",
+        "x": 790,
+        "y": 305.7,
+        "width": 26,
+        "height": 26,
+        "parent": "45:3"
+      },
+      {
+        "id": "pitch_slider_1",
+        "name": "pitch slider deck 1",
         "type": "slider",
-        "x": 676,
-        "y": 358,
-        "width": 100,
-        "height": 2,
+        "x": 648,
+        "y": 227,
+        "width": 9.94,
+        "height": 103,
         "parent": "45:3"
       },
       {
-        "id": "mixerKnobLow1",
-        "name": "knob low1",
-        "type": "knob",
-        "x": 690,
-        "y": 244.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerKnobMid1",
-        "name": "knob mid1",
-        "type": "knob",
-        "x": 690,
-        "y": 211.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerKnobHigh1",
-        "name": "knob high1",
-        "type": "knob",
-        "x": 690,
-        "y": 178.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerKnobTrim1",
-        "name": "knob trim1",
-        "type": "knob",
-        "x": 690,
-        "y": 145.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerKnobLow2",
-        "name": "knob low2",
-        "type": "knob",
-        "x": 742,
-        "y": 244.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerKnobMid2",
-        "name": "knob mid2",
-        "type": "knob",
-        "x": 742,
-        "y": 211.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerKnobHigh2",
-        "name": "knob high2",
-        "type": "knob",
-        "x": 742,
-        "y": 178.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerKnobTrim2",
-        "name": "knob trim2",
-        "type": "knob",
-        "x": 742,
-        "y": 145.04,
-        "width": 20,
-        "height": 20.35,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerVolBtn1",
-        "name": "volume btn1",
-        "type": "button",
-        "x": 695,
-        "y": 293,
-        "width": 10,
-        "height": 7,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerVolRail1",
-        "name": "volume rail1",
+        "id": "pitch_slider_2",
+        "name": "pitch slider deck 2",
         "type": "slider",
-        "x": 699,
-        "y": 293,
-        "width": 2,
-        "height": 46,
+        "x": 934,
+        "y": 227,
+        "width": 9.94,
+        "height": 103,
         "parent": "45:3"
       },
       {
-        "id": "mixerVolBtn2",
-        "name": "volume btn2",
-        "type": "button",
-        "x": 747,
-        "y": 293,
-        "width": 10,
-        "height": 7,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerVolRail2",
-        "name": "volume rail2",
-        "type": "slider",
-        "x": 751,
-        "y": 293,
-        "width": 2,
-        "height": 46,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerCueBtn1",
-        "name": "cue btn1",
-        "type": "button",
-        "x": 685,
-        "y": 276,
-        "width": 30,
-        "height": 14,
-        "parent": "45:3"
-      },
-      {
-        "id": "mixerCueBtn2",
-        "name": "cue btn2",
-        "type": "button",
-        "x": 737,
-        "y": 276,
-        "width": 30,
-        "height": 14,
+        "id": "8:1134",
+        "name": "mixer",
+        "type": "frame",
+        "x": 672,
+        "y": 137,
+        "width": 109,
+        "height": 242,
         "parent": "45:3"
       },
       {
         "id": "mixerVu1",
         "name": "vu meter1",
         "type": "vumeter",
-        "x": 680,
+        "x": 682.8,
         "y": 145,
         "width": 2,
         "height": 118,
@@ -660,11 +330,221 @@
         "id": "mixerVu2",
         "name": "vu meter2",
         "type": "vumeter",
-        "x": 732,
+        "x": 734.48,
         "y": 145,
-        "width": 1,
+        "width": 2,
         "height": 118,
         "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobTrim1",
+        "name": "knob trim1",
+        "type": "knob",
+        "x": 692.74,
+        "y": 145.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobHigh1",
+        "name": "knob high1",
+        "type": "knob",
+        "x": 692.74,
+        "y": 178.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobMid1",
+        "name": "knob mid1",
+        "type": "knob",
+        "x": 692.74,
+        "y": 211.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobLow1",
+        "name": "knob low1",
+        "type": "knob",
+        "x": 692.74,
+        "y": 244.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobTrim2",
+        "name": "knob trim2",
+        "type": "knob",
+        "x": 744.42,
+        "y": 145.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobHigh2",
+        "name": "knob high2",
+        "type": "knob",
+        "x": 744.42,
+        "y": 178.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobMid2",
+        "name": "knob mid2",
+        "type": "knob",
+        "x": 744.42,
+        "y": 211.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerKnobLow2",
+        "name": "knob low2",
+        "type": "knob",
+        "x": 744.42,
+        "y": 244.04,
+        "width": 20,
+        "height": 20,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerCueBtn1",
+        "name": "cue btn1",
+        "type": "button",
+        "x": 687.77,
+        "y": 276,
+        "width": 29.82,
+        "height": 14,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerCueBtn2",
+        "name": "cue btn2",
+        "type": "button",
+        "x": 739.45,
+        "y": 276,
+        "width": 29.82,
+        "height": 14,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerVolRail1",
+        "name": "volume rail1",
+        "type": "slider",
+        "x": 701.68,
+        "y": 293,
+        "width": 2,
+        "height": 46,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerVolBtn1",
+        "name": "volume btn1",
+        "type": "button",
+        "x": 697.71,
+        "y": 293,
+        "width": 9.94,
+        "height": 7,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerVolRail2",
+        "name": "volume rail2",
+        "type": "slider",
+        "x": 753.36,
+        "y": 293,
+        "width": 2,
+        "height": 46,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerVolBtn2",
+        "name": "volume btn2",
+        "type": "button",
+        "x": 749.39,
+        "y": 293,
+        "width": 9.94,
+        "height": 7,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerCrossfaderRail1",
+        "name": "crossfader rail1",
+        "type": "slider",
+        "x": 678.82,
+        "y": 358,
+        "width": 99.39,
+        "height": 2,
+        "parent": "45:3"
+      },
+      {
+        "id": "mixerCrossfaderBtn1",
+        "name": "crossfader btn1",
+        "type": "button",
+        "x": 721.56,
+        "y": 354,
+        "width": 11.93,
+        "height": 10,
+        "parent": "45:3"
+      },
+      {
+        "id": "39:2",
+        "name": "Biblioteca",
+        "type": "frame",
+        "x": 0,
+        "y": 379,
+        "width": 1452,
+        "height": 434,
+        "parent": "45:3"
+      },
+      {
+        "id": "libraryTree",
+        "name": "arvore",
+        "type": "frame",
+        "x": 0,
+        "y": 379,
+        "width": 249,
+        "height": 434,
+        "parent": "39:2"
+      },
+      {
+        "id": "trackTable",
+        "name": "biblioteca de faixas",
+        "type": "frame",
+        "x": 249,
+        "y": 379,
+        "width": 1203,
+        "height": 434,
+        "parent": "39:2"
+      },
+      {
+        "id": "bigWaveform1Label",
+        "name": "DECK 1 label",
+        "type": "text",
+        "x": 12,
+        "y": 8,
+        "width": 200,
+        "height": 20,
+        "parent": "8:824"
+      },
+      {
+        "id": "bigWaveform2Label",
+        "name": "DECK 2 label",
+        "type": "text",
+        "x": 12,
+        "y": 8,
+        "width": 200,
+        "height": 20,
+        "parent": "8:670"
       }
     ]
   },
@@ -673,7 +553,7 @@
       {
         "id": "bigWaveforms",
         "heightPercent": 0,
-        "heightPx": 71,
+        "heightPx": 137,
         "content": [
           "bigwaveform1",
           "bigwaveform2"
@@ -681,138 +561,90 @@
       },
       {
         "id": "decksAndMixer",
-        "heightPercent": 40,
-        "heightPx": 360,
+        "heightPercent": 0,
+        "heightPx": 242,
         "content": [
-          "deckA",
+          "deck1",
           "mixer",
-          "deckB"
+          "deck2"
         ]
       },
       {
         "id": "library",
-        "heightPercent": 27,
-        "heightPx": 243,
+        "heightPercent": 0,
+        "heightPx": 434,
         "content": [
           "libraryTree",
-          "trackList"
+          "trackTable"
         ]
       }
     ]
   },
-  "decksAndMixer": {
-    "columns": {
-      "deckA": 45,
-      "mixer": 10,
-      "deckB": 45
+  "waveformRendering": {
+    "note": "Big waveforms and mini waveforms are rendered at runtime by JUCE using AudioThumbnail / MiniWaveformComponent. The HTML only simulates them with random bars. Geometry below is what JUCE must use.",
+    "bigWaveform1": {
+      "x": 0,
+      "y": 0,
+      "width": 1452,
+      "height": 71,
+      "color": "#007DE1",
+      "label": "DECK 1 — {trackTitle}"
     },
-    "deckWidths": {
-      "deckA": 671,
-      "mixer": 108,
-      "deckB": 672
+    "bigWaveform2": {
+      "x": 0,
+      "y": 71,
+      "width": 1452,
+      "height": 66,
+      "color": "#A63031",
+      "label": "DECK 2 — {trackTitle}"
     },
-    "deckHeights": {
-      "deckA": 239,
-      "mixer": 241,
-      "deckB": 201
+    "miniWaveform1": {
+      "x": 0,
+      "y": 181,
+      "width": 670,
+      "height": 34,
+      "color": "#007DE1"
+    },
+    "miniWaveform2": {
+      "x": 781,
+      "y": 181,
+      "width": 670,
+      "height": 34,
+      "color": "#A63031"
     }
   },
   "library": {
     "columns": {
-      "libraryTree": 25,
-      "trackList": 75
+      "libraryTree": 249,
+      "trackList": 1203
     },
     "columnDefinitions": [
       {
-        "id": "hash",
-        "label": "#",
-        "content": "number + cue marker"
-      },
-      {
-        "id": "preview",
-        "label": "Preview",
-        "content": "waveform thumbnail colored with hot cues A-H"
-      },
-      {
-        "id": "title",
-        "label": "Title",
-        "content": "white title, gray artist"
-      },
-      {
-        "id": "artist",
-        "label": "Artist"
-      },
-      {
-        "id": "bpm",
-        "label": "BPM",
-        "content": "\"140.00\" + key \"Gm\""
+        "id": "titleArtist",
+        "label": "Título / Artista",
+        "width": 300
       },
       {
         "id": "album",
-        "label": "Album"
+        "label": "Álbum",
+        "width": 200
       },
       {
         "id": "genre",
-        "label": "Genre"
+        "label": "Gênero",
+        "width": 150
       },
       {
         "id": "rating",
         "label": "Rating",
-        "content": "5 stars filled amber #DEAB38"
+        "width": 80
       },
       {
         "id": "time",
-        "label": "Time",
-        "content": "duration"
+        "label": "Duração",
+        "width": 80
       }
     ]
-  },
-  "spacing": {
-    "gapTiny": 2,
-    "gapSmall": 4,
-    "gapMedium": 8,
-    "gapLarge": 16,
-    "panelInnerMargin": 8,
-    "sectionBorder": 1
-  },
-  "mirroring": {
-    "enabled": true,
-    "parameter": "bool mirrored",
-    "rule": "DeckComponent receives bool mirrored at construction; no scattered if(mirrored) in painting code — the component positions itself from the parameter.",
-    "elements": {
-      "padsGrid": {
-        "mirrored=false": "left",
-        "mirrored=true": "right",
-        "label": "Beat Jump / Hot Cue pads",
-        "positionRelativeToJog": {
-          "mirrored=false": "left",
-          "mirrored=true": "right"
-        }
-      },
-      "jogWheel": {
-        "mirrored=false": "right",
-        "mirrored=true": "left",
-        "label": "Jog wheel + CUE / Play",
-        "positionRelativeToPads": {
-          "mirrored=false": "right",
-          "mirrored=true": "left"
-        }
-      },
-      "cuePlayButtons": {
-        "mirrored=false": "left",
-        "mirrored=true": "right",
-        "label": "CUE and play/pause",
-        "positionRelativeToJog": {
-          "mirrored=false": "left side",
-          "mirrored=true": "right side"
-        }
-      },
-      "eqLabels": {
-        "mirrored=false": "right",
-        "mirrored=true": "left",
-        "label": "EQ knob labels"
-      }
-    }
   },
   "colors": {
     "surfaces": {
@@ -832,22 +664,32 @@
     "states": {
       "accent": "#007DE1",
       "selection": "#052E64",
-      "selectionText": "#158016",
       "hover": "#2A2A2A"
     },
     "djSemantics": {
       "loop": "#FF8C00",
       "cue": "#A63031",
       "rating": "#DEAB38",
+      "needle": "#FFFFFF",
       "beatGrid": "#B8B8B8",
-      "downbeat": "#A30000",
-      "needle": "#FFFFFF"
+      "downbeat": "#A30000"
     },
     "waveform": {
+      "deck1": "#007DE1",
+      "deck2": "#A63031",
       "low": "#006EFF",
       "mid": "#00B4C2",
       "high": "#3EB4B4",
       "region": "#805200"
+    },
+    "mixer": {
+      "knob_body": "#1E1E1E",
+      "knob_border": "#4D4D59",
+      "vu_meter": "#26262E",
+      "volume_button": "#CCCCD9",
+      "volume_rail": "#333340",
+      "cue_color": "#2666F2",
+      "text_primary": "#F2F2F2"
     },
     "hotCue": [
       "#007aff",
@@ -858,190 +700,117 @@
       "#ff6ec7",
       "#ffd700",
       "#ff0000"
-    ],
-    "mixer": {
-      "knob_body": "#1E1E1E",
-      "knob_border": "#4D4D59",
-      "vu_meter": "#26262E",
-      "volume_button": "#CCCCD9",
-      "volume_rail": "#333340",
-      "cue_color": "#2666F2",
-      "text_primary": "#F2F2F2"
-    },
-    "gradients": {
-      "vu": {
-        "from": "yellow",
-        "stop": [
-          {
-            "proportion": 0.75,
-            "color": "yellow"
-          }
-        ],
-        "to": "orangered"
-      },
-      "wave": {
-        "from": "waveLow",
-        "to": "waveHigh"
-      }
-    }
+    ]
   },
   "typography": {
     "fontFamily": "Inter",
     "roles": {
       "deckNumber": {
         "sizePx": 14,
-        "weight": "bold",
-        "usage": "deck number in header"
-      },
-      "display": {
-        "sizePx": 28,
-        "weight": "regular",
-        "usage": "BPM at jog wheel center"
+        "weight": "bold"
       },
       "title": {
         "sizePx": 15,
-        "weight": "bold",
-        "usage": "deck track title"
+        "weight": "bold"
       },
       "artist": {
         "sizePx": 11,
-        "weight": "regular",
-        "usage": "deck track artist"
-      },
-      "body": {
-        "sizePx": 13,
-        "weight": "regular",
-        "usage": "knob labels, BPM, key"
-      },
-      "caption": {
-        "sizePx": 11,
-        "weight": "regular",
-        "usage": "timestamps, counters"
-      },
-      "micro": {
-        "sizePx": 9,
-        "weight": "regular",
-        "usage": "beat grid markings"
+        "weight": "regular"
       },
       "bpm": {
         "sizePx": 11,
-        "weight": "regular",
-        "usage": "deck BPM + key"
+        "weight": "regular"
       },
       "time": {
         "sizePx": 14,
-        "weight": "bold",
-        "usage": "deck time counters"
+        "weight": "bold"
       },
-      "pitch": {
+      "jogBpm": {
+        "sizePx": 15,
+        "weight": "bold"
+      },
+      "jogPitch": {
         "sizePx": 9,
-        "weight": "regular",
-        "usage": "jog wheel pitch percent"
+        "weight": "regular"
+      },
+      "bigWaveformLabel": {
+        "sizePx": 11,
+        "weight": "bold"
+      },
+      "libraryHeader": {
+        "sizePx": 11,
+        "weight": "bold"
+      },
+      "libraryRow": {
+        "sizePx": 11,
+        "weight": "regular"
       }
-    },
-    "notes": [
-      "Numbers should use tabular figures to avoid shaking during playback",
-      "Format timestamps with fixed width: \"  1:23\" instead of \"1:23\""
-    ]
+    }
   },
   "deck": {
     "header": {
-      "heightPx": 64,
+      "heightPx": 44,
       "elements": [
         {
           "id": "deckNumber",
           "position": "topLeft",
           "widthPx": 7,
-          "heightPx": 17,
-          "color": "textPrimary",
-          "shape": "circle"
+          "heightPx": 17
         },
         {
           "id": "title",
           "position": "afterDeckNumber",
           "widthPx": 161,
-          "heightPx": 18,
-          "color": "textPrimary"
+          "heightPx": 18
         },
         {
           "id": "artist",
           "position": "belowTitle",
           "widthPx": 58,
-          "heightPx": 13,
-          "color": "textSecondary"
+          "heightPx": 13
         },
         {
           "id": "bpmKey",
           "position": "topRight",
           "widthPx": 55,
-          "heightPx": 13,
-          "color": "textPrimary"
+          "heightPx": 13
         },
         {
           "id": "elapsedTime",
           "position": "belowRight",
           "widthPx": 68,
-          "heightPx": 17,
-          "color": "textSecondary"
+          "heightPx": 17
         },
         {
           "id": "remainingTime",
           "position": "belowRight",
           "widthPx": 61,
-          "heightPx": 17,
-          "color": "textSecondary"
+          "heightPx": 17
         },
         {
           "id": "sync",
           "position": "topRightColumn",
           "widthPx": 39,
-          "heightPx": 32,
-          "color": "accent",
-          "activeColor": "accent"
+          "heightPx": 32
         },
         {
           "id": "master",
-          "position": "besideSync",
-          "color": "loop",
-          "activeColor": "loop"
+          "position": "besideSync"
         },
         {
           "id": "camelotKey",
           "position": "besideBPM",
           "widthPx": 41,
-          "heightPx": 32,
-          "color": "textPrimary"
+          "heightPx": 32
         }
       ]
-    },
-    "layout": [
-      {
-        "id": "deckHeader",
-        "label": "track info"
-      },
-      {
-        "id": "miniWaveform",
-        "label": "static waveform, moving needle"
-      },
-      {
-        "id": "beatJumpOrHotCue",
-        "label": "deck 1: Beat Jump left; deck 2: Hot Cue right"
-      },
-      {
-        "id": "jogWheel",
-        "label": "~140px diameter + CUE + Play"
-      },
-      {
-        "id": "footer",
-        "label": "assignment 1-4, MIXING, LEVEL"
-      }
-    ],
-    "transport": {
-      "heightPx": 38
     },
     "miniWaveform": {
       "widthPx": 670,
       "heightPx": 34
+    },
+    "jogWheel": {
+      "diameterPx": 102
     },
     "cue": {
       "widthPx": 26,
@@ -1049,23 +818,98 @@
     },
     "play": {
       "widthPx": 26,
-      "heightPx": 26,
-      "symbol": {
-        "widthPx": 14,
-        "heightPx": 17
-      }
-    },
-    "stop": {
-      "widthPx": 26,
       "heightPx": 26
     },
-    "sync": {
-      "widthPx": 39,
-      "heightPx": 32
+    "pitch": {
+      "widthPx": 9.94,
+      "heightPx": 103
     },
-    "camelotKey": {
-      "widthPx": 41,
-      "heightPx": 32
+    "transport": {
+      "heightPx": 38
+    }
+  },
+  "mixer": {
+    "widthPx": 109,
+    "heightPx": 242,
+    "knob": {
+      "widthPx": 20,
+      "heightPx": 20
+    },
+    "cueBtn": {
+      "widthPx": 29.82,
+      "heightPx": 14
+    },
+    "volumeRail": {
+      "widthPx": 2,
+      "heightPx": 46
+    },
+    "volumeBtn": {
+      "widthPx": 9.94,
+      "heightPx": 7
+    },
+    "crossfaderRail": {
+      "widthPx": 99.39,
+      "heightPx": 2
+    },
+    "crossfaderBtn": {
+      "widthPx": 11.93,
+      "heightPx": 10
+    },
+    "vuMeter": {
+      "widthPx": 2,
+      "heightPx": 118
+    }
+  },
+  "decksAndMixer": {
+    "columns": {
+      "deckA": 45,
+      "mixer": 10,
+      "deckB": 45
+    },
+    "deckWidths": {
+      "deckA": 671,
+      "mixer": 109,
+      "deckB": 671
+    },
+    "deckHeights": {
+      "deckA": 242,
+      "mixer": 242,
+      "deckB": 242
+    }
+  },
+  "spacing": {
+    "gapTiny": 2,
+    "gapSmall": 4,
+    "gapMedium": 8,
+    "gapLarge": 16,
+    "panelInnerMargin": 8,
+    "sectionBorder": 1
+  },
+  "mirroring": {
+    "enabled": true,
+    "parameter": "bool mirrored",
+    "rule": "DeckComponent receives bool mirrored at construction; no scattered if(mirrored) in painting code — the component positions itself from the parameter.",
+    "elements": {
+      "padsGrid": {
+        "mirrored=false": "left",
+        "mirrored=true": "right",
+        "label": "Beat Jump / Hot Cue pads"
+      },
+      "jogWheel": {
+        "mirrored=false": "right",
+        "mirrored=true": "left",
+        "label": "Jog wheel + CUE / Play"
+      },
+      "cuePlayButtons": {
+        "mirrored=false": "left",
+        "mirrored=true": "right",
+        "label": "CUE and play/pause"
+      },
+      "eqLabels": {
+        "mirrored=false": "right",
+        "mirrored=true": "left",
+        "label": "EQ knob labels"
+      }
     }
   },
   "components": {
@@ -1074,7 +918,6 @@
       "borderColor": "separator",
       "indicatorColor": "textPrimary",
       "indicatorLengthPercent": 70,
-      "arcColor": "accent",
       "arcThicknessPx": 2,
       "arcDegrees": 270,
       "labelBelow": true,
@@ -1119,6 +962,9 @@
     },
     "pads": {
       "grid": "4x2",
+      "rows": 2,
+      "cols": 4,
+      "total": 8,
       "labels": [
         "A",
         "B",
@@ -1203,7 +1049,7 @@
       }
     },
     "mixerCue": {
-      "widthPx": 30,
+      "widthPx": 29.82,
       "heightPx": 14
     }
   }

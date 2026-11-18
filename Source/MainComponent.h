@@ -9,14 +9,10 @@
 #include "DeckPlayer.h"
 #include "DeckComponent.h"
 #include "BigWaveformsComponent.h"
-#include "GlobalHeaderComponent.h"
 #include "LibraryComponent.h"
 #include "MixerComponent.h"
 #include "MixerDeviceScanner.h"
 #include "RekordboxLookAndFeel.h"
-
-// Forward declaration da janela de configurações (definida em SettingsDialog.h)
-class SettingsDialog;
 
 //==============================================================================
 // Componente principal da aplicação.
@@ -78,16 +74,9 @@ private:
     std::unique_ptr<DeckComponent> deck2;
 
     // Seções do layout raiz (docs/DOCUMENTACAO_LAYOUT_UI.md §2.1)
-    std::unique_ptr<GlobalHeaderComponent> globalHeader;
     std::unique_ptr<BigWaveformsComponent> bigWaveforms;
     std::unique_ptr<MixerComponent> mixer;
     std::unique_ptr<LibraryComponent> library;
-
-    // Diálogo de configurações de áudio (criado sob demanda)
-    std::unique_ptr<SettingsDialog> settingsDialog;
-
-    // Botão de settings
-    juce::TextButton settingsButton{ "Settings" };
 
     // Look and feel personalizado.
     //

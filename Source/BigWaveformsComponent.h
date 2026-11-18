@@ -31,6 +31,9 @@ public:
     // Carrega a URL apenas na onda do deck especificado (1 ou 2).
     void loadURL(int deckId, const juce::URL& url);
 
+    // Define o título da faixa exibido no label da big waveform.
+    void setTrackTitle(int deckId, const juce::String& title);
+
     // Acesso as ondas, para o cabecalho do deck marcar os hot cues.
     BigWaveformComponent& getWaveformA() { return waveformA; }
     BigWaveformComponent& getWaveformB() { return waveformB; }
@@ -41,6 +44,9 @@ private:
 
     DeckPlayer* playerA;
     DeckPlayer* playerB;
+
+    juce::String trackTitleA;
+    juce::String trackTitleB;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BigWaveformsComponent)
 };

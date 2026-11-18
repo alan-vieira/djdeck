@@ -34,7 +34,6 @@ MainComponent::MainComponent()
     juce::Logger::writeToLog ("[DIAG] deck2 created");
 
     // Seções do layout raiz.
-    globalHeader = std::make_unique<GlobalHeaderComponent>();
     bigWaveforms = std::make_unique<BigWaveformsComponent>(formatManager, bigThumbnailCache,
                                                            deckPlayer1.get(), deckPlayer2.get());
     mixer = std::make_unique<MixerComponent>(deckPlayer1.get(), deckPlayer2.get());
@@ -71,16 +70,11 @@ MainComponent::MainComponent()
         }
     };
 
-    addAndMakeVisible(*globalHeader);
     addAndMakeVisible(*bigWaveforms);
     addAndMakeVisible(*mixer);
     addAndMakeVisible(*deck1);
     addAndMakeVisible(*deck2);
     addAndMakeVisible(*library);
-    addAndMakeVisible(settingsButton);
-
-    settingsButton.addListener(this);
-    settingsButton.setTooltip("Configurações de dispositivo de áudio");
 
     setLookAndFeel(&lookAndFeel);
 
@@ -102,7 +96,6 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
-    settingsButton.removeListener(this);
     shutdownAudio();
     deviceManager.removeChangeListener(&deviceScanner);
     setLookAndFeel(nullptr);
@@ -184,13 +177,5 @@ void MainComponent::resized()
 //==============================================================================
 void MainComponent::buttonClicked(juce::Button* button)
 {
-    if (button == &settingsButton)
-    {
-        // O diálogo é mantido como member para não vazar memória. É destruído
-        // junto com o MainComponent.
-        if (settingsDialog == nullptr)
-            settingsDialog = std::make_unique<SettingsDialog>(deviceManager);
-
-        settingsDialog->setVisible(true);
-    }
+    juce::ignoreUnused(button);
 }
