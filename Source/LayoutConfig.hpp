@@ -90,7 +90,7 @@ namespace colours {
     inline const juce::Colour High = juce::Colour(0xff3EB4B4);
     inline const juce::Colour Region = juce::Colour(0xff805200);
     // mixer
-    inline const juce::Colour KnobBody = juce::Colour(0xff1E1E1E);
+    inline const juce::Colour KnobBody = juce::Colour(0xff2A2A2A);
     inline const juce::Colour KnobBorder = juce::Colour(0xff4D4D59);
     inline const juce::Colour VuMeter = juce::Colour(0xff26262E);
     inline const juce::Colour VolumeButton = juce::Colour(0xffCCCCD9);

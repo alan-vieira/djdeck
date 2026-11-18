@@ -683,7 +683,7 @@
       "region": "#805200"
     },
     "mixer": {
-      "knob_body": "#1E1E1E",
+      "knob_body": "#2A2A2A",
       "knob_border": "#4D4D59",
       "vu_meter": "#26262E",
       "volume_button": "#CCCCD9",
