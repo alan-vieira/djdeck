@@ -52,19 +52,16 @@ void LibraryComponent::paint (juce::Graphics& g)
 //==============================================================================
 void LibraryComponent::resized()
 {
-    // juce::SplitterComponent nao existe no JUCE 9. O mecanismo equivalente e
-    // o StretchableLayoutManager.
+    // Divisao de largura EXATA do Figma (no "arvore": x=0, w=249; no
+    // "biblioteca de faixas": x=249, w=1203) — e a mesma do prototipo HTML
+    // (.folder-tree { width: 249px; flex-shrink: 0 }).
     //
-    // Numeros negativos em setItemLayout sao proporcoes do espaco disponivel.
-    layoutManager.setItemLayout (0, 100, 400, 0.25);   // arvore (frame1) — 25%
-    layoutManager.setItemLayout (1, 200, -0.5, -0.75);  // lista de faixas (frame2) — 75%
+    // Antes o StretchableLayoutManager recebia (min=100, max=400,
+    // preferred=0.25): o "0.25" e um valor ABSOLUTO em pixels (proporcao
+    // exige sinal negativo), entao a arvore colapsava no minimo de 100 px
+    // e a lista comecava em x=100, 149 px antes da posicao do Figma.
+    const auto treeWidth = juce::jmin (djdeck::layout::figmaNodelibraryTree::widthPx, getWidth());
 
-    Component* components[] = { &treeView, trackList.get() };
-
-    // vertically = false -> os componentes sao distribuidos ao longo do eixo X,
-    // cada um recebendo a sua largura. resizeOtherDimension = true -> tambem
-    // preenchem a altura toda.
-    layoutManager.layOutComponents (components, 2,
-                                   0, 0, getWidth(), getHeight(),
-                                   false, true);
+    treeView.setBounds (0, 0, treeWidth, getHeight());
+    trackList->setBounds (treeWidth, 0, getWidth() - treeWidth, getHeight());
 }

@@ -56,7 +56,7 @@ private:
     float value = 0.0f;
     float minValue = -12.0f;
     float maxValue = 12.0f;
-    int lastMouseY = 0;
+    float lastMouseY = 0.0f;
 
     static constexpr float startAngle = -juce::MathConstants<float>::pi * 0.75f;
     static constexpr float endAngle   =  juce::MathConstants<float>::pi * 0.75f;

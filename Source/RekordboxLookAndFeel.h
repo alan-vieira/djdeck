@@ -45,6 +45,12 @@ public:
     juce::Font getLabelFont (juce::Label& label) override;
     juce::Font getComboBoxFont (juce::ComboBox& box) override;
 
+    // Sobrescreve getSliderLayout para os sliders do mixer (volume e
+    // crossfader): devolve o retangulo do TRILHO como sliderBounds, para
+    // que o curso do slider tenha o comprimento exato do trilho do Figma.
+    // Sliders nao-mixer (pitch, etc.) mantem o comportamento padrao do JUCE.
+    juce::Slider::SliderLayout getSliderLayout (juce::Slider& slider) override;
+
 private:
     // Desenha o knob rotativo de um Slider. Compartilhado entre
     // drawRotarySlider() e o KnobComponent, para que ambos os knobs tenham

@@ -52,39 +52,98 @@ RekordboxLookAndFeel::RekordboxLookAndFeel()
 
 //==============================================================================
 void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height,
-                                             float sliderPos, float minSliderPos, float maxSliderPos,
+                                             float sliderPos, float /*minSliderPos*/, float /*maxSliderPos*/,
                                              juce::Slider::SliderStyle style, juce::Slider& slider)
 {
     const auto isVertical = style == juce::Slider::LinearVertical;
+    const auto name = slider.getName();
+    const auto isMixerVolume  = name == "mixerVolume";
+    const auto isMixerCrossfader = name == "mixerCrossfader";
+    const auto isPitch = name == "pitch";
 
-    // No JUCE, x/y/width/height sao o sliderBounds (a regiao percorrida pelo
-    // thumb) e sliderPos/minSliderPos/maxSliderPos chegam em PIXELS, dentro
-    // dessa mesma regiao — ver Slider::getLinearSliderPos(), que devolve
-    // sliderRegionStart + pos * sliderRegionSize.
-    //
-    // Vertical: pos e invertido (1 - proporcao), logo o valor MAXIMO fica no
-    // TOPO e o MINIMO na BASE. Tratar sliderPos como proporcao 0..1 (o bug
-    // anterior) jogava o handle para y - 9660 e o hide do componente.
+    // x/y/width/height = sliderBounds (regiao percorrida pelo thumb), ja em
+    // coords locais do slider. Para sliders do mixer, isso E o proprio trilho.
     const auto bounds = juce::Rectangle<float> (static_cast<float> (x),
                                                 static_cast<float> (y),
                                                 static_cast<float> (width),
                                                 static_cast<float> (height));
 
+    // Geometria do trilho e do handle.
+    juce::Rectangle<float> rail, handle;
+
+    if (isMixerVolume)
+    {
+        // Vertical: trilho = bounds (2 x 46). Handle centrado no centro X do trilho.
+        rail = bounds;
+        const auto centreX = rail.getCentreX();
+        const auto handleY = juce::jlimit (rail.getY(), rail.getBottom(), sliderPos);
+        handle = juce::Rectangle<float> (
+            centreX - djdeck::layout::figmaNodemixerVolBtn1::widthPx / 2.0f,
+            handleY - djdeck::layout::figmaNodemixerVolBtn1::heightPx / 2.0f,
+            djdeck::layout::figmaNodemixerVolBtn1::widthPx,
+            djdeck::layout::figmaNodemixerVolBtn1::heightPx);
+    }
+    else if (isMixerCrossfader)
+    {
+        // Horizontal: trilho = bounds (99 x 2). Handle centrado no centro Y do trilho.
+        rail = bounds;
+        const auto centreY = rail.getCentreY();
+        const auto handleX = juce::jlimit (rail.getX(), rail.getRight(), sliderPos);
+        handle = juce::Rectangle<float> (
+            handleX - djdeck::layout::figmaNodemixerCrossfaderBtn1::widthPx / 2.0f,
+            centreY - djdeck::layout::figmaNodemixerCrossfaderBtn1::heightPx / 2.0f,
+            djdeck::layout::figmaNodemixerCrossfaderBtn1::widthPx,
+            djdeck::layout::figmaNodemixerCrossfaderBtn1::heightPx);
+    }
+    else
+    {
+        // Pitch (e demais sliders nao-mixer): comportamento ORIGINAL do HEAD,
+        // preservado byte-a-byte — trilho de 4 px e handle de 24 x 18 no
+        // vertical, trilho de 4 px e handle de 18 x 24 no horizontal.
+        // Os pinos de referencia do pitch sao dimensionados em funcao do
+        // handle de 24 px, portanto nao podem ser reduzidos.
+        if (isVertical)
+        {
+            const auto centreX = bounds.getCentreX();
+            const auto handleY = juce::jlimit (bounds.getY(), bounds.getBottom(), sliderPos);
+            rail = juce::Rectangle<float> (
+                centreX - 2.0f,
+                bounds.getY(),
+                4.0f,
+                bounds.getHeight());
+            handle = juce::Rectangle<float> (
+                centreX - 12.0f,
+                handleY - 9.0f,
+                24.0f,
+                18.0f);
+        }
+        else
+        {
+            const auto centreY = bounds.getCentreY();
+            const auto handleX = juce::jlimit (bounds.getX(), bounds.getRight(), sliderPos);
+            rail = juce::Rectangle<float> (
+                bounds.getX(),
+                centreY - 2.0f,
+                bounds.getWidth(),
+                4.0f);
+            handle = juce::Rectangle<float> (
+                handleX - 9.0f,
+                centreY - 12.0f,
+                18.0f,
+                24.0f);
+        }
+    }
+
     if (isVertical)
     {
-        const auto centreX = bounds.getCentreX();
-
-        // sliderPos e o Y (em pixels) do centro do thumb.
-        const auto handleY = juce::jlimit (bounds.getY(), bounds.getBottom(), sliderPos);
-
-        // O slider de pitch tem desenho proprio (linha de valor azul + pinos de
-        // referencia), conforme a referencia visual do Rekordbox. Os demais
-        // faders verticais (volume, EQ) mantem o preenchimento cinza.
-        const auto isPitch = slider.getName() == "pitch";
+        const auto centreX = rail.getCentreX();
+        const auto handleY = handle.getCentreY();
+        const auto railBottom = rail.getBottom();
 
         // Trilho
-        g.setColour (djdeck::layout::colours::Canvas);
-        g.fillRoundedRectangle (centreX - 2.0f, bounds.getY(), 4.0f, bounds.getHeight(), 2.0f);
+        g.setColour (isMixerVolume ? djdeck::layout::colours::VolumeRail
+                                   : djdeck::layout::colours::Canvas);
+        g.fillRoundedRectangle (rail, 2.0f);
 
         // Pinos de referencia do pitch: marcadores horizontais fixos no minimo,
         // no 0% e no maximo da faixa. Desenhados ANTES do preenchimento para
@@ -93,14 +152,14 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
             drawPitchReferencePins (g, bounds, slider);
 
         // Preenchimento: do handle ate a base (a parte ja percorrida).
-        g.setColour (isPitch ? djdeck::layout::colours::Accent : djdeck::layout::colours::Disabled);
-        g.fillRoundedRectangle (centreX - 2.0f, handleY, 4.0f,
-                                bounds.getBottom() - handleY, 2.0f);
+        g.setColour (isPitch ? djdeck::layout::colours::Accent
+                             : djdeck::layout::colours::Disabled);
+        g.fillRoundedRectangle (rail.getX(), handleY, rail.getWidth(),
+                                railBottom - handleY, 2.0f);
 
         // Handle
-        auto handle = juce::Rectangle<float> (centreX - 12.0f, handleY - 9.0f, 24.0f, 18.0f);
-
-        g.setColour (djdeck::layout::colours::Secondary);
+        g.setColour (isMixerVolume ? djdeck::layout::colours::VolumeButton
+                                   : djdeck::layout::colours::Secondary);
         g.fillRoundedRectangle (handle, 3.0f);
 
         g.setColour (djdeck::layout::colours::Canvas);
@@ -112,32 +171,64 @@ void RekordboxLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, in
     }
     else
     {
-        const auto centreY = bounds.getCentreY();
-
-        // sliderPos e o X (em pixels) do centro do thumb.
-        const auto handleX = juce::jlimit (bounds.getX(), bounds.getRight(), sliderPos);
+        const auto centreY = rail.getCentreY();
+        const auto handleX = handle.getCentreX();
 
         // Trilho
         g.setColour (djdeck::layout::colours::Canvas);
-        g.fillRoundedRectangle (bounds.getX(), centreY - 2.0f, bounds.getWidth(), 4.0f, 2.0f);
+        g.fillRoundedRectangle (rail, 2.0f);
 
         // Preenchimento: do inicio ate o handle.
         g.setColour (djdeck::layout::colours::Disabled);
-        g.fillRoundedRectangle (bounds.getX(), centreY - 2.0f, handleX - bounds.getX(), 4.0f, 2.0f);
+        g.fillRoundedRectangle (bounds.getX(), rail.getY(), handleX - bounds.getX(),
+                                rail.getHeight(), 1.0f);
 
         // Handle
-        auto handle = juce::Rectangle<float> (handleX - 9.0f, centreY - 12.0f, 18.0f, 24.0f);
-
-        g.setColour (djdeck::layout::colours::Secondary);
+        g.setColour (isMixerCrossfader ? djdeck::layout::colours::VolumeButton
+                                       : djdeck::layout::colours::Secondary);
         g.fillRoundedRectangle (handle, 3.0f);
 
         g.setColour (djdeck::layout::colours::Canvas);
-        g.fillRect (handle.getX(), handle.getCentreY() - 1.0f, handle.getWidth(), 2.0f);
+        g.fillRect (handle.getX(), centreY - 1.0f, handle.getWidth(), 2.0f);
 
         // Pino de posicao
         g.setColour (djdeck::layout::colours::Accent);
         g.fillRect (handleX - 1.5f, centreY - 6.0f, 3.0f, 12.0f);
     }
+}
+
+//==============================================================================
+juce::Slider::SliderLayout RekordboxLookAndFeel::getSliderLayout (juce::Slider& slider)
+{
+    const auto name = slider.getName();
+
+    // Sliders nao-mixer: comportamento padrao do JUCE (pitch, etc.).
+    if (name != "mixerVolume" && name != "mixerCrossfader")
+        return juce::LookAndFeel_V4::getSliderLayout (slider);
+
+    juce::Slider::SliderLayout layout;
+    layout.textBoxBounds = juce::Rectangle<int>();  // NoTextBox
+
+    if (name == "mixerVolume")
+    {
+        // Vertical: trilho de 2 x 46 px, curso vertical completo (46 px).
+        // O trilho fica centralizado horizontalmente no componente:
+        // centro do trilho = width/2 => sliderBounds.x = width/2 - 1.
+        auto w = slider.getWidth();
+        auto h = slider.getHeight();
+        layout.sliderBounds = juce::Rectangle<int> (w / 2 - 1, 0, 2, h);
+    }
+    else // mixerCrossfader
+    {
+        // Horizontal: trilho de 99 x 2 px, curso horizontal completo (99 px).
+        // O trilho fica centralizado verticalmente no componente:
+        // centro do trilho = height/2 => sliderBounds.y = height/2 - 1.
+        auto w = slider.getWidth();
+        auto h = slider.getHeight();
+        layout.sliderBounds = juce::Rectangle<int> (0, h / 2 - 1, w, 2);
+    }
+
+    return layout;
 }
 
 //==============================================================================

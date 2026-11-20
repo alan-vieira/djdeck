@@ -96,15 +96,29 @@ void PlaylistComponent::saveLibrary() const
 //==============================================================================
 void PlaylistComponent::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::black);
+    // Fundo da area de faixas: #1A1A1A (mesmo do ".track-table" do
+    // prototipo HTML e do token "Panel" do layout.json).
+    g.fillAll(djdeck::layout::colours::Panel);
 }
 
 void PlaylistComponent::resized()
 {
     auto area = getLocalBounds();
 
-    addButton.setBounds(area.removeFromTop(40).removeFromLeft(200));
+    // O prototipo HTML nao tem um botao "Adicionar faixa" no topo da lista:
+    // a tabela comeca imediatamente com o cabecalho de colunas. O botao do
+    // JUCE e mantido (funcao de importar faixas), mas flutua no rodape em
+    // vez de empurrar a tabela 40 px para baixo.
     playlistTable.setBounds(area);
+
+    constexpr int buttonWidth = 120;
+    constexpr int buttonHeight = 26;
+    constexpr int margin = 8;
+
+    addButton.setBounds(area.getRight() - buttonWidth - margin,
+                        area.getBottom() - buttonHeight - margin,
+                        buttonWidth,
+                        buttonHeight);
 }
 
 //==============================================================================

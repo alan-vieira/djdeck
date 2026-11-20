@@ -42,6 +42,18 @@ def fmt_float(v):
     return s + '.0f'
 
 
+def cpp_type_for_value(v):
+    """Retorna o tipo C++ (int ou float) apropriado para o valor."""
+    return "float" if isinstance(v, float) else "int"
+
+
+def cpp_literal(v):
+    """Formata o valor como literal C++ com sufixo quando for float."""
+    if isinstance(v, float):
+        return f"{v}f"
+    return str(v)
+
+
 def format_array(name, values, cpp_type="constexpr int"):
     lines = [f"{cpp_type} {name}[] = {{" ]
     lines.append("    " + ", ".join(str(v) for v in values) + ",")
@@ -350,19 +362,12 @@ def generate_header(spec):
 
     out.append(f"namespace mixerCue {{")
     mc = comp["mixerCue"]
-    out.append(f"    constexpr int widthPx  = {mc['widthPx']};")
+    # `mixerCue.widthPx` vale 29.82 px (medida fracionaria do Figma/HTML).
+    # Declarar como `int` forcava a conversao double -> int e produzia o
+    # warning C4244 em todos os arquivos que incluem este header.
+    out.append(f"    constexpr {cpp_type_for_value(mc['widthPx'])}  widthPx  = {cpp_literal(mc['widthPx'])};")
     out.append(f"    constexpr int heightPx = {mc['heightPx']};")
     out.append(f"}}")
-
-    def cpp_type_for_value(v):
-        """Retorna o tipo C++ (int ou float) apropriado para o valor."""
-        return "float" if isinstance(v, float) else "int"
-
-    def cpp_literal(v):
-        """Formata o valor como literal C++ com sufixo quando for float."""
-        if isinstance(v, float):
-            return f"{v}f"
-        return str(v)
 
     # ---- figmaNodes ----
     out.append(f"")

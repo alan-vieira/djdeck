@@ -75,13 +75,26 @@ void MixerComponent::resized()
                         djdeck::layout::figmaNodemixer::widthPx / 2,
                         djdeck::layout::figmaNodemixer::heightPx);
 
-    // ---- Crossfader button ----
-    // Figma: x719 y354 l12 a10  -> relativo ao mixer: x47 y216
-    crossfader.setBounds (xLocal (djdeck::layout::figmaNodemixerCrossfaderBtn1::xPx),
-                          yLocal (djdeck::layout::figmaNodemixerCrossfaderBtn1::yPx),
-                          djdeck::layout::figmaNodemixerCrossfaderBtn1::widthPx,
-                          djdeck::layout::figmaNodemixerCrossfaderBtn1::heightPx);
+    // ---- Crossfader ----
+    // O componente dono do crossfader cobre a regiao do Figma que contem o
+    // trilho (crossfader rail1: 99.39 x 2 em 678,358) e o botao
+    // (crossfader btn1: 11.93 x 10 em 721,354). Antes ele recebia apenas o
+    // retangulo do BOTAO (11.93 x 10), o que recortava o trilho inteiro.
+    //
+    // Coordenadas do Figma -> locais do mixer (subtrai 672, 137).
+    const auto crossfaderAbsX = juce::jmin (djdeck::layout::figmaNodemixerCrossfaderRail1::xPx,
+                                            djdeck::layout::figmaNodemixerCrossfaderBtn1::xPx);
+    const auto crossfaderAbsY = juce::jmin (djdeck::layout::figmaNodemixerCrossfaderRail1::yPx,
+                                            djdeck::layout::figmaNodemixerCrossfaderBtn1::yPx);
+    const auto crossfaderAbsRight = juce::jmax (
+        djdeck::layout::figmaNodemixerCrossfaderRail1::xPx + djdeck::layout::figmaNodemixerCrossfaderRail1::widthPx,
+        djdeck::layout::figmaNodemixerCrossfaderBtn1::xPx + djdeck::layout::figmaNodemixerCrossfaderBtn1::widthPx);
+    const auto crossfaderAbsBottom = juce::jmax (
+        djdeck::layout::figmaNodemixerCrossfaderRail1::yPx + djdeck::layout::figmaNodemixerCrossfaderRail1::heightPx,
+        djdeck::layout::figmaNodemixerCrossfaderBtn1::yPx + djdeck::layout::figmaNodemixerCrossfaderBtn1::heightPx);
 
-
-    // ---- Crossfader button (nó 8:2024 / 8:1151) ----
+    crossfader.setBounds (xLocalf (crossfaderAbsX),
+                          yLocal (crossfaderAbsY),
+                          static_cast<int> (crossfaderAbsRight - crossfaderAbsX),
+                          static_cast<int> (crossfaderAbsBottom - crossfaderAbsY));
 }

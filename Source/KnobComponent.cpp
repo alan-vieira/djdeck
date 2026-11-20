@@ -61,11 +61,21 @@ void KnobComponent::paint (juce::Graphics& g)
 {
     auto area = getLocalBounds().toFloat();
 
-    // A faixa do rotulo e reservada no rodape.
-    if (caption.isNotEmpty())
-        area.removeFromBottom (14.0f);
+    // A faixa do rotulo so e reservada quando ainda sobra espaco para o
+    // knob. Nos knobs do mixer (20 x 20 px, medida do Figma) reservar 14 px
+    // deixaria um circulo de apenas 6 px de altura — e o `return` abaixo
+    // apagaria o knob INTEIRO. Nesse caso o knob ocupa toda a area e o
+    // rotulo e omitido (o prototipo HTML tambem nao tem rotulo nos knobs).
+    constexpr float captionHeight = 14.0f;
+    constexpr float minKnobHeight = 16.0f;
 
-    const auto radius = juce::jmin (area.getWidth(), area.getHeight()) * 0.5f - 2.0f;
+    const bool hasCaptionRoom = caption.isNotEmpty()
+                                 && area.getHeight() - captionHeight >= minKnobHeight;
+
+    if (hasCaptionRoom)
+        area.removeFromBottom (captionHeight);
+
+    const auto radius = juce::jmin (area.getWidth(), area.getHeight()) * 0.5f - 0.5f;
 
     if (radius <= 2.0f)
         return;
@@ -106,12 +116,12 @@ void KnobComponent::paint (juce::Graphics& g)
     g.setColour (djdeck::layout::colours::TextPrimary);
     g.drawLine (centre.x, centre.y, indicatorX, indicatorY, 2.0f);
 
-    // Rotulo
-    if (caption.isNotEmpty())
+    // Rotulo (apenas quando a area reservada acima existe)
+    if (hasCaptionRoom)
     {
         g.setFont (juce::Font (juce::FontOptions (11.0f)));
         g.setColour (djdeck::layout::colours::Secondary);
-        g.drawText (caption, getLocalBounds().removeFromBottom (14), juce::Justification::centred, true);
+        g.drawText (caption, getLocalBounds().removeFromBottom (static_cast<int> (captionHeight)), juce::Justification::centred, true);
     }
 }
 

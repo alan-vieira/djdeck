@@ -50,6 +50,7 @@ ChannelStripComponent::ChannelStripComponent (DeckPlayer* playerToUse,
     volumeFader.addListener (this);
     volumeFader.setColour (juce::Slider::trackColourId, djdeck::layout::colours::VolumeRail);
     volumeFader.setColour (juce::Slider::thumbColourId, djdeck::layout::colours::VolumeButton);
+    volumeFader.setName ("mixerVolume");
     addAndMakeVisible (volumeFader);
 
     // ---- VU meter ----
@@ -67,10 +68,10 @@ void ChannelStripComponent::setCueActive (bool shouldBeActive)
 //==============================================================================
 void ChannelStripComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (djdeck::layout::colours::Panelraised);
-
-    g.setColour (djdeck::layout::colours::Separator);
-    g.drawRect (getLocalBounds(), 1);
+    // O canal NAO pinta fundo proprio. No prototipo HTML o mixer e uma
+    // unica superficie (#0F0F14) e os controles ficam posicionados por
+    // cima; pintar #282828 aqui cobria o fundo do mixer inteiro.
+    juce::ignoreUnused (g);
 }
 
 //==============================================================================
@@ -132,9 +133,16 @@ void ChannelStripComponent::resized()
     cueButton.setBounds (xLocal (static_cast<int> (cux)), yLocal (static_cast<int> (cuy)),
                          static_cast<int> (cuw), static_cast<int> (cuh));
 
-    // ---- Fader de volume (trilho 2 x 46) ----
-    volumeFader.setBounds (xLocalf (vfx), yLocalf (vfy),
-                           static_cast<int> (vfw), static_cast<int> (vfh));
+    // ---- Fader de volume (trilho 2 x 46, botao 9.94 x 7) ----
+    // O componente contem a uniao do trilho e do botao (para nada ser cortado
+    // pelo clip do JUCE), com o trilho centralizado horizontalmente de modo
+    // que centroTrilhoLocal == width/2 do componente.
+    const auto btnW = djdeck::layout::figmaNodemixerVolBtn1::widthPx;      // 9.94
+    const auto compW = juce::roundToInt (btnW);                             // 10
+    const auto railCentreAbs = vfx + vfw / 2.0;                             // centro do trilho em Figma abs
+    const auto compLeftX = juce::roundToInt (railCentreAbs - mixerAbsX - channelOffsetX - compW / 2.0);
+
+    volumeFader.setBounds (compLeftX, yLocal (static_cast<int> (vfy)), compW, static_cast<int> (vfh));
 }
 
 void ChannelStripComponent::sliderValueChanged (juce::Slider* slider)
@@ -145,5 +153,4 @@ void ChannelStripComponent::sliderValueChanged (juce::Slider* slider)
     if (slider == &volumeFader)
         player->setGain (volumeFader.getValue());
 }
-
 

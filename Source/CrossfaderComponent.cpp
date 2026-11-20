@@ -9,16 +9,14 @@ CrossfaderComponent::CrossfaderComponent()
     crossfader.setValue (0.0);
     crossfader.setDoubleClickReturnValue (true, 0.0);
     crossfader.addListener (this);
+    crossfader.setName ("mixerCrossfader");
     addAndMakeVisible (crossfader);
 
-    assignOne.setClickingTogglesState (true);
-    assignOne.setToggleState (true, juce::dontSendNotification);
-    assignOne.setTooltip ("Deck 1 atribuido a este lado do crossfader");
-    addAndMakeVisible (assignOne);
-
-    assignTwo.setClickingTogglesState (true);
-    assignTwo.setTooltip ("Deck 2 atribuido a este lado do crossfader");
-    addAndMakeVisible (assignTwo);
+    // Botoes de atribuicao ao crossfader. O prototipo HTML e o Figma NAO tem
+    // esses botoes no mixer (apenas o trilho e o botao do fader), entao
+    // ficam ocultos: visiveis, eles cobriam o trilho.
+    assignOne.setVisible (false);
+    assignTwo.setVisible (false);
 
     computeGains (0.0, gainA, gainB);
 }
@@ -68,41 +66,18 @@ void CrossfaderComponent::sliderValueChanged (juce::Slider* slider)
 //==============================================================================
 void CrossfaderComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (djdeck::layout::colours::Mixerbackground);
-
-    // Rotulos A e B embaixo do fader.
-    g.setFont (juce::Font (juce::FontOptions (11.0f)));
-    g.setColour (djdeck::layout::colours::Tertiary);
-
-    auto labelArea = getLocalBounds().removeFromBottom (14);
-    labelArea.removeFromLeft (labelArea.getWidth() / 2);
-    g.drawText ("A", labelArea, juce::Justification::centred, true);
-
-    labelArea = getLocalBounds().removeFromBottom (14);
-    labelArea.removeFromRight (labelArea.getWidth() / 2);
-    g.drawText ("B", labelArea, juce::Justification::centred, true);
+    // O trilho e o botao sao desenhados pelo LookAndFeel (drawLinearSlider
+    // horizontal). Aqui nao ha fundo: a superficie e a do mixer (#0F0F14).
+    juce::ignoreUnused (g);
 }
 
 //==============================================================================
 void CrossfaderComponent::resized()
 {
-    auto area = getLocalBounds();
-
-    // Faixa dos botoes de atribuicao, acima do fader.
-    // Botoes 1 e 2: 12 x 10 px (medida do Figma).
-    auto buttonRow = area.removeFromTop (djdeck::layout::crossfader::assignButton::heightPx);
-    const auto buttonWidth = djdeck::layout::crossfader::assignButton::widthPx;
-    const auto buttonHeight = djdeck::layout::crossfader::assignButton::heightPx;
-    assignOne.setBounds (buttonRow.removeFromLeft (buttonWidth).withSizeKeepingCentre (buttonWidth, buttonHeight));
-    assignTwo.setBounds (buttonRow.removeFromLeft (buttonWidth).withSizeKeepingCentre (buttonWidth, buttonHeight));
-
-    // O fader ocupa o resto, com folga para os rotulos A/B.
-    // Trilha do slider: 100 x 2 px (medida do Figma).
-    auto faderArea = area;
-    faderArea.removeFromBottom (14);
-    const auto faderWidth = djdeck::layout::crossfader::rail::widthPx;
-    const auto faderHeight = djdeck::layout::crossfader::rail::heightPx;
-    crossfader.setBounds (faderArea.getX() + (faderArea.getWidth() - faderWidth) / 2,
-                          faderArea.getY() + (faderArea.getHeight() - faderHeight) / 2,
-                          faderWidth, faderHeight);
+    // O componente dono (CrossfaderComponent) recebe do MixerComponent o
+    // envelope do trilho+botao do Figma (99.39 x 10 px). O slider crossfader
+    // ocupa o envelope inteiro (0, 0, w, h); o trilho fica centralizado
+    // verticalmente dentro dele (centro do trilho = height/2), para que o
+    // botao de 10 px nao seja recortado pelo clip do JUCE.
+    crossfader.setBounds (0, 0, getWidth(), getHeight());
 }

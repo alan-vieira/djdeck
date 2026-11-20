@@ -30,17 +30,18 @@ void BigWaveformsComponent::paint (juce::Graphics& g)
 
     g.fillAll (djdeck::layout::colours::Background);
 
-    const auto halfHeight = area.getHeight() / 2;
+    const auto halfHeight = djdeck::layout::figmaNodebigwaveform1::heightPx;
 
-    // ---- Labels de track (conforme o HTML de referência) ----
-    // Deck 1 (azul) — top half
+    // ---- Labels de track (conforme o HTML de referencia) ----
+    // Deck 1 (azul) — banda superior (y=0..71)
     g.setColour (djdeck::layout::colours::Accent);
     g.setFont (juce::Font (juce::FontOptions ("Segoe UI", 11.0f, juce::Font::bold)));
     g.drawText ("DECK 1 — " + trackTitleA,
                 juce::Rectangle<int> (12, 8, area.getWidth() - 24, 16),
                 juce::Justification::centredLeft, false);
 
-    // Deck 2 (vermelho) — bottom half
+    // Deck 2 (vermelho) — banda inferior (y=71..137); o label e 8 px abaixo
+    // do topo da SUA banda, como no HTML.
     g.setColour (djdeck::layout::colours::Cue);
     g.drawText ("DECK 2 — " + trackTitleB,
                 juce::Rectangle<int> (12, halfHeight + 8, area.getWidth() - 24, 16),
@@ -50,13 +51,14 @@ void BigWaveformsComponent::paint (juce::Graphics& g)
 //==============================================================================
 void BigWaveformsComponent::resized()
 {
-    auto area = getLocalBounds();
+    // Alturas EXATAS dos nos do Figma (bigwaveform1: 71 px; bigwaveform2:
+    // 66 px). A divisao em partes iguais (68/69) e o `reduced (2)` deixavam
+    // as ondas fora das medidas do Figma e do prototipo HTML.
+    const auto heightA = djdeck::layout::figmaNodebigwaveform1::heightPx;
+    const auto heightB = djdeck::layout::figmaNodebigwaveform2::heightPx;
 
-    // Deck 1 em cima, deck 2 embaixo, com 2 px de folga entre as ondas.
-    const auto halfHeight = area.getHeight() / 2;
-
-    waveformA.setBounds (area.removeFromTop (halfHeight).reduced (2));
-    waveformB.setBounds (area.reduced (2));
+    waveformA.setBounds (0, 0, getWidth(), heightA);
+    waveformB.setBounds (0, heightA, getWidth(), heightB);
 }
 
 //==============================================================================

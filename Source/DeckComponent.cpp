@@ -184,8 +184,11 @@ void DeckComponent::resized()
     const auto mwRelY = static_cast<int> (mwNodeY - deckAbsY);
     const auto mwW    = static_cast<int> (mwNodeW);
     const auto mwH    = static_cast<int> (mwNodeH);
-    auto waveformArea = juce::Rectangle<int> (mwRelX, mwRelY, mwW, mwH);
-    waveformDisplay.setBounds (waveformArea.reduced (2));
+
+    // Sem `reduced (2)`: o no do Figma ja mede 670 x 34 exatamente na
+    // posicao 0,181 (relativo ao deck: 0,44). A reducao de 2 px encolhia e
+    // deslocava a onda em relacao ao cabecalho e ao deck.
+    waveformDisplay.setBounds (juce::Rectangle<int> (mwRelX, mwRelY, mwW, mwH));
 
     // ---- Transport no rodape: altura do nó do Figma ----
     auto transportArea = juce::Rectangle<int> (0, area.getHeight() - djdeck::layout::deckTransport::heightPx,

@@ -81,16 +81,11 @@ void DeckHeaderComponent::buttonClicked (juce::Button* button)
 //==============================================================================
 void DeckHeaderComponent::drawDeckBadge (juce::Graphics& g, const juce::Rectangle<int>& area)
 {
-    const auto centre = area.getCentre().toFloat();
-    // Numero do deck: 7 x 17 px — circulo pequeno com o digito centrado.
-    constexpr float radius = 3.5f;
-
+    // Numero do deck: 7 x 17 px — apenas o digito em branco, como no
+    // prototipo HTML (".deck-number": texto, sem circulo).
     g.setColour (djdeck::layout::colours::Primary);
-    g.fillEllipse (centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f);
-
-    g.setColour (djdeck::layout::colours::Background);
     g.setFont (juce::Font (juce::FontOptions ("Inter", 14.0f, juce::Font::bold)));
-    g.drawText (juce::String (deckId), area, juce::Justification::centred, true);
+    g.drawText (juce::String (deckId), area, juce::Justification::centredLeft, true);
 }
 
 //==============================================================================
@@ -117,7 +112,12 @@ void DeckHeaderComponent::paint (juce::Graphics& g)
     const auto bpmKeyHeight = isDeck2
         ? static_cast<int> (djdeck::layout::figmaNodedeck2BpmKey::heightPx)
         : static_cast<int> (djdeck::layout::figmaNodedeck1BpmKey::heightPx);
-    g.drawText (bpmText, bpmArea.removeFromTop (bpmKeyHeight), juce::Justification::centredLeft, false);
+    // removeFromTop() MUTA o retangulo receptor. Sem a copia local abaixo, a
+    // area encolhe a cada repaint (o header repinta a ~30 fps) e o texto
+    // desaparece depois do primeiro quadro.
+    auto bpmTextArea = bpmArea;
+    bpmTextArea.removeFromTop (bpmKeyHeight);
+    g.drawText (bpmText, bpmTextArea, juce::Justification::centredLeft, false);
 
     // ---- Titulo e artista ----
     g.setFont (juce::Font (juce::FontOptions ("Inter", 15.0f, juce::Font::bold)));
@@ -130,7 +130,9 @@ void DeckHeaderComponent::paint (juce::Graphics& g)
     const auto artistHeight = isDeck2
         ? static_cast<int> (djdeck::layout::figmaNodedeck2Artist::heightPx)
         : static_cast<int> (djdeck::layout::figmaNodedeck1Artist::heightPx);
-    g.drawText (trackArtist, artistArea.removeFromTop (artistHeight), juce::Justification::centredLeft, false);
+    auto artistTextArea = artistArea;
+    artistTextArea.removeFromTop (artistHeight);
+    g.drawText (trackArtist, artistTextArea, juce::Justification::centredLeft, false);
 
     // ---- Tempos: decorrido, regressiva e duracao ----
     const auto formatTime = [] (double seconds)
@@ -153,8 +155,11 @@ void DeckHeaderComponent::paint (juce::Graphics& g)
     const auto timerHeight = isDeck2
         ? static_cast<int> (djdeck::layout::figmaNodedeck2Timer::heightPx)
         : static_cast<int> (djdeck::layout::figmaNodedeck1Timer::heightPx);
-    auto timerTextArea = timerArea.removeFromTop (timerHeight);
-    g.drawText (formatTime (elapsedSeconds), timerTextArea.removeFromLeft (68), juce::Justification::centredLeft, false);
+    // Mesma correcao do BPM: o retangulo do timer e um member, entao a
+    // mutacao precisa acontecer numa copia local.
+    auto timerTextArea = timerArea;
+    timerTextArea.removeFromTop (timerHeight);
+    g.drawText (formatTime (elapsedSeconds), timerTextArea.removeFromLeft (djdeck::layout::deckHeader::ElapsedtimeWidthPx), juce::Justification::centredLeft, false);
 
     // Contagem regressiva — destacada quando falta pouco.
     const auto remainingColour = remainingSeconds <= 10.0 ? djdeck::layout::colours::Cue
@@ -162,9 +167,9 @@ void DeckHeaderComponent::paint (juce::Graphics& g)
     g.setColour (remainingColour);
     g.drawText (formatTime (remainingSeconds), timerTextArea.removeFromLeft (djdeck::layout::deckHeader::RemainingtimeWidthPx), juce::Justification::centredLeft, false);
 
-    // Duracao total da faixa
-    g.setColour (djdeck::layout::colours::Tertiary);
-    g.drawText (formatTime (durationSeconds), timerTextArea.removeFromLeft (djdeck::layout::deckHeader::RemainingtimeWidthPx), juce::Justification::centredLeft, false);
+    // A duracao total nao cabe no no "deck1Timer" do Figma (122 px) — o
+    // prototipo HTML tambem mostra apenas os dois tempos no cabecalho. O
+    // valor completo continua disponivel na coluna "Duracao" da biblioteca.
 }
 
 //==============================================================================
@@ -248,25 +253,45 @@ void DeckHeaderComponent::resized()
             djdeck::layout::figmaNodedeck1Timer::heightPx);
     }
 
-    // Botoes SYNC e MASTER, no topo direito.
-    const auto buttonHeight = juce::jmin (22, area.getHeight() / 2);
+    // ---- Botoes SYNC e MASTER, no topo direito ----
+    // Posicoes vindas dos nos do Figma (key sync1 / beat sync1 no deck 1,
+    // keySync2 / beatSync2 no deck 2), convertidas para o espaco do header
+    // (que tem a mesma origem que o deck).
+    //
+    // No Figma o slot esquerdo e "KEY SYNC" (41 x 32) e o direito e
+    // "BEAT SYNC" (39 x 32). O badge do tom (Camelot) ocupa o slot do KEY
+    // SYNC — e a informacao da key — e o botao SYNC ocupa o slot do BEAT
+    // SYNC (mesma largura: 39 px). O botao MASTER nao tem slot no Figma e
+    // nao tem nenhum listener registrado no app, entao fica oculto.
+    masterButton.setVisible (false);
 
-    auto masterArea = area.removeFromRight (64);
-    auto syncArea = area.removeFromRight (djdeck::layout::deckHeader::SyncWidthPx + djdeck::layout::deckHeader::CamelotkeyWidthPx);
+    const auto syncSlotX = isDeck2 ? djdeck::layout::figmaNodebeatSync2::xPx
+                                    : djdeck::layout::figmaNodebeatSync1::xPx;
+    const auto syncSlotY = isDeck2 ? djdeck::layout::figmaNodebeatSync2::yPx
+                                    : djdeck::layout::figmaNodebeatSync1::yPx;
+    const auto syncSlotW = isDeck2 ? djdeck::layout::figmaNodebeatSync2::widthPx
+                                    : djdeck::layout::figmaNodebeatSync1::widthPx;
+    const auto syncSlotH = isDeck2 ? djdeck::layout::figmaNodebeatSync2::heightPx
+                                    : djdeck::layout::figmaNodebeatSync1::heightPx;
 
-    // SYNC: 39 x 32 px, centralizado na sua area.
-    auto syncBounds = syncArea.removeFromTop (djdeck::layout::deckHeader::SyncHeightPx);
-    syncButton.setBounds (syncBounds.getX() + (syncBounds.getWidth() - djdeck::layout::deckHeader::SyncWidthPx) / 2,
-                          syncBounds.getY(), djdeck::layout::deckHeader::SyncWidthPx, djdeck::layout::deckHeader::SyncHeightPx);
+    const auto keySlotX = isDeck2 ? djdeck::layout::figmaNodekeySync2::xPx
+                                   : djdeck::layout::figmaNodekeySync1::xPx;
+    const auto keySlotY = isDeck2 ? djdeck::layout::figmaNodekeySync2::yPx
+                                   : djdeck::layout::figmaNodekeySync1::yPx;
+    const auto keySlotW = isDeck2 ? djdeck::layout::figmaNodekeySync2::widthPx
+                                   : djdeck::layout::figmaNodekeySync1::widthPx;
+    const auto keySlotH = isDeck2 ? djdeck::layout::figmaNodekeySync2::heightPx
+                                   : djdeck::layout::figmaNodekeySync1::heightPx;
 
-    masterButton.setBounds (masterArea.removeFromTop (buttonHeight).reduced (2));
+    // SYNC: ocupa o slot BEAT SYNC (39 x 32 no deck 1, 44 x 32 no deck 2).
+    syncButton.setBounds (syncSlotX + relX + (syncSlotW - djdeck::layout::deckHeader::SyncWidthPx) / 2,
+                          syncSlotY + relY + (syncSlotH - djdeck::layout::deckHeader::SyncHeightPx) / 2,
+                          djdeck::layout::deckHeader::SyncWidthPx,
+                          djdeck::layout::deckHeader::SyncHeightPx);
 
-    // O badge do tom fica logo abaixo do BPM, na coluna da direita.
-    auto bpmKeyArea = area.removeFromRight (128);
-    bpmKeyArea.removeFromTop (20);
-
-    // Key (Camelot): 41 x 32 px, centralizado na sua area.
-    auto keyBounds = bpmKeyArea.removeFromTop (djdeck::layout::deckHeader::CamelotkeyHeightPx);
-    camelotKey.setBounds (keyBounds.getX() + (keyBounds.getWidth() - djdeck::layout::deckHeader::CamelotkeyWidthPx) / 2,
-                          keyBounds.getY(), djdeck::layout::deckHeader::CamelotkeyWidthPx, djdeck::layout::deckHeader::CamelotkeyHeightPx);
+    // Badge do tom: slot KEY SYNC (41 x 32 no deck 1, 50 x 32 no deck 2).
+    camelotKey.setBounds (keySlotX + relX + (keySlotW - djdeck::layout::deckHeader::CamelotkeyWidthPx) / 2,
+                          keySlotY + relY + (keySlotH - djdeck::layout::deckHeader::CamelotkeyHeightPx) / 2,
+                          djdeck::layout::deckHeader::CamelotkeyWidthPx,
+                          djdeck::layout::deckHeader::CamelotkeyHeightPx);
 }

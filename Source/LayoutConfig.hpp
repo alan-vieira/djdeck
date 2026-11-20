@@ -271,7 +271,7 @@ namespace volumeFader {
     }
 }
 namespace mixerCue {
-    constexpr int widthPx  = 29.82;
+    constexpr float  widthPx  = 29.82f;
     constexpr int heightPx = 14;
 }
 
