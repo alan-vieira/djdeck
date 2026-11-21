@@ -140,8 +140,8 @@ errada produziu `!!! Test 3 failed` e `EXIT=1`. Sem ele, o gate não prova nada.
 
 - [x] `git add` dos arquivos novos/alterados
 - [x] Commits da reformulação e da release em `main`
-- [ ] `git tag v0.5.0` + `CMakeLists.txt` version bump para `0.5.0` — version bump concluído; tag pendente
-- [ ] Push para o remoto — pendente de autenticação do GitHub
+- [x] `git tag v0.5.0` + `CMakeLists.txt` version bump para `0.5.0`
+- [x] Push de `main` e da tag `v0.5.0` para o GitHub
 
 ---
 
