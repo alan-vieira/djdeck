@@ -1,13 +1,14 @@
 # djdeck — Guia de Estilo, Layout e Referências de Construção
 
-Documento de referência para a reestruturação visual do djdeck e para a
-construção dos componentes que ainda não existem (big waveform, mixer, jog
-wheel, knobs, VU meter, biblioteca em árvore).
+Documento de referência para a UI do djdeck, para a evolução visual no modelo
+Rekordbox e para a construção dos componentes que ainda não existem. Big
+waveform, mixer, jog wheel, knobs, VU meter e biblioteca em árvore já estão
+implementados; as lacunas restantes são indicadas nas seções de estado atual.
 
-> **Status:** referência técnica. As seções "Estado atual" descrevem o código
-> existente em `Source/` (verificado no commit `48b402a`, HEAD). As seções
-> "Especificação" descrevem o alvo. Onde os dois divergem, a divergência está
-> explícita.
+> **Status:** referência técnica da release `v0.5.0`. As seções "Estado atual"
+> descrevem o código existente em `Source/` e a fonte de verdade da UI é
+> `Source/layout.json`. As seções "Especificação" descrevem o alvo. Onde os
+> dois divergem, a divergência está explícita.
 >
 > **Base técnica:** JUCE **9.0.5** (tag fixada no `CMakeLists.txt`).
 > Todas as APIs citadas neste documento foram verificadas no código-fonte
@@ -207,67 +208,65 @@ const juce::ColourGradient waveGradient =
 
 ### 2.1 Proporções da tela
 
-Medido na captura do Rekordbox em modo PERFORMANCE / 2Deck Horizontal.
-A janela do djdeck é `1600×900` (`MainComponent::MainComponent`, linha 51).
+A janela do djdeck usa o canvas de `1452×813`, definido em `Source/layout.json`
+e propagado para `Source/LayoutConfig.hpp` pelo codegen. A seção de decks e
+mixer segue as medidas exatas do Figma: deck 1 (`671×242`), mixer (`110×242`)
+e deck 2 (`671×242`). A biblioteca ocupa `1452×434` abaixo deles.
 
 | Seção | Altura | % | Conteúdo |
 |---|---|---|---|
-| Header + barra FX | ~90 px | ~10% | modo, layout, módulos ativos, relógio |
-| Big waveforms | ~200 px | ~22% | 2 ondas empilhadas (deck 1 acima, deck 2 abaixo) |
-| Decks + mixer | ~350 px | ~39% | deck A \| mixer \| deck B |
-| Biblioteca | ~250 px | ~28% | árvore à esquerda, lista de faixas à direita |
+| Big waveforms | 137 px | ~17% | 2 ondas empilhadas (deck 1: 71 px; deck 2: 66 px) |
+| Decks + mixer | 242 px | ~30% | deck 1 (671 px) \| mixer (110 px) \| deck 2 (671 px) |
+| Biblioteca | 434 px | ~53% | árvore de 249 px + lista de faixas |
 
 Na largura da seção de decks:
 
-| Coluna | % da largura |
-|---|---|
-| Deck A | ~45% |
-| Mixer | ~10% |
-| Deck B | ~45% |
+| Coluna | Largura | % aproximado |
+|---|---:|---:|
+| Deck 1 | 671 px | 46% |
+| Mixer | 110 px | 8% |
+| Deck 2 | 671 px | 46% |
 
 Na seção da biblioteca:
 
-| Coluna | % da largura |
-|---|---|
-| Árvore | ~30% |
-| Lista de faixas | ~70% |
+| Coluna | Largura | % aproximado |
+|---|---:|---:|
+| Árvore | 249 px | 17% |
+| Lista de faixas | 1203 px | 83% |
 
 ### 2.2 Estrutura de componentes
 
-Proposta de árvore de componentes. Os arquivos marcados com *(novo)* ainda não
-existem.
+Árvore implementada no djdeck:
 
 ```
-MainComponent (juce::AudioAppComponent)
-├── RekordboxLookAndFeel.h                    (novo)
-├── GlobalHeaderComponent                     (novo)
-├── BigWaveformsComponent                     (novo)
-│   ├── BigWaveformComponent  (deck 1)
-│   └── BigWaveformComponent  (deck 2)
-├── DecksMixerComponent                       (novo)
-│   ├── DeckComponent          (deck A)
-│   │   ├── DeckHeaderComponent
-│   │   ├── MiniWaveformComponent  (existente: WaveformDisplay, a renomear)
-│   │   ├── BeatJumpComponent  (novo)  ┐ espelhados:
-│   │   ├── HotCuePadsComponent (novo)  ┘ deck 1 = Beat Jump, deck 2 = Hot Cue
-│   │   └── JogWheelComponent   (novo)
-│   ├── MixerComponent                     (novo)
-│   │   ├── ChannelStripComponent (deck A)
-│   │   │   ├── VUMeterComponent
-│   │   │   ├── KnobComponent (TRIM)
-│   │   │   ├── KnobComponent (HIGH)
-│   │   │   ├── KnobComponent (MID)
-│   │   │   ├── KnobComponent (LOW)
-│   │   │   ├── KnobComponent (FILTER)
-│   │   │   ├── CUEButton
-│   │   │   └── ChannelFader
-│   │   ├── CrossfaderComponent
-│   │   └── ChannelStripComponent (deck B)   (mesma estrutura, espelhada)
-│   └── DeckComponent          (deck B)
-└── LibraryComponent                       (novo)
+MainComponent (juce::AudioAppComponent + juce::DragAndDropContainer)
+├── RekordboxLookAndFeel
+├── BigWaveformsComponent
+│   ├── BigWaveformComponent (deck 1)
+│   └── BigWaveformComponent (deck 2)
+├── DeckComponent (deck 1, não espelhado)
+│   ├── DeckHeaderComponent
+│   ├── MiniWaveformComponent
+│   ├── BeatJumpComponent
+│   ├── JogWheelComponent
+│   └── controles de transporte
+├── MixerComponent
+│   ├── ChannelStripComponent (deck 1)
+│   │   ├── VUMeterComponent
+│   │   ├── KnobComponent (TRIM/EQ/FILTER)
+│   │   ├── CUEButton
+│   │   └── volumeFader
+│   ├── CrossfaderComponent
+│   └── ChannelStripComponent (deck 2, espelhado)
+├── DeckComponent (deck 2, espelhado)
+│   ├── DeckHeaderComponent
+│   ├── MiniWaveformComponent
+│   ├── HotCuePadsComponent
+│   ├── JogWheelComponent
+│   └── controles de transporte
+└── LibraryComponent
     ├── LibraryTreeView + LibraryTreeModel
-    ├── TrackListView + TrackListModel
-    └── RelatedTracksPanel     (opcional)
+    └── PlaylistComponent (TableListBox + persistência XML)
 ```
 
 ### 2.3 Espelhamento dos decks
@@ -315,13 +314,17 @@ const juce::Font xxii { juce::Typeface::createSystemTypefaceFor (
 
 ### 3.1 Escala tipográfica
 
+Os valores canônicos estão em `Source/layout.json` e são gerados para
+`Source/LayoutConfig.hpp`. A implementação atual usa:
+
 | Papel | Tamanho | Peso | Uso |
 |---|---|---|---|
-| Display | 28 px | regular | BPM no centro do jog wheel |
-| Title | 16 px | regular | título da faixa no deck |
-| Body | 13 px | regular | rótulos de knob, BPM, key |
-| Caption | 11 px | regular | timestamps, contadores |
-| Micro | 9 px | regular | marcações da grade de beats |
+| Número do deck | 14 px | bold | identificação do deck no cabeçalho |
+| Title | 15 px | bold | título da faixa no deck |
+| Body | 11 px | plain | artista, BPM e key |
+| Tempo | 14 px | bold | tempo decorrido e regressiva |
+| BPM no jog | 15 px | bold | BPM no centro do jog wheel |
+| Biblioteca | 11 px | plain/bold | cabeçalho e linhas da tabela |
 
 Números devem usar algarismos tabulares para não tremer durante a reprodução.
 A JUCE não expõe isso diretamente — o truque é formatar com largura fixa:
@@ -575,8 +578,7 @@ O que falta para casar com a referência:
 | Overview (miniatura) | ❌ ausente | faixa fina acima, com posição |
 | Agulha com marcadores triangulares | ❌ ausente | |
 
-O `position` é atualizado pelo timer de 33 ms do `DeckGUI`
-(`Source/DeckGUI.cpp`, `timerCallback()`), que já lê
+O `position` é atualizado pelo timer de 33 ms do `DeckComponent`, que lê
 `player->getPositionRelative()`.
 
 ---
@@ -835,9 +837,9 @@ void DeckPlayer::setFilterAmount (float amount)   // -1 .. +1
 
 ### 5.6 Fader de canal
 
-O fader de volume do deck. No djdeck atual ele é o `volSlider` do `DeckGUI`,
-com faixa 0.0–1.0. A especificação do Rekordbox usa um volume em dB com
--∞ no fundo:
+O fader de volume do deck. No djdeck atual é o `volumeFader` do
+`ChannelStripComponent`, com faixa linear 0.0–1.0. A especificação do
+Rekordbox usa um volume em dB com -∞ no fundo:
 
 ```cpp
 // -inf no fundo, 0 dB a 3/4 do curso
@@ -1813,23 +1815,28 @@ fracões de batida (1/8, 1/4, 1/2, 1, 2, 4, 8) em vez de letras.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ (1)  Título da Faixa                            [SYNC]     │
-│      Artista                                     140.00  Gm │
-│                                          -05:10.5  00:00.4 │
-│                                                    [MASTER] │
+│ (1) ▣  Título da Faixa                     140.00  │ Gm    │ [SYNC]   │
+│        Artista                                        │       │ [MASTER] │
+│                                    -05:10.5  00:00.4  │       │          │
 └────────────────────────────────────────────────────────────┘
 ```
 
 | Elemento | Posição | Estilo |
 |---|---|---|
-| Número do deck | topo esquerdo | círculo, 18 px, branco |
-| Título | após o número | 16 px, branco |
-| Artista | abaixo do título | 13 px, cinza |
-| BPM + key | topo direito | 16 px, branco; key em badge vermelho |
-| Tempo decorrido | abaixo | 11 px, cinza |
-| Tempo restante | abaixo | 11 px, cinza |
-| SYNC | topo direito, coluna | botão retangular; azul quando ativo |
-| MASTER | abaixo do SYNC, mesma coluna | laranja quando ativo |
+| Número do deck | topo esquerdo | 14 px, bold, branco |
+| Capa/arte | após o número | placeholder de 36×36 px com ícone de disco |
+| Título | após a capa | 15 px, bold, branco |
+| Artista | abaixo do título | 11 px, plain, cinza |
+| BPM | coluna esquerda do nó BPM/key (70%) | 11 px, plain, branco; `--.--` se desconhecido |
+| Tom | coluna direita do nó BPM/key (30%) | 11 px, plain, cinza; `--` se desconhecido |
+| Tempo decorrido | abaixo | 14 px, bold, cinza |
+| Tempo regressivo | abaixo | 14 px, bold; laranja nos últimos 10 s |
+| SYNC | topo direito | 64×20 px; azul quando ativo |
+| MASTER | abaixo do SYNC, mesma coluna | 64×20 px; laranja quando ativo |
+
+O botão MASTER não possui um nó equivalente no Figma, mas foi mantido
+empilhado abaixo do SYNC no canto direito, conforme a especificação visual do
+cabeçalho do djdeck.
 
 ### 7.2 Layout do deck
 
@@ -1865,24 +1872,17 @@ O `mirrored` controla:
 
 ### 7.4 Estado atual
 
-O `DeckGUI` atual (`Source/DeckGUI.cpp`) é muito mais simples:
+O cabeçalho atual está implementado em `Source/DeckHeaderComponent.cpp` e usa
+as coordenadas de `Source/layout.json`. Ele inclui:
 
-```cpp
-void DeckGUI::resized()
-{
-    auto area = getLocalBounds();
-    int h = area.getHeight();
-    int row = h / 14;
+- placeholder de capa/arte;
+- número do deck;
+- título e artista;
+- BPM e tom em colunas separadas de 70% / 30%;
+- tempo decorrido e regressivo;
+- botões SYNC e MASTER empilhados no canto direito.
 
-    // 4 botões de transporte na mesma faixa
-    // 3 sliders (vol, speed) — o terceiro fica vazio
-    // 1 slider de posição
-    // waveform ocupa o resto
-}
-```
-
-Faltam: cabeçalho com BPM/key, jog wheel, pads, EQ, mixer, crossfader,
-sync/master, hot cues, loops.
+A cobertura automatizada está em `tests/test_deckheader.cpp`.
 
 ---
 
@@ -1892,11 +1892,11 @@ sync/master, hot cues, loops.
 
 ```
 LibraryComponent
-├── LibraryTreeView        (árvore, ~30% da largura)
+├── LibraryTreeView        (árvore, 249 px)
 │   └── LibraryTreeModel
-└── TrackListView          (lista, ~70% da largura)
-    ├── Header: título + contagem + busca + view modes
-    └── TrackListModel
+└── PlaylistComponent      (lista, 1203 px)
+    ├── TableListBox com cabeçalho e cinco colunas
+    └── LibraryStore (persistência XML)
 ```
 
 ### 8.2 Árvore de navegação
@@ -1956,16 +1956,19 @@ Nós esperados, espelhando o Rekordbox:
 ### 8.3 Tabela de faixas
 
 O `juce::TableListBox` com um `TableListBoxModel`. O modelo atual do djdeck
-(`Source/PlaylistComponent.cpp`) já implementa o padrão correto, com 3
-colunas: Título, Artista, Duração.
+(`Source/PlaylistComponent.cpp`) implementa cinco colunas: Título / Artista,
+Álbum, Gênero, Rating e Duração.
 
 As colunas são declaradas no **header** do `TableListBox`, não no modelo:
 
 ```cpp
-// No construtor do componente
-playlistTable.getHeader().addColumn ("Título", columnTitle, 200);
-playlistTable.getHeader().addColumn ("Artista", columnArtist, 150);
-playlistTable.getHeader().addColumn ("Duração", columnLength, 100);
+// No construtor do componente. fromUTF8() e obrigatorio em C++17:
+// o construtor String(const char*) da JUCE 9 assume ASCII.
+playlistTable.getHeader().addColumn (juce::String::fromUTF8 (u8"Título / Artista"), infoColumn, 300);
+playlistTable.getHeader().addColumn (juce::String::fromUTF8 (u8"Álbum"), albumColumn, 180);
+playlistTable.getHeader().addColumn (juce::String::fromUTF8 (u8"Gênero"), genreColumn, 150);
+playlistTable.getHeader().addColumn (juce::String::fromUTF8 (u8"Rating"), ratingColumn, 90);
+playlistTable.getHeader().addColumn (juce::String::fromUTF8 (u8"Duração"), lengthColumn, 80);
 ```
 
 > `juce::TableListBox::getHeader()` retorna um
@@ -2049,8 +2052,14 @@ void TrackPreviewComponent::paint (juce::Graphics& g)
 
 ### 8.5 Divisor redimensionável
 
-**`juce::SplitterComponent` não existe na JUCE 9.** O mecanismo equivalente
-é o `juce::StretchableLayoutManager` com uma `StretchableLayoutResizerBar`.
+**`juce::SplitterComponent` não existe na JUCE 9.** A implementação atual usa
+larguras explícitas, alinhadas ao Figma: a árvore ocupa 249 px e a lista de
+faixas usa o restante da largura. Um divisor redimensionável poderia ser
+adicionado futuramente com `juce::StretchableLayoutManager` +
+`juce::StretchableLayoutResizerBar`, mas não é usado na release `v0.5.0`.
+
+A geometria canônica é gerada a partir de `Source/layout.json`; o exemplo
+abaixo documenta a alternativa da JUCE 9, não o código vigente.
 
 ```cpp
 class LibraryComponent : public juce::Component
@@ -2113,7 +2122,7 @@ private:
 ### 9.2 Divisão de responsabilidade
 
 ```
-DeckGUI / DeckComponent  ──UI──▶  DeckPlayer  ──DSP──▶  áudio
+DeckComponent  ──UI──▶  DeckPlayer  ──DSP──▶  áudio
        │                              ▲
        └── botões, sliders, pads      │
                                       └── setTrimDb / setEq / setFilter / setCrossfade
@@ -2276,11 +2285,12 @@ Para o djdeck, um formato próprio simplificado em memória é suficiente — o
 
 ## 11. Estado atual vs. alvo
 
-Verificado na tag `v0.4.0`.
+Verificado na release `v0.5.0`.
 
-|| Área | Estado | Observação |
-|---|---|---|---|
-| Layout raiz | ✅ completo | 4 seções: header (~10%), big waveforms (~22%), decks+mixer (~39%), biblioteca (~28%) |
+| Área | Estado | Observação |
+|---|---|---|
+| Layout raiz | ✅ completo | Big waveforms (137 px), decks+mixer (242 px) e biblioteca (434 px), com medidas do Figma |
+| Fonte de verdade do layout | ✅ centralizada | `Source/layout.json` gera `Source/LayoutConfig.hpp` durante o build |
 | Big waveform | ✅ presente | `BigWaveformComponent` — agulha fixa no centro, onda rolante, janela simétrica de 30 s |
 | Waveform do deck | ✅ presente | `MiniWaveformComponent` — faixa estática, agulha móvel esquerda → direita |
 | Carregamento da waveform | ✅ OK | Usa `FileInputSource` (não carrega arquivo inteiro em memória) |
@@ -2295,9 +2305,9 @@ Verificado na tag `v0.4.0`.
 | Knob | ✅ presente | `KnobComponent` — rotativo, bipolar/unipolar, arco de valor |
 | Jog wheel | ✅ presente | `JogWheelComponent` — modo touch (scratch) e pitch (vertical), rotação do disco |
 | Pads (hot cue / beat jump) | ✅ presente | `HotCuePadsComponent` + `BeatJumpComponent` |
-| Cabeçalho do deck | ✅ presente | `DeckHeaderComponent` — título, artista, BPM, key, tempo decorrido/restante |
+| Cabeçalho do deck | ✅ presente | `DeckHeaderComponent` — capa/arte, número, título, artista, BPM (70%), tom (30%), tempos e SYNC/MASTER empilhados |
 | LookAndFeel | ✅ customizado | `RekordboxLookAndFeel` — desenho de knobs, sliders, botões, VU meter |
-| Biblioteca em árvore | ✅ presente | `LibraryComponent` + `LibraryTreeModel` + `StretchableLayoutManager` |
+| Biblioteca em árvore | ✅ presente | `LibraryComponent` + `LibraryTreeModel`; árvore com largura fixa de 249 px e lista ocupando o restante |
 | Preview com waveform | ❌ ausente | Coluna Preview na biblioteca não tem miniatura de onda |
 | Árvore de navegação | ✅ presente | Collection, Playlists, Explorer, Devices, Histories, Recordings |
 | Fonte customizada | ❌ ausente | Fonte do sistema |
@@ -2305,10 +2315,10 @@ Verificado na tag `v0.4.0`.
 | Metadados (TagLib) | ✅ presente | `TagLibReader` + `TagLibFileStream` — ID3, Vorbis, MP4, APE, caminhos largos no Windows |
 | Detecção de BPM | ✅ presente | `BpmDetector` — envelope de onsets por fluxo espectral + autocorrelação (60–200 BPM), rodando em thread de fundo ao carregar/importar a faixa; fallback: tag BPM do arquivo → detecção por áudio → placeholder `--.--`. O valor aparece no cabeçalho do deck e no centro do jog wheel. |
 
-### 11.1 Ordem sugerida de implementação (próximas fases)
+### 11.1 Próximas fases
 
-1. **Detecção de BPM** — implementada (`Source/BpmDetector.h/.cpp`). Aparece no cabeçalho do deck e no centro do jog wheel após o carregamento da faixa, via `PlaylistDragPayload` (drag-and-drop da biblioteca) ou detecção assíncrona por áudio (`DeckPlayer::detectBpm`).
-2. **Preview com waveform na biblioteca** — coluna Preview na tabela de faixas.
+1. **Preview com waveform na biblioteca** — coluna Preview na tabela de faixas.
+2. **Colunas de BPM e key na playlist** — os valores já são carregados no deck, mas ainda não aparecem como colunas próprias na tabela.
 3. **Persistência de hot cues** — gravar posição dos cues no arquivo (tag ANLZ do Rekordbox ou similar).
 4. **Caminhos Unicode no Windows** — validar `TagLibFileStream` com caminhos acentuados.
 5. **Segunda saída de áudio (fone)** — necessário para PFL/MIXING/LEVEL reais (§5.9).

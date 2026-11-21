@@ -25,11 +25,13 @@ PlaylistComponent::PlaylistComponent (juce::AudioFormatManager& formatManagerToU
     playlistTable.setModel(this);
 
     // Colunas da biblioteca (docs/DOCUMENTACAO_LAYOUT_UI.md §8.3).
-    playlistTable.getHeader().addColumn(u8"Título / Artista", infoColumn, 300);
-    playlistTable.getHeader().addColumn(u8"Álbum", albumColumn, 180);
-    playlistTable.getHeader().addColumn(u8"Gênero", genreColumn, 150);
-    playlistTable.getHeader().addColumn(u8"Rating", ratingColumn, 90);
-    playlistTable.getHeader().addColumn(u8"Duração", lengthColumn, 80);
+    // fromUTF8() e obrigatorio: em C++17, u8"..." ainda tem o tipo const char*
+    // e o construtor String(const char*) da JUCE 9 assume ASCII.
+    playlistTable.getHeader().addColumn(juce::String::fromUTF8(u8"Título / Artista"), infoColumn, 300);
+    playlistTable.getHeader().addColumn(juce::String::fromUTF8(u8"Álbum"), albumColumn, 180);
+    playlistTable.getHeader().addColumn(juce::String::fromUTF8(u8"Gênero"), genreColumn, 150);
+    playlistTable.getHeader().addColumn(juce::String::fromUTF8(u8"Rating"), ratingColumn, 90);
+    playlistTable.getHeader().addColumn(juce::String::fromUTF8(u8"Duração"), lengthColumn, 80);
 
     addAndMakeVisible(addButton);
     addButton.addListener(this);

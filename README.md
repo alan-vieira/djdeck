@@ -6,8 +6,8 @@ Aplicação de DJ para desktop com **dois decks**, mixer, equalizador de 3 banda
 
 ![Janela principal do djdeck](docs/screenshots/main-window.png)
 
-> **Status:** `v0.4.0` — versão estável com mixer completo, equalizador, filtro, crossfader, big/mini waveform sincronizadas, detecção de BPM e testes automatizados.
-> Compila sem erros nem warnings, abre corretamente, e o fluxo principal (importar faixa → arrastar para um deck → reproduzir) está verificado em execução.
+> **Status:** `v0.5.0` — release com a UI centralizada em `Source/layout.json`, codegen C++ do layout, alinhamento geométrico com o Figma/HTML, cabeçalho dos decks com placeholder de capa, BPM e tom em colunas separadas, SYNC/MASTER empilhados, propagação da key musical e testes automatizados.
+> A referência visual da aplicação é o canvas de `1452×813`; o build e a suíte Catch2 podem ser reproduzidos pelos comandos abaixo.
 
 O [roadmap completo](docs/ROADMAP.md) está em [`docs/ROADMAP.md`](docs/ROADMAP.md). O guia detalhado de layout, cores e componentes está em [`docs/DOCUMENTACAO_LAYOUT_UI.md`](docs/DOCUMENTACAO_LAYOUT_UI.md).
 
@@ -39,8 +39,12 @@ Ou deixe o CMake fazer isso automaticamente (o target `djdeck` depende de `djdec
 | Waveform com playhead em tempo real | ✅ Funcionando |
 | Big waveform (agulha fixa, onda rolante) | ✅ Funcionando |
 | Mini waveform (faixa estática, agulha móvel) | ✅ Funcionando |
+| Detecção de BPM por áudio (TagLib → análise de áudio → `--.--`) | ✅ Funcionando — execução em segundo plano e persistência na biblioteca |
+| Key musical no cabeçalho do deck (clássica e Camelot) | ✅ Funcionando — propagada ao carregar ou arrastar uma faixa |
+| Cabeçalho do deck com capa/arte placeholder, BPM e tom separados | ✅ Funcionando — BPM 70% / tom 30%, SYNC e MASTER empilhados |
+| Layout centralizado em JSON com codegen C++ | ✅ Funcionando — `Source/layout.json` → `Source/LayoutConfig.hpp` |
 | Carregamento via FileInputSource (sem ler arquivo inteiro em memória) | ✅ Funcionando |
-|| Playlist com colunas de título / artista / duração | ✅ Funcionando (via TagLib) — metadados extraídos e persistidos em `library.xml` |
+| Playlist com título / artista, álbum, gênero, rating e duração | ✅ Funcionando (via TagLib) — metadados extraídos e persistidos em `library.xml` |
 | Arrastar faixa da playlist para um deck | ✅ Funcionando |
 | Duplo-clique na playlist carrega no Deck 1 | ✅ Funcionando |
 | Arrastar arquivo do Explorer para a playlist | ✅ Funcionando |
@@ -138,14 +142,21 @@ djdeck/
 │   ├── Main.cpp                # ponto de entrada (JUCEApplication)
 │   ├── MainComponent.h/.cpp    # janela, mixer, layout, drag-and-drop
 │   ├── DeckComponent.h/.cpp    # UI de um deck (transport, pads, jog)
+│   ├── DeckHeaderComponent.h/.cpp # cabeçalho: capa, título, artista, BPM, tom, tempos, SYNC/MASTER
 │   ├── DeckPlayer.h/.cpp       # áudio de um deck (transporte, DSP, ganho)
 │   ├── BigWaveformComponent.h/.cpp  # onda rolante, agulha fixa no centro
 │   ├── MiniWaveformComponent.h/.cpp # onda estática, agulha móvel
 │   ├── MixerComponent.h/.cpp   # UI do mixer (strips, crossfader)
 │   ├── ChannelStripComponent.h/.cpp # UI de um canal (VU, TRIM, EQ, filtro, fader)
 │   ├── LibraryComponent.h/.cpp# biblioteca (árvore + lista de faixas)
+│   ├── LibraryTreeModel.h/.cpp # árvore de navegação da biblioteca
+│   ├── PlaylistComponent.h/.cpp # tabela de faixas, importação e persistência
+│   ├── PlaylistDragPayload.h   # payload de drag-and-drop com arquivo, BPM, título, artista e key
 │   ├── LibraryStore.h/.cpp     # persistência XML da biblioteca
 │   ├── Song.h/.cpp             # modelo de uma faixa
+│   ├── BpmDetector.h/.cpp      # detecção de BPM por análise de áudio
+│   ├── CamelotKeyComponent.h/.cpp # conversão e exibição de key musical
+│   ├── GlobalHeaderComponent.h/.cpp # cabeçalho global
 │   ├── RekordboxLookAndFeel.h/.cpp# LookAndFeel customizado
 │   ├── RekordboxColours.h      # paleta de cores medida no Rekordbox
 │   ├── SettingsDialog.h        # diálogo de dispositivo de áudio
@@ -157,7 +168,9 @@ djdeck/
 │   ├── test_song.cpp           # testes de Song / metadados
 │   ├── test_deckplayer.cpp     # testes de DeckPlayer (ganho, cue, speed, posição)
 │   ├── test_crossfader.cpp     # testes de CrossfaderComponent (curva constant power)
-│   └── test_waveform.cpp       # testes de waveform (MP3, FileInputSource, caches)
+│   ├── test_waveform.cpp       # testes de waveform (MP3, FileInputSource, caches)
+│   ├── test_bpm_detector.cpp   # testes do detector de BPM por áudio
+│   └── test_deckheader.cpp     # testes do cabeçalho dos decks (BPM/tom, capa, SYNC/MASTER)
 ├── docs/
 │   ├── ROADMAP.md              # planejamento e decisões de arquitetura
 │   └── DOCUMENTACAO_LAYOUT_UI.md # guia de estilo, layout e componentes
@@ -197,7 +210,7 @@ arquivo → AudioFormatReader → AudioFormatReaderSource → AudioTransportSour
 
 Alguns pontos que exigem atenção ao mexer no código:
 
-- **Versão:** definida como `0.4.0` em `CMakeLists.txt` e `Source/Main.cpp` (`ProjectInfo::versionString`).
+- **Versão:** definida como `0.5.0` em `CMakeLists.txt` e `Source/Main.cpp` (`ProjectInfo::versionString`).
 - **`MainComponent` herda de `juce::DragAndDropContainer`.** Ele é um *mixin* (não deriva de `Component`), então convive com `juce::AudioAppComponent`. É ele que fornece `startDragging()` e roteia os eventos de drop.
 - **`setSize()` vem depois de `addAndMakeVisible()`.** `setSize()` dispara `resized()`, e é `resized()` que distribui os bounds entre os filhos. Chamar `setSize()` antes dos filhos existirem resulta em **tela preta**.
 - **`juce::Array::getUnchecked()` e `operator[]` retornam por valor** no JUCE 9. Pegar o endereço (`&`) de um deles gera um ponteiro para um temporário. Use `getReference()`.
@@ -224,7 +237,7 @@ Duas decisões de arquitetura já tomadas:
 
 ### Pendências conhecidas
 
-- **Acentuação quebrada nos textos da interface.** O cabeçalho “Duração” aparece como `DuraÃ§Ã£o` e “Título” como `TÃtulo`. A causa está identificada: no JUCE 9, `juce::String(const char*)` interpreta os bytes como **ASCII/Latin-1** (`CharPointer_ASCII`), não como UTF-8. A flag `/utf-8` já foi adicionada ao `CMakeLists.txt` para o compilador ler os fontes corretamente, mas a conversão para Unicode precisa ser explícita via `juce::String::fromUTF8()`. A correção está pendente.
+- **Acentuação em textos da interface.** Os literais acentuados da biblioteca usam `juce::String::fromUTF8(u8"...")`, e a leitura de metadados do TagLib converte explicitamente para Unicode com `juce::String::fromUTF8()`. A flag `/utf-8` garante que o MSVC leia os fontes como UTF-8. A validação visual final deve confirmar todos os rótulos acentuados em uma execução limpa.
 - **Segunda saída de áudio (PFL / fone).** Ainda não implementada — em aberto no [roadmap](docs/ROADMAP.md).
 
 ---

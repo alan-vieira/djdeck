@@ -84,7 +84,7 @@ MainComponent::MainComponent()
     // setSize() dispara resized(), e é resized() que distribui os bounds entre
     // os filhos. Se chamarmos setSize() antes dos filhos existirem, resized()
     // roda com a lista de filhos vazia e eles ficam com tamanho 0x0 -> tela preta.
-    // Como a janela depois define bounds idênticos (1600x900), resized() não
+    // Como a janela depois define bounds idênticos (1452x813), resized() não
     // dispara novamente, e os filhos nunca receberiam bounds.
     setSize (djdeck::layout::screenWidth, djdeck::layout::screenHeight);
     juce::Logger::writeToLog ("[DIAG] setSize done");
@@ -137,8 +137,8 @@ void MainComponent::resized()
 {
     auto area = getLocalBounds();
 
-    // Canvas do Figma eh 1452x813; a tela JUCE eh 1600x900.
-    // Centraliza o canvas do Figma dentro da tela para nao ficar grudado no canto.
+    // A tela JUCE e o canvas do Figma: ambos usam 1452x813.
+    // O offset centraliza qualquer sobra caso as dimensoes sejam alteradas.
     const int offsetX = (djdeck::layout::screenWidth  - djdeck::layout::figmaCanvas::widthPx)  / 2;
     const int offsetY = (djdeck::layout::screenHeight - djdeck::layout::figmaCanvas::heightPx) / 2;
 

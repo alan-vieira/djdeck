@@ -7,6 +7,37 @@ o versionamento segue [SemVer](https://semver.org/lang/pt-BR/).
 
 ---
 
+## [0.5.0] — 2026-11-20
+
+Release focada na centralização do layout e na reformulação visual do cabeçalho dos decks.
+
+### Adicionado
+
+- **Layout centralizado em `Source/layout.json`** — cores, tipografia, geometria e regras de espelhamento passam a ser a fonte de verdade da UI. `tools/layout_codegen.py` gera `Source/LayoutConfig.hpp` durante o build, sem parsing de JSON em runtime.
+- **Cabeçalho dos decks reformulado** — placeholder de capa/arte, número do deck, título, artista, BPM e tom em colunas separadas (70% / 30%), tempos decorrido/restante e botões SYNC/MASTER empilhados no canto direito.
+- **Propagação da key musical** — `PlaylistDragPayload` e `Song` transportam a key até o `DeckHeaderComponent`, que a exibe na coluna de tom.
+- **Testes do cabeçalho dos decks** — `tests/test_deckheader.cpp` cobre a separação BPM/tom, a área de artista, os tempos, o placeholder de capa e o empilhamento SYNC/MASTER.
+
+### Alterado
+
+- **Precisão geométrica alinhada ao Figma/HTML** — decks, mixer, biblioteca, waveforms, knobs, sliders, crossfader e header usam as medidas e coordenadas da referência visual.
+- **Knobs do mixer como componentesJUCE** — `KnobComponent` desenha e posiciona cada knob; valores pequenos preservam o diâmetro real em vez de desaparecer com a área reservada ao rótulo.
+- **Biblioteca** — árvore com largura fixa de 249 px, lista ocupando o restante, fundo da tabela conforme o tema e botão de importação flutuante no rodapé.
+- **Sliders lineares** — pinos de referência fixos em mínimo, centro e máximo.
+
+### Corrigido
+
+- **Z-order do mixer** — o mixer é adicionado antes dos decks para que os decks fiquem desenhados por cima.
+- **Exibição dos decks** — títulos, artistas, BPM e tempos não desaparecem mais após repaints sucessivos; os retângulos de pintura não são mutados entre quadros.
+- **Codificação UTF-8** — fontes compilados com `/utf-8`, metadados do TagLib e rótulos acentuados da biblioteca convertidos explicitamente com `juce::String::fromUTF8()`.
+- **Build paralelo** — opção `/FS` habilitada para evitar conflitos do compilador em builds paralelos do MSVC.
+
+### Versão
+
+- `CMakeLists.txt` e `Source/Main.cpp` atualizados de `0.4.0` para `0.5.0` (`ProjectInfo::versionNumber` passou de `2` para `500`).
+
+---
+
 ## [0.4.0] — 2026-11-15
 
 ### Corrigido
@@ -254,6 +285,9 @@ Bugs que impediam a aplicação de compilar ou de funcionar corretamente:
 - A playlist não é persistida entre execuções.
 - Não há crossfader, equalização nem hotcues (adicionados na v0.3.0).
 
+[0.5.0]: https://github.com/alan-vieira/djdeck/releases/tag/v0.5.0
+[0.4.0]: https://github.com/alan-vieira/djdeck/releases/tag/v0.4.0
+[0.3.1]: https://github.com/alan-vieira/djdeck/releases/tag/v0.3.1
 [0.3.0]: https://github.com/alan-vieira/djdeck/releases/tag/v0.3.0
 [0.2.0]: https://github.com/alan-vieira/djdeck/releases/tag/v0.2.0
 [0.1.0]: https://github.com/alan-vieira/djdeck/releases/tag/v0.1.0

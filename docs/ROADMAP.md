@@ -31,13 +31,15 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 ## Geral
 
 - [x] **Esquema de cores e gráficos de UI customizados** — `RekordboxColours` + `RekordboxLookAndFeel` implementados, paleta medida no Rekordbox.
+- [x] **Layout centralizado em `Source/layout.json`** — geometria, cores, tipografia e regras de espelhamento são geradas para `Source/LayoutConfig.hpp` durante o build por `tools/layout_codegen.py`.
 - [ ] **Fonte customizada** (open source) — hoje usa a fonte padrão do sistema.
 - [ ] **Lógica de interpolação** (pitch e afinação) — hoje o pitch é alterado
   por *resampling* simples, o que desloca a duração. O objetivo é manter a
   duração constante com interpolação de qualidade.
 - [x] **Testes automatizados** — suíte com Catch2 v3.5.2 (`tests/`):
   `test_song.cpp`, `test_deckplayer.cpp`, `test_crossfader.cpp`,
-  `test_waveform.cpp`. Ponto de entrada em `tests/main.cpp` que inicializa
+  `test_waveform.cpp`, `test_bpm_detector.cpp` e `test_deckheader.cpp`.
+  Ponto de entrada em `tests/main.cpp` que inicializa
   o JUCE dentro de `main()`. Ativado por padrão via
   `DJDECK_ENABLE_TESTS`.
 - [ ] **Digital Vinyl System (DVS)** — ver [Alternativas avaliadas](#alternativas-avaliadas-para-dvs--vinyl-control).
@@ -57,7 +59,7 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 ## Display do playhead
 
 - [x] Atualizar a posição da faixa — o playhead já se move em tempo real
-      (timer de ~30 fps no `DeckGUI`).
+      (timer de ~30 fps no `DeckComponent`).
 - [ ] **Feedback visual de amplitude ou “power spectrum”** — hoje a waveform é
   estática; o objetivo é exibir o espectro/amplitude em tempo real durante a
   reprodução.
@@ -68,8 +70,8 @@ Planejamento do projeto. A ordem dos itens reflete a prioridade atual.
 
 - [x] **Arrastar “track” para o player** — implementado na v0.1.0 com
       drag-and-drop nativo do JUCE e payload tipado. O `PlaylistDragPayload`
-      agora transporta `bpm`, `title` e `artist` além do `file`, de modo que o
-      BPM detectado aparece no cabeçalho do deck e no centro do jog wheel após
+      agora transporta `bpm`, `title`, `artist` e `key` além do `file`, de modo que o
+      BPM detectado e a key musical apareçam no cabeçalho do deck e no centro do jog wheel após
       o drop.
 - [x] **Biblioteca para metadados** → **TagLib** (decidido).
       TagLib v2.3.2 integrado via `FetchContent`, com build estático e o
@@ -105,8 +107,10 @@ O `juce::ValueTree` do DJDecks é uma abstração de árvore mais elegante que o
 `XmlElement` cru. Fica como melhoria futura se a biblioteca ganhar playlists
 e folders aninhados.
 
-- [x] **Listar metadados na playlist** — colunas de título, artista, BPM,
-      key, álbum, gênero, rating (5 estrelas) e duração.
+- [x] **Listar metadados na playlist** — colunas de título / artista, álbum,
+      gênero, rating (5 estrelas) e duração. BPM e key são transportados no
+      `PlaylistDragPayload` e exibidos no cabeçalho do deck, mas ainda não
+      possuem colunas próprias na tabela.
 - [ ] **Caminhos Unicode no Windows** — o `FileStream` do próprio TagLib
       usa `fopen(const char*)`, que depende da codepage ANSI. O djdeck usa um
       adaptador (`TagLibFileStream`) que abre por caminho largo (`_wfopen`).
@@ -117,7 +121,7 @@ e folders aninhados.
 - [x] **Detecção de BPM por áudio** — detector próprio em JUCE (`Source/BpmDetector.h/.cpp`):
   envelope de onsets por fluxo espectral + autocorrelação (60–200 BPM), rodando
   em thread de fundo ao importar/carregar a faixa, com fallback tag → áudio →
-  placeholder 120 BPM. Sem dependências externas.
+  placeholder `--.--`. Sem dependências externas.
 
 ---
 
