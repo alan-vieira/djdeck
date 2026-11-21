@@ -4,7 +4,7 @@ Aplicação de DJ para desktop com **dois decks**, mixer, equalizador de 3 banda
 
 > Projeto **independente**, com identidade e roadmap próprios. A estrutura dos decks e da playlist foi inspirada no [TheAudioProgrammer/juceDjApp](https://github.com/TheAudioProgrammer/juceDjApp).
 
-![Janela principal do djdeck](docs/screenshots/main-window.png)
+![Janela principal do djdeck](docs/screenshots/main-window.png?v=2026-11-21)
 
 > **Status:** `v0.5.0` — release com a UI centralizada em `Source/layout.json`, codegen C++ do layout, alinhamento geométrico com o Figma/HTML, cabeçalho dos decks com placeholder de capa, BPM e tom em colunas separadas, SYNC/MASTER empilhados, propagação da key musical e testes automatizados.
 > A referência visual da aplicação é o canvas de `1452×813`; o build e a suíte Catch2 podem ser reproduzidos pelos comandos abaixo.
