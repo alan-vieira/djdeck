@@ -202,11 +202,14 @@ if (DJDECK_ENABLE_TESTS)
         tests/test_crossfader.cpp
         tests/test_waveform.cpp
         tests/test_bpm_detector.cpp
+        tests/test_deckheader.cpp
 
         # Implementacoes do projeto necessarias pelos testes
         Source/Song.cpp
         Source/DeckPlayer.cpp
         Source/CrossfaderComponent.cpp
+        Source/CamelotKeyComponent.cpp
+        Source/DeckHeaderComponent.cpp
 
         # O detector de BPM por analise de audio (usa juce::dsp::FFT).
         Source/BpmDetector.cpp

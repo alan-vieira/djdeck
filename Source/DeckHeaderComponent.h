@@ -7,11 +7,8 @@
 //==============================================================================
 // Cabecalho do deck: informacoes da faixa carregada.
 //
-//   ┌────────────────────────────────────────────────────────────┐
-//   │ (1)  Título da Faixa                   ╭───╮   [SYNC][MASTER]
-//   │      Artista                           │ 3A│                │
-//   │                            -05:10.5   ╰───╯   00:03.2    │
-//   └────────────────────────────────────────────────────────────┘
+// Top Row: Deck Number (18px icon), Title (16px), KEY SYNC (button)
+// Bottom Row: Artist (13px), BPM (16px), Tom (16px), Remaining/Elapsed (11px)
 //
 // | Elemento            | Posicao      | Estilo                       |
 // |---------------------|--------------|------------------------------|
@@ -19,12 +16,12 @@
 // | Titulo              | apos numero  | 16 px, branco                |
 // | Artista             | abaixo       | 13 px, cinza                 |
 // | BPM                 | com a key    | 16 px, branco                |
-// | Tom (Camelot wheel) | com o BPM    | roda de 12 segmentos         |
+// | Tom (Classical Key) | com o BPM    | 16 px, cinza                | <-- NEW: Tom em coluna separada
 // | Tempo decorrido     | rodape       | 11 px, cinza                 |
 // | Contagem regressiva | rodape       | 11 px, cinza                 |
 // | Duracao da faixa    | rodape       | 11 px, cinza                 |
 // | SYNC                | topo direito | botao; azul quando ativo     |
-// | MASTER              | ao lado      | laranja quando ativo         |
+// | MASTER              | abaixo SYNC | laranja quando ativo         |
 //
 // Ver docs/DOCUMENTACAO_LAYOUT_UI.md §7.1.
 class DeckHeaderComponent : public juce::Component,
@@ -40,21 +37,12 @@ public:
     // Button::Listener
     void buttonClicked (juce::Button* button) override;
 
-    // Metadados da faixa. Titulo, artista, BPM e key ainda nao vem do
-    // TagLib — a deteccao de BPM e a leitura de metadados estao pendentes
-    // (ver docs/ROADMAP.md). Enquanto isso, os valores sao placeholders.
+    // Metadados da faixa.
     void setTrackTitle (const juce::String& title);
     void setTrackArtist (const juce::String& artist);
     void setBpm (double bpm);
-
-    // Tom musical. Aceita a notacao classica ("C#m", "Eb") e converte para
-    // Camelot, que e o formato deHarmonia usado em software de DJ.
-    void setKey (const juce::String& key);
-
-    // Tempos, em segundos:
-    //   elapsed   — tempo decorrido desde o inicio
-    //   remaining — contagem regressiva ate o fim da faixa
-    //   duration  — duracao total da faixa
+    void setKey (const juce::String& key); // Set para o badge Camelot
+    void setRawKey (const juce::String& key); // NEW: Set para a coluna Tom (classical notation)
     void setTimes (double elapsed, double remaining, double duration);
 
     // Estado dos botoes.
@@ -71,6 +59,7 @@ public:
 
 private:
     void drawDeckBadge (juce::Graphics& g, const juce::Rectangle<int>& area);
+    void drawArtworkPlaceholder (juce::Graphics& g, const juce::Rectangle<int>& area);
 
     int deckId;
     bool isDeck2;
@@ -79,23 +68,25 @@ private:
     juce::String trackTitle { "Sem faixa" };
     juce::String trackArtist;
     double bpm = 0.0;
+    juce::String trackKey; // NEW: Armazena a chave musical (clássica ou Camelot)
 
     double elapsedSeconds = 0.0;
     double remainingSeconds = 0.0;
     double durationSeconds = 0.0;
+
+    juce::Rectangle<int> deckNumberArea;
+    juce::Rectangle<int> artworkArea;
+    juce::Rectangle<int> titleArea;
+    juce::Rectangle<int> artistArea;
+    juce::Rectangle<int> bpmArea;
+    juce::Rectangle<int> tomArea; // NEW: Area para a coluna Tom
+    juce::Rectangle<int> timerArea;
 
     juce::TextButton syncButton { "SYNC" };
     juce::TextButton masterButton { "MASTER" };
 
     // Roda do tom musical (Camelot).
     CamelotKeyComponent camelotKey;
-
-    // Areas de desenho dos elementos de texto (calculadas em resized())
-    juce::Rectangle<int> deckNumberArea;
-    juce::Rectangle<int> titleArea;
-    juce::Rectangle<int> artistArea;
-    juce::Rectangle<int> bpmArea;
-    juce::Rectangle<int> timerArea;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeckHeaderComponent)
 };

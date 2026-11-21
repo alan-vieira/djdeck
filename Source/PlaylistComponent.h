@@ -60,8 +60,9 @@ public:
     const Song* getSelectedSong() const;
 
     // Callback chamado quando o usuário seleciona uma faixa para carregar em um deck.
-    // Parâmetros: URL, BPM, título, artista e ID do deck alvo (1 = deck 1, padrão).
-    std::function<void(juce::URL, double, const juce::String&, const juce::String&, int)> onSongSelected;
+    // Parâmetros: URL, BPM, título, artista, tom musical e ID do deck alvo (1 = deck 1, padrão).
+    std::function<void(juce::URL, double, const juce::String&, const juce::String&,
+                       const juce::String&, int)> onSongSelected;
 
     // Carrega a faixa de um índice (usado no duplo-clique)
     void loadSongAtRow(int row);

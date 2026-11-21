@@ -203,8 +203,6 @@ void DeckComponent::resized()
                                      : djdeck::layout::figmaNodejog2::yPx;
     auto jogNodeW = ! mirrored ? djdeck::layout::figmaNodejog1::widthPx
                                      : djdeck::layout::figmaNodejog2::widthPx;
-    auto jogNodeH = ! mirrored ? djdeck::layout::figmaNodejog1::heightPx
-                                     : djdeck::layout::figmaNodejog2::heightPx;
 
     const auto jogRelX = static_cast<int> (jogNodeX - deckAbsX);
     const auto jogRelY = static_cast<int> (jogNodeY - deckAbsY);
@@ -299,7 +297,8 @@ bool DeckComponent::isInterestedInFileDrag (const juce::StringArray& files)
 void DeckComponent::filesDropped (const juce::StringArray& files, int, int)
 {
     if (files.size() == 1)
-        loadFileURL (juce::URL { juce::File { files[0] } }, 0.0, juce::String(), juce::String());
+        loadFileURL (juce::URL { juce::File { files[0] } },
+                     0.0, juce::String(), juce::String(), juce::String());
 }
 
 //==============================================================================
@@ -339,7 +338,7 @@ void DeckComponent::itemDropped (const juce::DragAndDropTarget::SourceDetails& d
     {
         if (payload->file.existsAsFile())
             loadFileURL (juce::URL { payload->file }, payload->bpm,
-                         payload->title, payload->artist);
+                         payload->title, payload->artist, payload->key);
         // Notificar a big waveform para que ela exiba o track.
         // O drag and drop ignora o caminho do double-click, mas a big
         // waveform e notificada via onTrackLoaded definido pelo MainComponent.
@@ -389,24 +388,27 @@ void DeckComponent::loadFile (juce::URL audioURL, double bpm)
     jogWheel.setBpm (bpm);
     header.setBpm (bpm);
 
-    loadFileURL (audioURL, bpm, juce::String(), juce::String());
+    loadFileURL (audioURL, bpm, juce::String(), juce::String(), juce::String());
 }
 
 void DeckComponent::loadFile (juce::URL audioURL, double bpm,
-                              const juce::String& title, const juce::String& artist)
+                              const juce::String& title, const juce::String& artist,
+                              const juce::String& key)
 {
-    juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFile(url,bpm,title,artist) called with bpm=" + juce::String (bpm, 2) + " title=" + title);
+    juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFile(url,bpm,title,artist,key) called with bpm="
+                              + juce::String (bpm, 2) + " title=" + title);
 
     if (player != nullptr)
         player->setBpm (bpm);
     jogWheel.setBpm (bpm);
     header.setBpm (bpm);
 
-    loadFileURL (audioURL, bpm, title, artist);
+    loadFileURL (audioURL, bpm, title, artist, key);
 }
 
 void DeckComponent::loadFileURL (juce::URL audioURL, double bpm,
-                              const juce::String& title, const juce::String& artist)
+                              const juce::String& title, const juce::String& artist,
+                              const juce::String& key)
 {
     if (player == nullptr)
         return;
@@ -437,17 +439,21 @@ void DeckComponent::loadFileURL (juce::URL audioURL, double bpm,
     // à detecção por análise de áudio.
     auto localTitle = title;
     auto localArtist = artist;
-    if (player->getBpm() <= 0.0)
+    auto localKey = key;
+    if (player->getBpm() <= 0.0 || localTitle.isEmpty() || localArtist.isEmpty() || localKey.isEmpty())
     {
         TagLibReader tagReader;
         auto metadata = tagReader.readMetadata (audioURL.getLocalFile());
-        if (metadata.isValid && metadata.bpm > 0.0)
+        if (metadata.isValid)
         {
-            player->setBpm (metadata.bpm);
+            if (player->getBpm() <= 0.0 && metadata.bpm > 0.0)
+                player->setBpm (metadata.bpm);
             if (localTitle.isEmpty())
                 localTitle = metadata.title;
             if (localArtist.isEmpty())
                 localArtist = metadata.artist;
+            if (localKey.isEmpty())
+                localKey = metadata.key;
         }
     }
 
@@ -460,6 +466,8 @@ void DeckComponent::loadFileURL (juce::URL audioURL, double bpm,
     // Usa os metadados reais do TagLib quando disponiveis; caso contrario, o nome do arquivo.
     header.setTrackTitle (localTitle.isNotEmpty() ? localTitle : juce::File (audioURL.getLocalFile()).getFileNameWithoutExtension());
     header.setTrackArtist (localArtist);
+    header.setKey (localKey);
+    header.setRawKey (localKey);
     header.setBpm (player->getBpm());
 
     juce::Logger::writeToLog ("[DIAG] DeckComponent::loadFileURL finished, player->getBpm()=" + juce::String (player->getBpm(), 2));

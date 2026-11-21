@@ -75,6 +75,7 @@ namespace colours {
     inline const juce::Colour Accent = juce::Colour(0xff007DE1);
     inline const juce::Colour Selection = juce::Colour(0xff052E64);
     inline const juce::Colour Hover = juce::Colour(0xff2A2A2A);
+    inline const juce::Colour Artwork = juce::Colour(0xff156082);
     // djSemantics
     inline const juce::Colour Loop = juce::Colour(0xffFF8C00);
     inline const juce::Colour Cue = juce::Colour(0xffA63031);
@@ -157,6 +158,10 @@ namespace deckHeader {
     constexpr int heightPx = 44;
     constexpr int DecknumberWidthPx  = 7;
     constexpr int DecknumberHeightPx = 17;
+    constexpr int ArtworkWidthPx  = 36;
+    constexpr int ArtworkHeightPx = 36;
+    constexpr int ArtworkXpx = 28;
+    constexpr int ArtworkYpx = 2;
     constexpr int TitleWidthPx  = 161;
     constexpr int TitleHeightPx = 18;
     constexpr int ArtistWidthPx  = 58;
@@ -167,8 +172,10 @@ namespace deckHeader {
     constexpr int ElapsedtimeHeightPx = 17;
     constexpr int RemainingtimeWidthPx  = 61;
     constexpr int RemainingtimeHeightPx = 17;
-    constexpr int SyncWidthPx  = 39;
-    constexpr int SyncHeightPx = 32;
+    constexpr int SyncWidthPx  = 64;
+    constexpr int SyncHeightPx = 20;
+    constexpr int MasterWidthPx  = 64;
+    constexpr int MasterHeightPx = 20;
     constexpr int CamelotkeyWidthPx  = 41;
     constexpr int CamelotkeyHeightPx = 32;
 }

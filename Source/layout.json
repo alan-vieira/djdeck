@@ -664,7 +664,8 @@
     "states": {
       "accent": "#007DE1",
       "selection": "#052E64",
-      "hover": "#2A2A2A"
+      "hover": "#2A2A2A",
+      "artwork": "#156082"
     },
     "djSemantics": {
       "loop": "#FF8C00",
@@ -758,8 +759,16 @@
           "heightPx": 17
         },
         {
-          "id": "title",
+          "id": "artwork",
           "position": "afterDeckNumber",
+          "xPx": 28,
+          "yPx": 2,
+          "widthPx": 36,
+          "heightPx": 36
+        },
+        {
+          "id": "title",
+          "position": "afterArtwork",
           "widthPx": 161,
           "heightPx": 18
         },
@@ -790,12 +799,14 @@
         {
           "id": "sync",
           "position": "topRightColumn",
-          "widthPx": 39,
-          "heightPx": 32
+          "widthPx": 64,
+          "heightPx": 20
         },
         {
           "id": "master",
-          "position": "besideSync"
+          "position": "belowSync",
+          "widthPx": 64,
+          "heightPx": 20
         },
         {
           "id": "camelotKey",

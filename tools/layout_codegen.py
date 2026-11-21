@@ -197,6 +197,10 @@ def generate_header(spec):
                 out.append(f"    constexpr int {cpp_name}WidthPx  = {el['widthPx']};")
             if "heightPx" in el:
                 out.append(f"    constexpr int {cpp_name}HeightPx = {el['heightPx']};")
+            if "xPx" in el:
+                out.append(f"    constexpr int {cpp_name}Xpx = {el['xPx']};")
+            if "yPx" in el:
+                out.append(f"    constexpr int {cpp_name}Ypx = {el['yPx']};")
         out.append(f"}}")
     if "transport" in dk:
         out.append(f"namespace deckTransport {{")

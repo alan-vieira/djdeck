@@ -1813,9 +1813,10 @@ fracões de batida (1/8, 1/4, 1/2, 1, 2, 4, 8) em vez de letras.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ (1)  Título da Faixa                          [SYNC] [MASTER]│
+│ (1)  Título da Faixa                            [SYNC]     │
 │      Artista                                     140.00  Gm │
 │                                          -05:10.5  00:00.4 │
+│                                                    [MASTER] │
 └────────────────────────────────────────────────────────────┘
 ```
 
@@ -1828,7 +1829,7 @@ fracões de batida (1/8, 1/4, 1/2, 1, 2, 4, 8) em vez de letras.
 | Tempo decorrido | abaixo | 11 px, cinza |
 | Tempo restante | abaixo | 11 px, cinza |
 | SYNC | topo direito, coluna | botão retangular; azul quando ativo |
-| MASTER | ao lado do SYNC | laranja quando ativo |
+| MASTER | abaixo do SYNC, mesma coluna | laranja quando ativo |
 
 ### 7.2 Layout do deck
 

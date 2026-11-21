@@ -344,7 +344,7 @@ juce::var PlaylistComponent::getDragSourceDescription (const juce::SparseSet<int
         return {};
 
     const auto& song = songs.getReference (row);
-    return juce::var (new PlaylistDragPayload (song.file, song.bpm, song.title, song.artist));
+    return juce::var (new PlaylistDragPayload (song.file, song.bpm, song.title, song.artist, song.key));
 }
 
 //==============================================================================
@@ -355,10 +355,10 @@ void PlaylistComponent::loadSongAtRow(int row)
 
     const auto& song = songs.getReference (row);
 
-    // O duplo-clique carrega no Deck 1. Passamos também o BPM, título e artista
-    // lidos pelo TagLib, para o deck exibir metadados reais no cabeçalho.
+    // O duplo-clique carrega no Deck 1. Passamos também o BPM, título, artista
+    // e tom lidos pelo TagLib, para o deck exibir metadados reais no cabeçalho.
     if (onSongSelected)
-        onSongSelected (juce::URL { song.file }, song.bpm, song.title, song.artist, 1);
+        onSongSelected (juce::URL { song.file }, song.bpm, song.title, song.artist, song.key, 1);
 }
 
 //==============================================================================

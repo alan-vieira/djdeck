@@ -25,11 +25,13 @@ public:
     PlaylistDragPayload (juce::File fileToUse,
                          double bpmToUse = 0.0,
                          juce::String titleToUse = {},
-                         juce::String artistToUse = {})
+                         juce::String artistToUse = {},
+                         juce::String keyToUse = {})
         : file (std::move (fileToUse)),
           bpm (bpmToUse),
           title (std::move (titleToUse)),
-          artist (std::move (artistToUse))
+          artist (std::move (artistToUse)),
+          key (std::move (keyToUse))
     {
     }
 
@@ -37,6 +39,7 @@ public:
     double bpm = 0.0;
     juce::String title;
     juce::String artist;
+    juce::String key;
 
     static bool isPayload (const juce::var& value)
     {

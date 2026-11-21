@@ -81,19 +81,13 @@ public:
     // Chamado pela playlist para carregar uma faixa neste deck.
     void loadFile(juce::URL audioURL, double bpm);
     void loadFile(juce::URL audioURL, double bpm,
-                  const juce::String& title, const juce::String& artist);
+                  const juce::String& title, const juce::String& artist, const juce::String& key);
 
     // Notificado sempre que uma faixa e carregada neste deck, por QUALQUER
     // caminho (duplo-clique, arrastar-soltar, arquivos do sistema).
-    //
-    // O MainComponent usa isto para sincronizar a big waveform do topo.
-    // Um callback (e nao um cast para o componente pai) evita include
-    // circular: DeckComponent.h nao conhece MainComponent.
     std::function<void (int deckId, const juce::URL&)> onTrackLoaded;
 
     // Notificado quando o BPM desta faixa e detectado por analise de audio.
-    // Mesmo padrao de onTrackLoaded (callback em vez de cast para o pai) para
-    // nao criar include circular entre DeckComponent e a biblioteca.
     std::function<void (int deckId, double bpm)> onBpmDetected;
 
     DeckPlayer* getPlayer() const { return player; }
@@ -102,7 +96,7 @@ public:
 private:
     void loadFileURL (juce::URL audioURL, double bpm = 0.0,
                       const juce::String& title = {},
-                      const juce::String& artist = {});
+                      const juce::String& artist = {}, const juce::String& key = {});
     void updateHeaderTimes();
 
     int id;

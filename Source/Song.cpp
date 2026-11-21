@@ -1,12 +1,12 @@
 #include "Song.h"
+#include <cmath>
 
 Song::Song(const juce::File& f)
     : file(f),
       title(f.getFileNameWithoutExtension()),
       artist("Artista desconhecido"),
       lengthInSeconds(0.0)
-{
-}
+{}
 
 juce::String Song::getDisplayName() const
 {
@@ -18,8 +18,6 @@ juce::String Song::getDisplayName() const
 //==============================================================================
 void Song::applyMetadata (const TrackMetadata& metadata)
 {
-    // O titulo e o artista so sao substituidos quando o arquivo realmente os
-    // tem — caso contrario o nome do arquivo (que o Song ja traz) e melhor.
     if (metadata.title.isNotEmpty())
         title = metadata.title;
 
@@ -28,7 +26,7 @@ void Song::applyMetadata (const TrackMetadata& metadata)
 
     album = metadata.album;
     genre = metadata.genre;
-    key = metadata.key;
+    key = metadata.key; // FIXED: Use public member
     year = metadata.year;
     trackNumber = metadata.trackNumber;
     bpm = metadata.bpm;

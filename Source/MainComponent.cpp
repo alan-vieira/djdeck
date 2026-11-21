@@ -58,15 +58,17 @@ MainComponent::MainComponent()
     // caminho e nao ha risco de a big waveform ficar dessincronizada.
     library->getTrackList().onSongSelected = [this] (const juce::URL& url, double bpm,
                                                      const juce::String& title,
-                                                     const juce::String& artist, int targetDeckId)
+                                                     const juce::String& artist,
+                                                     const juce::String& key,
+                                                     int targetDeckId)
     {
         if (targetDeckId == 1 && deck1 != nullptr)
         {
-            deck1->loadFile (url, bpm, title, artist);
+            deck1->loadFile (url, bpm, title, artist, key);
         }
         else if (targetDeckId == 2 && deck2 != nullptr)
         {
-            deck2->loadFile (url, bpm, title, artist);
+            deck2->loadFile (url, bpm, title, artist, key);
         }
     };
 
